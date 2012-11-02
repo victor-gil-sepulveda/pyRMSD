@@ -1,13 +1,7 @@
-import pyRMSD_cfuncs
-import numpy
-from prody.proteins import parsePDB
-from prody.ensemble import PDBEnsemble
-from prody import *
-import sys
 from math import fabs
 import time
-import RMSD as python_pure_functions
-import utils
+import pyRMSD.RMSD as python_pure_functions
+import pyRMSD.utils
 
 #################
 # Assertion
@@ -56,8 +50,8 @@ expected_rmsd = {0:[ 0.60179184,  0.70814575,  0.88785042,  0.92862096,  0.69024
 #######################
 # READING COORDINATES
 ######################
-coordsets,number_of_conformations,number_of_atoms = utils.getCoorsetsFromPDB('amber_mini.pdb')
-np_coords = utils.flattenCoords(coordsets)
+coordsets,number_of_conformations,number_of_atoms = pyRMSD.utils.getCoorsetsFromPDB('amber_mini.pdb')
+np_coords = pyRMSD.utils.flattenCoords(coordsets)
 ########################
 ## TESTING PYTHON FUNCTIONS
 #######################
@@ -68,9 +62,9 @@ checkRMSDs(rmsd, expected_rmsd_data)
 #######################
 # TESTING CUDA
 ######################
-print "Testing CUDA serial:"
-rmsd =  pyRMSD_cfuncs.calculateRMSDCondensedMatrix(2,np_coords, number_of_atoms, number_of_conformations)
-checkRMSDs(rmsd, expected_rmsd_data, 0.0001)
+#print "Testing CUDA serial:"
+#rmsd =  python_pure_functions.calculateRMSDCondensedMatrix(coordsets,"CUDA_CALCULATOR")
+#checkRMSDs(rmsd, expected_rmsd_data, 0.0001)
 
 
 #######################
@@ -79,8 +73,8 @@ checkRMSDs(rmsd, expected_rmsd_data, 0.0001)
 #######################
 # READING COORDINATES
 ######################
-coordsets,number_of_conformations,number_of_atoms = utils.getCoorsetsFromPDB('amber_short.pdb')
-np_coords = utils.flattenCoords(coordsets)
+coordsets,number_of_conformations,number_of_atoms = pyRMSD.utils.getCoorsetsFromPDB('amber_short.pdb')
+np_coords = pyRMSD.utils.flattenCoords(coordsets)
 #######################
 # TEST SERIAL
 ######################
@@ -92,11 +86,11 @@ for conf_num in expected_rmsd:
 #######################
 # TEST CUDA
 ######################
-print "Testing Cuda:"
-for conf_num in expected_rmsd:
-    rmsd = python_pure_functions.oneVsTheOthers(conf_num,coordsets,"CUDA_CALCULATOR")
-    print "Conf. ",conf_num, " ", 
-    checkRMSDs(rmsd, expected_rmsd[conf_num])
+#print "Testing Cuda:"
+#for conf_num in expected_rmsd:
+#    rmsd = python_pure_functions.oneVsTheOthers(conf_num,coordsets,"CUDA_CALCULATOR")
+#    print "Conf. ",conf_num, " ", 
+#    checkRMSDs(rmsd, expected_rmsd[conf_num])
 #######################
 # TEST OPENMP
 ######################
@@ -129,9 +123,9 @@ checkRMSDs(rmsd, expected_serial_matrix)
 #######################
 # TEST CUDA MATRIX
 ######################
-print "Testing CUDA Matrix Generation:"
-rmsd = python_pure_functions.calculateRMSDCondensedMatrix(coordsets,"CUDA_CALCULATOR")
-checkRMSDs(rmsd, expected_serial_matrix)
+#print "Testing CUDA Matrix Generation:"
+#rmsd = python_pure_functions.calculateRMSDCondensedMatrix(coordsets,"CUDA_CALCULATOR")
+#checkRMSDs(rmsd, expected_serial_matrix)
 #######################
 # TEST OMP MATRIX
 ######################
@@ -145,8 +139,8 @@ checkRMSDs(rmsd, expected_serial_matrix)
 ######################
 print "Loading file..."
 t1 = time.time()
-coordsets,number_of_conformations,number_of_atoms = utils.getCoorsetsFromPDB('amber_long.pdb')
-np_coords = utils.flattenCoords(coordsets)
+coordsets,number_of_conformations,number_of_atoms = pyRMSD.utils.getCoorsetsFromPDB('amber_long.pdb')
+np_coords = pyRMSD.utils.flattenCoords(coordsets)
 t2 = time.time()
 print 'Loading took %0.3f s' % (t2-t1)
 
