@@ -3,9 +3,12 @@ import numpy
 import pyRMSD_cfuncs
 from utils import flattenCoords
 
+def availableCalculators():
+    return {"PYTHON_CALCULATOR":-1,"SERIAL_CALCULATOR":0,"OMP_CALCULATOR":1,\
+            "THEOBALD_CUDA_CALCULATOR":2,"THEOBALD_SERIAL_CALCULATOR":3,"THEOBALD_SERIAL_OMP_CALCULATOR":4}
+
 def oneVsTheOthers(target,coordsets,calcType = "PYTHON_CALCULATOR"):
-    calculators = {"PYTHON_CALCULATOR":-1,"SERIAL_CALCULATOR":0,"OMP_CALCULATOR":1,"CUDA_CALCULATOR":2}
-    if not calcType in calculators:
+    if not calcType in availableCalculators():
         print "Calculator ",calcType, " is not a calculator."
         return []
     
@@ -21,13 +24,12 @@ def oneVsTheOthers(target,coordsets,calcType = "PYTHON_CALCULATOR"):
         __oneVsTheOthers(target,coordsets[conf_num+1:],rmsd)
         return rmsd
     else:
-        return pyRMSD_cfuncs.oneVsTheOthers(calculators[calcType],np_coords, number_of_atoms, conf_num, number_of_conformations)
+        return pyRMSD_cfuncs.oneVsTheOthers(availableCalculators()[calcType],np_coords, number_of_atoms, conf_num, number_of_conformations)
     
     return []
 
 def calculateRMSDCondensedMatrix(coordsets,calcType = "PYTHON_CALCULATOR"):
-    calculators = {"PYTHON_CALCULATOR":-1,"SERIAL_CALCULATOR":0,"OMP_CALCULATOR":1,"CUDA_CALCULATOR":2}
-    if not calcType in calculators:
+    if not calcType in availableCalculators():
         print "Calculator ",calcType, " is not a calculator."
         return []
     
@@ -38,11 +40,9 @@ def calculateRMSDCondensedMatrix(coordsets,calcType = "PYTHON_CALCULATOR"):
     if calcType == "PYTHON_CALCULATOR":
         return __calculateRMSDCondensedMatrix(coordsets)
     else:
-        return pyRMSD_cfuncs.calculateRMSDCondensedMatrix(calculators[calcType],np_coords, number_of_atoms, number_of_conformations)
+        return pyRMSD_cfuncs.calculateRMSDCondensedMatrix(availableCalculators()[calcType],np_coords, number_of_atoms, number_of_conformations)
     
     return []
-
-
 
 def __calculateRMSDCondensedMatrix(coordsets):
     rmsd_data = []

@@ -12,7 +12,6 @@
 class PyArrayObject;
 
 int      not_doublevector(PyArrayObject *vec);
-double** ptrvector(long n);
 double*  pyvector_to_Carrayptrs(PyArrayObject *arrayin);
 
 #endif /* NUMPYHELPERFUNCS_H_ */

@@ -17,6 +17,7 @@ class RMSD{
 		int atomsPerConformation;
 		int coordinatesPerConformation;
 		double* allCoordinates;
+
 	private:
 		RMSD(const RMSD& r){}
 };

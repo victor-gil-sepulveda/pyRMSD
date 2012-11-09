@@ -2,18 +2,21 @@
 #include <numpy/arrayobject.h>
 #include "NumpyHelperFuncs.h"
 #include "../serial/RMSDSerial.h"
-#include "../cuda/RMSDCUDA.cuh"
+#include "../serial/RMSDomp.h"
+#include "../theobald/ThRMSDCuda.cuh"
+#include "../theobald/ThRMSDSerial.h"
+#include "../theobald/ThRMSDSerialOmp.h"
 #include <omp.h>
-
 #include <vector>
 #include <iostream>
-#include "../serial/RMSDomp.h"
 using namespace std;
 
 enum calcType{
 	SERIAL_CALCULATOR = 0,
 	OPENMP_CALCULATOR,
-	CUDA_CALCULATOR
+	THEOBALD_CUDA_CALCULATOR,
+	THEOBALD_SERIAL_CALCULATOR,
+	THEOBALD_SERIAL_OMP_CALCULATOR
 };
 
 void parse_params_for_one_vs_others(PyObject *args, calcType& cType,
@@ -83,8 +86,10 @@ PyArrayObject* embed_rmsd_data(vector<double>& rmsd){
 	return rmsds_list_obj;
 }
 
-RMSD* getCalculator(calcType cType,int numberOfConformations, int atomsPerConformation, double* Coordinates){
+RMSD* getCalculator(calcType cType, int numberOfConformations, int atomsPerConformation, double* Coordinates){
+
 	switch(cType){
+
 		case SERIAL_CALCULATOR:
 			return new RMSDSerial(numberOfConformations,atomsPerConformation,Coordinates);
 			break;
@@ -93,8 +98,16 @@ RMSD* getCalculator(calcType cType,int numberOfConformations, int atomsPerConfor
 			return new RMSDomp(numberOfConformations,atomsPerConformation,Coordinates);
 			break;
 
-		case CUDA_CALCULATOR:
-			return new RMSDCuda(numberOfConformations,atomsPerConformation,Coordinates);
+		case THEOBALD_CUDA_CALCULATOR:
+			return new ThRMSDCuda(numberOfConformations, atomsPerConformation, Coordinates, 32, 8);
+			break;
+
+		case THEOBALD_SERIAL_CALCULATOR:
+			return new ThRMSDSerial(numberOfConformations,atomsPerConformation,Coordinates);
+			break;
+
+		case THEOBALD_SERIAL_OMP_CALCULATOR:
+			return new ThRMSDSerialOmp(numberOfConformations,atomsPerConformation,Coordinates);
 			break;
 
 		default:
@@ -140,7 +153,6 @@ static PyObject* calculateRMSDCondensedMatrix(PyObject *self, PyObject *args){
 
 	return PyArray_Return(rmsds_list_obj);
 }
-
 
 static PyMethodDef pyRMSDMethods[] = {
     {"oneVsTheOthers",  oneVsTheOthers, METH_VARARGS,""},
