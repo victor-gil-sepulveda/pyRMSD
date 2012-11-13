@@ -1,5 +1,4 @@
 import numpy.linalg
-import numpy
 import pyRMSD_cfuncs
 from utils import flattenCoords
 from pyRMSD.Calculators import availableCalculators
@@ -7,7 +6,7 @@ from pyRMSD.Calculators import availableCalculators
 def oneVsTheOthers(target,coordsets,calcType = "PYTHON_CALCULATOR"):
     if not calcType in availableCalculators():
         print "Calculator ",calcType, " is not a calculator."
-        return []
+        raise  KeyError
     
     # TODO: Check for availability of the device ie. CUDA
     number_of_conformations = len(coordsets)
@@ -28,7 +27,7 @@ def oneVsTheOthers(target,coordsets,calcType = "PYTHON_CALCULATOR"):
 def calculateRMSDCondensedMatrix(coordsets,calcType = "PYTHON_CALCULATOR"):
     if not calcType in availableCalculators():
         print "Calculator ",calcType, " is not a calculator."
-        return []
+        raise KeyError
     
     # TODO: Check for availability of the device ie. CUDA
     number_of_conformations = len(coordsets)

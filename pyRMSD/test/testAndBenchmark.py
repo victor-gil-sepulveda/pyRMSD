@@ -5,6 +5,9 @@ import pyRMSD.utils
 import bz2
 import os
 
+
+using_cuda = True
+
 #################
 # Assertion
 ################
@@ -101,10 +104,13 @@ for conf_num in expected_rmsd:
     rmsd = python_pure_functions.oneVsTheOthers(conf_num,coordsets,"THEOBALD_SERIAL_OMP_CALCULATOR")
     checkRMSDs(rmsd, expected_rmsd[conf_num])
 print "Testing Theobald CUDA:"
-for conf_num in expected_rmsd:
-    rmsd = python_pure_functions.oneVsTheOthers(conf_num,coordsets,"THEOBALD_CUDA_CALCULATOR")
-    checkRMSDs(rmsd, expected_rmsd[conf_num],precission=1e-4)
-
+try:
+    for conf_num in expected_rmsd:
+        rmsd = python_pure_functions.oneVsTheOthers(conf_num,coordsets,"THEOBALD_CUDA_CALCULATOR")
+        checkRMSDs(rmsd, expected_rmsd[conf_num],precission=1e-4)
+except KeyError:
+    print "THEOBALD_CUDA_CALCULATOR is not defined."
+    using_cuda = False
 
 #######################
 # MEDIUM TEST, WHOLE MATRIX
@@ -142,8 +148,11 @@ checkRMSDs(rmsd, expected_serial_matrix)
 # TEST THEOBALD CUDA MATRIX
 #############################
 print "Testing Theobald CUDA Matrix Generation:"
-rmsd = python_pure_functions.calculateRMSDCondensedMatrix(coordsets,"THEOBALD_CUDA_CALCULATOR")
-checkRMSDs(rmsd, expected_serial_matrix,precission=1e-4)
+try:
+    rmsd = python_pure_functions.calculateRMSDCondensedMatrix(coordsets,"THEOBALD_CUDA_CALCULATOR")
+    checkRMSDs(rmsd, expected_serial_matrix,precission=1e-4)
+except KeyError:
+    print "THEOBALD_CUDA_CALCULATOR is not defined."
 
 ######################
 # BENCHMARKING
@@ -160,15 +169,14 @@ np_coords = pyRMSD.utils.flattenCoords(coordsets)
 t2 = time.time()
 print 'Loading took %0.3f s' % (t2-t1)
 
-#big_data = open("big_data","w")
-#for x in np_coords:
-#    big_data.write("%.3f\n"%x)
-#big_data.close()
-
 #######################
 # CALCULATION
 #####################
-types = {"THEOBALD_SERIAL_CALCULATOR", "THEOBALD_SERIAL_OMP_CALCULATOR", "THEOBALD_CUDA_CALCULATOR", "OMP_CALCULATOR"} #PYTHON_CALCULATOR
+types = ["THEOBALD_SERIAL_CALCULATOR", "THEOBALD_SERIAL_OMP_CALCULATOR", "OMP_CALCULATOR"] #PYTHON_CALCULATOR
+
+if using_cuda:
+    types.append("THEOBALD_CUDA_CALCULATOR")
+
 precission = {"THEOBALD_SERIAL_CALCULATOR":1e-8, "THEOBALD_SERIAL_OMP_CALCULATOR":1e-8, "OMP_CALCULATOR":1e-8, "THEOBALD_CUDA_CALCULATOR":1e-4}
 rmsds = {}
 times = {}
