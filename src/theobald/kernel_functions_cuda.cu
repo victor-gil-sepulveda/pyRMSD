@@ -2,7 +2,22 @@
 
 #define floating_point_type float
 
-// Centers all conformations
+///////////////////////////////////////////////////////////////
+/// \remarks
+/// Uses one thread to center the coordinates an arbitrary large number of conformations based on the GPU block topology chosen.
+///
+/// \param 	number_of_conformations [In] The number of conformations stored in all_coordinates.
+///
+/// \param 	number_of_atoms [In] The number of atoms PER CONFORMATION.
+///
+/// \param 	all_coordinates [In/Out] An array containing all the coordinates of all the conformations of the
+///	trajectory, where the first conformation first atom coordinates are x = all_coordinates[0],
+/// y = all_coordinates[1], z = all_coordinates[2]; Second conformation's first atom's coordinates would be
+/// x = all_coordinates[number_of_atoms*3 + 0], y = all_coordinates[number_of_atoms*3 + 1] ... and so on.
+///
+/// \author victor_gil
+/// \date 05/10/2012
+///////////////////////////////////////////////////////////////
 __global__ void centerCoordsOfAllConformations(const int number_of_conformations, const int number_of_atoms, floating_point_type* all_coordinates){
 	int current_conformation_id = blockDim.x*blockIdx.x + threadIdx.x;
 	while(current_conformation_id < number_of_conformations){
@@ -13,8 +28,18 @@ __global__ void centerCoordsOfAllConformations(const int number_of_conformations
 	}
 }
 
-// Centers ONE conformation given by coords[number_of_conformation]
-// to be changed by coords[number_of_conformation*3*number_of_atoms_per_conformation]
+///////////////////////////////////////////////////////////////
+/// \remarks
+/// Uses one thread to center the coordinates of ONE conformation.
+///
+/// \param 	conformation_coordinates [In] Pointer to the starting point of this conformation's coordinates inside
+/// the array containing ALL the coordinates.
+///
+/// \param 	number_of_atoms [In] The number of atoms of this conformation.
+///
+/// \author victor_gil
+/// \date 05/10/2012
+///////////////////////////////////////////////////////////////
 __device__ void centerCoords( floating_point_type* conformation_coordinates, const int number_of_atoms){
     floating_point_type xsum = 0;
     floating_point_type ysum = 0;
@@ -34,6 +59,26 @@ __device__ void centerCoords( floating_point_type* conformation_coordinates, con
     }
 }
 
+
+///////////////////////////////////////////////////////////////
+/// \remarks
+/// Implements the 'inner product' operation of Douglas Theobald QCP superposition method (see : http://theobald.brandeis.edu/qcp/
+/// and "Rapid calculation of RMSDs using a quaternion-based characteristic polynomial."  Acta Crystallogr A 61(4):478-480
+/// for more info ).
+///
+/// \param 	A [In/Out] A 3x3 matrix (                blank space for a real explanation of this parameter)
+///
+/// \param 	first_conformation_coords [In] Array containing the coordinates of the reference conformation.
+///
+/// \param 	second_conformation_coords [In] Array containing the coordinates of the conformation to be measured.
+///
+/// \param 	number_of_atoms [In] Number of atoms of both conformations (must be the same, of course).
+///
+/// \return The E0 parameter (upper bound for max Eigenvalue).
+///
+/// \author victor_gil
+/// \date 05/10/2012
+///////////////////////////////////////////////////////////////
 __device__ floating_point_type innerProduct(floating_point_type* A, 
 											floating_point_type* first_conformation_coords, 
 											floating_point_type* second_conformation_coords, 
@@ -74,7 +119,21 @@ __device__ floating_point_type innerProduct(floating_point_type* A,
     return (G1 + G2) * 0.5;
 }
 
-// Calculates the rmsd of second over first conformations in 'innerProduct'
+///////////////////////////////////////////////////////////////
+/// \remarks
+///	This function ports the second part of Douglas Theobald QCP superposition method (see 'innerProduct').
+///
+/// \param 	A [In] A 3x3 matrix (more ?).
+///
+/// \param 	E0 [In] Upper bound for the maximum eigenvalue (?).
+///
+/// \param 	number_of_atoms [In] Number of atoms of conformations used to get A and E0.
+///
+/// \return The actual rmsd between both conformations.
+///
+/// \author victor_gil
+/// \date 05/10/2012
+///////////////////////////////////////////////////////////////
 __device__ floating_point_type calcRMSDForTwoConformationsWithTheobaldMethod(floating_point_type *A, 
 																			 const floating_point_type E0, 
 																			 const int number_of_atoms){
@@ -143,6 +202,21 @@ __device__ floating_point_type calcRMSDForTwoConformationsWithTheobaldMethod(flo
     return sqrt(fabs(2.0f * (E0 - mxEigenV)/number_of_atoms));
 }
 
+///////////////////////////////////////////////////////////////
+/// \remarks
+/// Wrapping function for Douglas Theobald QCP superposition method to calculate the RMSD for two conformations.
+///
+/// \param 	first_conformation_coords [In] Array containing the coordinates of the reference conformation.
+///
+/// \param 	second_conformation_coords [In] Array containing the coordinates of the conformation to be measured.
+///
+/// \param 	number_of_atoms [In] Number of atoms of both conformations (must be the same, of course).
+///
+/// \return The actual rmsd between both conformations.
+///
+/// \author victor_gil
+/// \date 05/10/2012
+///////////////////////////////////////////////////////////////
 __device__ floating_point_type calcRMSDOfTwoConformations(floating_point_type* first_conformation_coords, 
 									 			floating_point_type* second_conformation_coords, 
 									 			const int number_of_atoms){
@@ -152,6 +226,29 @@ __device__ floating_point_type calcRMSDOfTwoConformations(floating_point_type* f
 	return calcRMSDForTwoConformationsWithTheobaldMethod(A, E0, number_of_atoms);
 }
 
+///////////////////////////////////////////////////////////////
+/// \remarks
+/// Given a trajectory with N conformations stored in 'all_coordinates', it calculates the rmsd between the conformation
+/// with 'i' = 'base_conformation_id' and the conformations in the range [j+1,M). In this case it tries to do each of the 
+/// single rmsd measures in one thread.
+///
+/// \param 	all_coordinates [In] The array storing all coordinates for all conformations in order:
+/// (conf0_atom_0_x,conf0_atom_0_y,conf0_atom_0_z,conf0_atom_1_x,conf0_atom_1_y ... confN-1_atom_N_z)
+///
+/// \param 	base_conformation_id [In] The reference conformation id ('i' in the above explanation).
+///
+/// \param 	other_conformations_starting_id [In] The value of j in the above explanation.
+///
+/// \param 	number_of_conformations [In] Number of conformations stored in the coordinates array.
+///
+/// \param 	number_of_atoms [In] Number of atoms of any of the conformations.
+///
+/// \param 	rmsd [In] Array where the rmsds are stored (rmsd[j]  is the rmsd between conformation 'i' and
+///	conformation 'j').
+///
+/// \author victor_gil
+/// \date 05/10/2012
+///////////////////////////////////////////////////////////////
 __global__ void calcRMSDOfOneVsOthers(floating_point_type* all_coordinates,
 									 const int base_conformation_id,
 									 const int other_conformations_starting_id,

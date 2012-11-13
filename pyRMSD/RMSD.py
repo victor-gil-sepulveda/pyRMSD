@@ -2,10 +2,7 @@ import numpy.linalg
 import numpy
 import pyRMSD_cfuncs
 from utils import flattenCoords
-
-def availableCalculators():
-    return {"PYTHON_CALCULATOR":-1,"SERIAL_CALCULATOR":0,"OMP_CALCULATOR":1,\
-            "THEOBALD_CUDA_CALCULATOR":2,"THEOBALD_SERIAL_CALCULATOR":3,"THEOBALD_SERIAL_OMP_CALCULATOR":4}
+from pyRMSD.Calculators import availableCalculators
 
 def oneVsTheOthers(target,coordsets,calcType = "PYTHON_CALCULATOR"):
     if not calcType in availableCalculators():

@@ -65,8 +65,8 @@ void ThRMSDSerialKernel::centerCoords( floating_point_type* conformation_coordin
 ///////////////////////////////////////////////////////////////
 /// \remarks
 /// Implements the 'inner product' operation of Douglas Theobald QCP superposition method (see : http://theobald.brandeis.edu/qcp/
-/// and "Rapid calculation of RMSDs using a quaternion-based characteristic polynomial."  Acta Crystallogr A 61(4):478-480.
-/// for more info.
+/// and "Rapid calculation of RMSDs using a quaternion-based characteristic polynomial."  Acta Crystallogr A 61(4):478-480
+/// for more info).
 ///
 /// \param 	A [In/Out] A 3x3 matrix (                blank space for a real explanation of this parameter)
 ///
@@ -203,7 +203,7 @@ floating_point_type ThRMSDSerialKernel::calcRMSDForTwoConformationsWithTheobaldM
 
 ///////////////////////////////////////////////////////////////
 /// \remarks
-/// Wrapping function for Douglas Theobald QCP superposition method to calculate the RMSD.
+/// Wrapping function for Douglas Theobald QCP superposition method to calculate the RMSD for two conformations.
 ///
 /// \param 	first_conformation_coords [In] Array containing the coordinates of the reference conformation.
 ///
@@ -237,7 +237,7 @@ floating_point_type ThRMSDSerialKernel::calcRMSDOfTwoConformations(	floating_poi
 ///
 /// \param 	other_conformations_starting_id [In] The value of j in the above explanation.
 ///
-/// \param 	number_of_conformations [In]
+/// \param 	number_of_conformations [In] Number of conformations stored in the coordinates array.
 ///
 /// \param 	number_of_atoms [In] Number of atoms of any of the conformations.
 ///

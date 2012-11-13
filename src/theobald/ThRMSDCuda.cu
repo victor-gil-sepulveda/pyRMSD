@@ -5,29 +5,64 @@ using namespace std;
 
 #define floating_point_type float
 
-inline void checkCudaError(char* id, cudaError_t error_code){
+///////////////////////////////////////////////////////////////
+/// \remarks
+///	Convenience function for CUDA error handling. It captures the error, writes a user-based message,
+/// and exits the program.
+///
+/// \param 	message [In] Message to print if something went wrong (usually calling CUDA function name).
+///
+/// \param 	error_code [In] CUDA error code (It may be 0 if everything is OK).
+///
+/// \author victor_gil
+/// \date 05/10/2012
+///////////////////////////////////////////////////////////////
+inline void checkCudaError(char* message, cudaError_t error_code){
 	if (error_code != 0){
-		cout<<"Error in "<<id<<" . Error code: "<<error_code<<". Exiting..."<<flush<<endl;
+		cout<<"Error in "<<message<<" . Error code: "<<error_code<<". Exiting..."<<flush<<endl;
 		exit(-1);
 	}
 }
 
+///////////////////////////////////////////////////////////////
+/// \remarks
+///	This function encapsulates initial CUDA queries to the GPU.
+///
+/// \author victor_gil
+/// \date 05/10/2012
+///////////////////////////////////////////////////////////////
 void ThRMSDCuda::cudaInit(){
 	cudaDeviceProp props;
 	int device;
-	cudaGetDevice(&device);
-	cudaGetDeviceProperties(&props, device);
+	checkCudaError("cudaGetDevice",cudaGetDevice(&device));
+	checkCudaError("cudaGetDeviceProperties",cudaGetDeviceProperties(&props, device));
 	
 	if(!props.deviceOverlap){
-		cout<<"No multiple streams"<<endl;
+		cout<<"There are no multiple streams, so this implementation may not work propperly :S"<<endl;
 	}
 }
 
+///////////////////////////////////////////////////////////////
+/// \remarks
+///	Class constructor. Allocates memory both in host and device, and initializes them.
+///
+/// \param 	numberOfConformations [In] Total number of conformations in the coordinates array.
+///
+/// \param 	atomsPerConformation [In] Number of atoms of every conformation.
+///
+/// \param 	coords [In] Coordinates array with numberOfConformations*atomsPerConformation*3 elements.
+///
+/// \param 	threads_per_block [In] Threads per block to be used in CUDA kernel calls.
+///
+/// \param 	number_of_blocks [In] Number of blocks to be used in CUDA kernel calls.
+///
+/// \author victor_gil
+/// \date 05/10/2012
+///////////////////////////////////////////////////////////////
 ThRMSDCuda::ThRMSDCuda(int numberOfConformations, int atomsPerConformation, double* coords, int threads_per_block, int number_of_blocks):
 				RMSD(numberOfConformations, atomsPerConformation, coords){
     
     cudaInit();
-    
     
 	int total_num_of_coords = this->numberOfConformations*this->atomsPerConformation*3;
     
@@ -63,6 +98,13 @@ ThRMSDCuda::ThRMSDCuda(int numberOfConformations, int atomsPerConformation, doub
     centerCoordsOfAllConformations<<<numberOfBlocks, threadsPerBlock>>>(numberOfConformations,atomsPerConformation,deviceCoords);
 }
 
+///////////////////////////////////////////////////////////////
+/// \remarks
+///	Class destructor. Frees memory.
+///
+/// \author victor_gil
+/// \date 05/10/2012
+///////////////////////////////////////////////////////////////
 ThRMSDCuda::~ThRMSDCuda(){
     checkCudaError(" deviceCoords cudaFree ", cudaFree(this->deviceCoords));
     checkCudaError(" deviceRMSDs cudaFree ", cudaFree(this->deviceRMSDs));
@@ -70,6 +112,17 @@ ThRMSDCuda::~ThRMSDCuda(){
     delete [] this->tmpHostCoords;
 }
 
+///////////////////////////////////////////////////////////////
+/// \remarks
+///	Implements a 'i' vs [i+1,M] rmsd conformation calculation, where M is the number of conformations.
+///
+/// \param 	conformation [In] Total number of conformations in the coordinates array.
+///
+/// \param 	rmsd_result [In/Out] Array where the rmsds will be stored (it needs to have the correct size!).
+///
+/// \author victor_gil
+/// \date 05/10/2012
+///////////////////////////////////////////////////////////////
 void ThRMSDCuda::oneVsTheOthers(int conformation, double* rmsd_result) {
 	if (conformation < numberOfConformations){
 	    calcRMSDOfOneVsOthers<<<numberOfBlocks,threadsPerBlock>>>(this->deviceCoords, conformation, conformation + 1, 
@@ -80,7 +133,7 @@ void ThRMSDCuda::oneVsTheOthers(int conformation, double* rmsd_result) {
 	    											   numberOfConformations * sizeof(floating_point_type), 
 	    											   cudaMemcpyDeviceToHost));
 	    
-	    // Do the copy to the output vector (need to have the correct size)
+	    // Do the copy to the output vector (needs to have the correct size)
 		int j = 0;
 		for (int i = conformation + 1; i < numberOfConformations;++i,++j){
 			rmsd_result[j] = (double) this->tmpHostRMSDs[i];
@@ -88,6 +141,16 @@ void ThRMSDCuda::oneVsTheOthers(int conformation, double* rmsd_result) {
 	}
 }
 
+///////////////////////////////////////////////////////////////
+/// \remarks
+///	Implements the calculation of the upper triangular matrix in row major format of the rmsd distance between all
+/// conformations stored in the coordinates.
+///
+/// \param 	rmsd [In/Out] Vector where the resulting RMSDs will be stored.
+///
+/// \author victor_gil
+/// \date 05/10/2012
+///////////////////////////////////////////////////////////////
 void ThRMSDCuda::calculateRMSDCondensedMatrix(vector<double>& rmsd){ 
 	
 	cudaStream_t copy_stream, execution_stream;
@@ -95,8 +158,9 @@ void ThRMSDCuda::calculateRMSDCondensedMatrix(vector<double>& rmsd){
 	cudaStreamCreate(&execution_stream);
 	
 	this->rmsdMatrixLen = (numberOfConformations*(numberOfConformations-1))/2;
-	checkCudaError("tmpHostRMSD cudaHostAlloc ", cudaHostAlloc((void**)&(this->tmpHostRMSDMatrix), 
-												rmsdMatrixLen*sizeof(floating_point_type),cudaHostAllocDefault));
+	//checkCudaError("tmpHostRMSD cudaHostAlloc ", cudaHostAlloc((void**)&(this->tmpHostRMSDMatrix), 
+	//											rmsdMatrixLen*sizeof(floating_point_type),cudaHostAllocDefault));
+	this->tmpHostRMSDMatrix = new floating_point_type[rmsdMatrixLen];
 	
 	float time;
 	cudaEvent_t start;
@@ -143,9 +207,19 @@ void ThRMSDCuda::calculateRMSDCondensedMatrix(vector<double>& rmsd){
     
     cudaStreamDestroy(copy_stream);
 	cudaStreamDestroy(execution_stream);
-    checkCudaError("tmpHostRMSD cudaFreeHost ",cudaFreeHost(tmpHostRMSDMatrix));
+    //checkCudaError("tmpHostRMSD cudaFreeHost ",cudaFreeHost(tmpHostRMSDMatrix));
+    delete [] this->tmpHostRMSDMatrix;
 }
 
+///////////////////////////////////////////////////////////////
+/// \remarks
+///	Returns the coordinates stored in the device (for testing purposes).
+///
+/// \param 	coordinates [In/Out] Vector where the device coordinates will be .
+///
+/// \author victor_gil
+/// \date 05/10/2012
+///////////////////////////////////////////////////////////////
 void ThRMSDCuda::getDeviceCoordinates(vector<double>& coordinates){
 	int number_of_coords = numberOfConformations*atomsPerConformation*3;
     floating_point_type* tmpCoords = new floating_point_type[number_of_coords];

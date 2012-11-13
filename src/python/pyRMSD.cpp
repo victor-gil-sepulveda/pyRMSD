@@ -98,10 +98,11 @@ RMSD* getCalculator(calcType cType, int numberOfConformations, int atomsPerConfo
 			return new RMSDomp(numberOfConformations,atomsPerConformation,Coordinates);
 			break;
 
+#ifdef USE_CUDA
 		case THEOBALD_CUDA_CALCULATOR:
 			return new ThRMSDCuda(numberOfConformations, atomsPerConformation, Coordinates, 32, 8);
 			break;
-
+#endif
 		case THEOBALD_SERIAL_CALCULATOR:
 			return new ThRMSDSerial(numberOfConformations,atomsPerConformation,Coordinates);
 			break;

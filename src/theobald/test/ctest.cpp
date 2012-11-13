@@ -14,33 +14,42 @@ bool expectedVectorEqualsCalculatedWithinPrecision(const double * const , const 
 void compareVectors(const char*, const double * const , const double * const , int , double );
 
 int main(int argc, char **argv){
-	vector<double> serial_coordinates,cuda_coordinates;
+	vector<double> serial_coordinates, cuda_coordinates, big_cuda_coordinates;
 	vector<double> cuda_centered_coordinates;
 
 	double* rmsd_serial = new double[11];
 	double* rmsd_cuda = new double[11];
+	vector<double> rmsd_cuda_big;
 
 	// Load golden data
 	load_vector(serial_coordinates, "data/coordinates");
 	load_vector(cuda_coordinates, "data/coordinates");
+	load_vector(big_cuda_coordinates, "data/coordinates_big");
 
 	// Calculate
 	ThRMSDSerial serial(11,66,&(serial_coordinates[0]));
 	serial.oneVsTheOthers(0, rmsd_serial);
 	print_vector("Serial:",rmsd_serial,11);
 
-	ThRMSDCuda cuda(11,66,&(cuda_coordinates[0]));
-	cuda.getDeviceCoordinates(cuda_centered_coordinates);
-	cuda.oneVsTheOthers(0, rmsd_cuda);
-	print_vector("CUDA:",rmsd_cuda,11);
+//	ThRMSDCuda cuda(11,66,&(cuda_coordinates[0]));
+//	cuda.getDeviceCoordinates(cuda_centered_coordinates);
+//	cuda.oneVsTheOthers(0, rmsd_cuda);
+//	print_vector("CUDA:",rmsd_cuda,11);
+//
+//	// Assert!
+//	compareVectors("Comparing centered coordinates (precision = 1e-4) ... ", serial.getCoordinates(),\
+//			&(cuda_centered_coordinates[0]), 11*66*3, 1e-4);
+//	compareVectors("Comparing rmsd_results (precision = 1e-4) ... ", &(rmsd_serial[0]),\
+//			&(rmsd_cuda[0]), 11, 1e-4);
 
-	// Assert!
-	compareVectors("Comparing centered coordinates (precision = 1e-4) ... ",serial.getCoordinates(), &(cuda_centered_coordinates[0]), 11*66*3, 1e-4);
-	compareVectors("Comparing rmsd_results (precision = 1e-4) ... ",&(rmsd_serial[0]), &(rmsd_cuda[0]),11,1e-4);
-
-	// and clean the room...
+	// And clean the room...
 	delete [] rmsd_serial;
 	delete [] rmsd_cuda;
+
+
+	// Now try with a big dataset (for profiling)
+	ThRMSDCuda cuda_big(10001,66,&(big_cuda_coordinates[0]));
+	cuda_big.calculateRMSDCondensedMatrix(rmsd_cuda_big);
 
 	return 0;
 }

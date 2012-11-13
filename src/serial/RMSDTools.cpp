@@ -5,7 +5,6 @@
 #include <cmath>
 using namespace std;
 
-
 void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* const coord_ref)
 {
 	double center_fit[3];
