@@ -21,6 +21,7 @@ CUDA_ARCH = "sm_11"                         # CUDA architecture of your card.
 PYTHON_EXTENSION_OPTIONS = "-pthread -fno-strict-aliasing -fmessage-length=0 -O2 -Wall -D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -fPIC"
 OPENMP_OPTION = "-fopenmp"
 PYTHON_LIBRARY = "python2.7"
+CUDA_LIBRARY = "cudart"
 ###############################################
 
 
@@ -84,7 +85,7 @@ if __name__ == '__main__':
     linkDSL = Link().\
                     using("g++").\
                     with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
-                    using_libs([PYTHON_LIBRARY,"lapack","cudart"]).\
+                    using_libs([PYTHON_LIBRARY,CUDA_LIBRARY]).\
                     using_lib_locations([CUDA_LIB_64]).\
                     this_object_files([files_to_link["ThRMSDSerial"],files_to_link["ThRMSDSerialOmp"],files_to_link["ThRMSDCuda"],files_to_link["kernel_functions_serial"],\
                                        files_to_link["kernel_functions_omp"],files_to_link["kernel_functions_cuda"],files_to_link["NumpyHelperFuncs"],files_to_link["pyRMSD"],\
@@ -98,7 +99,7 @@ if __name__ == '__main__':
         linkDSL = Link().\
                         using("g++").\
                         with_options([]).\
-                        using_libs(["cudart"]).\
+                        using_libs([CUDA_LIBRARY]).\
                         using_lib_locations([CUDA_LIB_64]).\
                         this_object_files([files_to_link["ctest"],files_to_link["ThRMSDSerial"],files_to_link["kernel_functions_serial"],files_to_link["ThRMSDCuda"],\
                                            files_to_link["kernel_functions_cuda"],files_to_link["RMSD"]]).\

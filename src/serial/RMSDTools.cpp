@@ -14,9 +14,8 @@ void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* cons
 	RMSDTools::shift3D(n, coord_fit, center_fit, +1.);
 }
 
-
-void RMSDTools::superposeMatrix(unsigned int n, double * const coord_fit, double* const coord_ref, double * const center_fit)
-{
+void RMSDTools::superposeMatrix(unsigned int n, double * const coord_fit,
+									double* const coord_ref, double * const center_fit){
 	double center_ref[3]={0,0,0};
 	double u[3][3];
 	double q[4];
@@ -38,8 +37,8 @@ void RMSDTools::superposeMatrix(unsigned int n, double * const coord_fit, double
 	RMSDTools::shift3D(n, coord_ref, center_fit, +1.);
 }
 
-void RMSDTools::getRotationMatrixGetCentersAndShiftMolecules(double * const center_fit, double * const center_ref, unsigned int num_atoms, double * const coord_fit, double * const coord_ref, double u[][3], double * const q)
-{
+void RMSDTools::getRotationMatrixGetCentersAndShiftMolecules(double * const center_fit, double * const center_ref,
+							unsigned int num_atoms, double * const coord_fit, double * const coord_ref, double u[][3], double * const q){
 	// Geometrical center of reference coordinates
 	RMSDTools::geometricCenter(num_atoms, coord_ref, center_ref);
 
@@ -57,8 +56,7 @@ void RMSDTools::getRotationMatrixGetCentersAndShiftMolecules(double * const cent
 }
 
 
-void RMSDTools::geometricCenter(unsigned int n, const double * const x, double * const center)
-{
+void RMSDTools::geometricCenter(unsigned int n, const double * const x, double * const center){
 	unsigned int i;
 
 	// Initialize variables before the loop
@@ -66,72 +64,41 @@ void RMSDTools::geometricCenter(unsigned int n, const double * const x, double *
 	center[1] = 0.0;
 	center[2] = 0.0;
 
-	// Computed the weighted geometric center
 	for(i=0; i<n; i++)
 	{
-		RMSDTools::ourDaxpy(3, 1., (x+3*i), center);
+		int offset = 3*i;
+		center[0] += x[offset];
+		center[1] += x[offset+1];
+		center[2] += x[offset+2];
 	}
 
-	RMSDTools::multiplyVectorByScalar(center, 1.0/n, 3);
+	center[0] /= n;
+	center[1] /= n;
+	center[2] /= n;
 }
 
-void RMSDTools::multiplyVectorByScalar(double * const x, double scalar, unsigned int n)
-{
-	for(unsigned int i=0; i<n; ++i)
-	{
-		*(x+i) *= scalar;
-	}
-}
-
-void RMSDTools::multiplyVectorByScalar(double * y, const double * const x, double scalar, unsigned int n)
-{
-	for(unsigned int i=0; i<n; ++i)
-	{
-		*(y+i) = *(x+i) * scalar;
-	}
-}
-
-
-void RMSDTools::ourDaxpy(int num_elems, double sa, const double * const sx, double * const sy)
-{
-	int inc = 1;
-	daxpy(&num_elems, &sa, sx, &inc, sy, &inc);
-}
-
-void RMSDTools::shift3D(unsigned int numberOfPoints, double * const x, double trans[3], double scalar)
-{
-	const unsigned int num_coords = 3 * numberOfPoints;
-
+void RMSDTools::shift3D(unsigned int numberOfPoints, double * const x, double trans[3], double scalar){
 	double shiftVector[3];
-	RMSDTools::multiplyVectorByScalar(shiftVector, trans, scalar, 3);
 
-	for(unsigned int i=0; i<num_coords; i+=3)
-	{
-		RMSDTools::shiftOne3dPoint(x+i, shiftVector);
-	}
-}
+	shiftVector[0] = trans[0]*scalar;
+	shiftVector[1] = trans[1]*scalar;
+	shiftVector[2] = trans[2]*scalar;
 
-void RMSDTools::shiftOne3dPoint(double * const x, double trans[3])
-{
-	for(unsigned int i=0; i<3; ++i)
-	{
-		*(x+i) += trans[i];
+	for(unsigned int i=0; i<numberOfPoints; ++i){
+		int offset = 3*i;
+		x[offset] += shiftVector[0];
+		x[offset+1] += shiftVector[1];
+		x[offset+2] += shiftVector[2];
 	}
 }
 
 void RMSDTools::superpositionQuatFit(unsigned int n, const double * const x, const double * const y, double q[4], double u[3][3])
 {
-	vector<double> w(n, 1.0);
-
-	superpositionQuatFit(n, x, y, &w[0], q, u);
-}
-
-void RMSDTools::superpositionQuatFit(unsigned int n, const double * const x, const double * const y, const double * const w, double q[4], double u[3][3])
-{
-	vector<double> upperQuadMatrix(16, 0);
+	//vector<double> upperQuadMatrix(16, 0);
+	double upperQuadMatrix[4][4];
 
 	// Generate the upper triangle of the quadratic matrix
-	generateUpperQuadraticMatrix(&upperQuadMatrix[0], n, y, x, w);
+	generateUpperQuadraticMatrix(upperQuadMatrix, n, y, x);
 
 	// Compute quaternion
 	computeFittedQuaternionFromUpperQuadraticMatrix(&upperQuadMatrix[0], q);
@@ -140,12 +107,17 @@ void RMSDTools::superpositionQuatFit(unsigned int n, const double * const x, con
 	generateLeftRotationMatrixFromNormalizedQuaternion(q, u);
 }
 
-void RMSDTools::generateUpperQuadraticMatrix(double * const upperQuadMatrix, unsigned int n, const double * const y, const double *const x, const double * const w)
+void RMSDTools::generateUpperQuadraticMatrix(double upperQuadMatrix[4][4], unsigned int n, const double * const y, const double *const x)
 {
 	//Initialize upperQuadMatrix
-	for(unsigned int i=0; i<16; ++i)
+	/*for(unsigned int i=0; i<16; ++i)
 	{
 		upperQuadMatrix[i] = 0.0;
+	}*/
+	for(unsigned int i = 0; i < 4; ++i){
+		for(unsigned int j = 0; j < 4; ++j){
+			upperQuadMatrix[i][j] = 0.0;
+		}
 	}
 
 	// Generate the upper triangle of the quadratic matrix
@@ -163,18 +135,18 @@ void RMSDTools::generateUpperQuadraticMatrix(double * const upperQuadMatrix, uns
 	{
 		unsigned int k = 3 * i;
 
-		xxyx += x[k] * y[k] * w[i];
-		xxyy += x[k] * y[k+1] * w[i];
-		xxyz += x[k] * y[k+2] * w[i];
-		xyyx += x[k+1] * y[k] * w[i];
-		xyyy += x[k+1] * y[k+1] * w[i];
-		xyyz += x[k+1] * y[k+2] * w[i];
-		xzyx += x[k+2] * y[k] * w[i];
-		xzyy += x[k+2] * y[k+1] * w[i];
-		xzyz += x[k+2] * y[k+2] * w[i];
+		xxyx += x[k] * y[k];
+		xxyy += x[k] * y[k+1];
+		xxyz += x[k] * y[k+2];
+		xyyx += x[k+1] * y[k];
+		xyyy += x[k+1] * y[k+1];
+		xyyz += x[k+1] * y[k+2];
+		xzyx += x[k+2] * y[k];
+		xzyy += x[k+2] * y[k+1];
+		xzyz += x[k+2] * y[k+2];
 	}
 
-	upperQuadMatrix[0] = xxyx + xyyy + xzyz;
+	/*upperQuadMatrix[0] = xxyx + xyyy + xzyz;
 
 	upperQuadMatrix[4] = xzyy - xyyz;
 	upperQuadMatrix[5] = xxyx - xyyy - xzyz;
@@ -186,30 +158,31 @@ void RMSDTools::generateUpperQuadraticMatrix(double * const upperQuadMatrix, uns
 	upperQuadMatrix[12] = xyyx - xxyy;
 	upperQuadMatrix[13] = xzyx + xxyz;
 	upperQuadMatrix[14] = xyyz + xzyy;
-	upperQuadMatrix[15] = xzyz - xxyx - xyyy;
+	upperQuadMatrix[15] = xzyz - xxyx - xyyy;*/
+
+	upperQuadMatrix[0][0] = xxyx + xyyy + xzyz;
+
+	upperQuadMatrix[0][1] = xzyy - xyyz;
+	upperQuadMatrix[1][1] = xxyx - xyyy - xzyz;
+
+	upperQuadMatrix[0][2] = xxyz - xzyx;
+	upperQuadMatrix[1][2] = xxyy + xyyx;
+	upperQuadMatrix[2][2] = xyyy - xzyz - xxyx;
+
+	upperQuadMatrix[0][3] = xyyx - xxyy;
+	upperQuadMatrix[1][3] = xzyx + xxyz;
+	upperQuadMatrix[2][3] = xyyz + xzyy;
+	upperQuadMatrix[3][3] = xzyz - xxyx - xyyy;
 }
 
-void RMSDTools::computeFittedQuaternionFromUpperQuadraticMatrix(double * const upperQuadMatrix, double q[4])
-{
-	// Diagonalize upperQuadMatrix
-	int info;
-	int dimension = 4;
-	int lda = 4;
+void RMSDTools::computeFittedQuaternionFromUpperQuadraticMatrix(double upperQuadMatrix[4][4], double q[4]){
+	double eigvec[4][4],eigval[4];
+	RMSDTools::jacobi(upperQuadMatrix,eigval,eigvec);
+	q[0] = eigvec[0][3];
+	q[1] = eigvec[1][3];
+	q[2] = eigvec[2][3];
+	q[3] = eigvec[3][3];
 
-	vector<double> work1(4, 0.0);
-
-	// 136 is the optimal size for LWORK
-	int lwork = 136;
-	vector<double> work2(lwork, 0.0);
-
-	// Get eigenvalues and eigenVectors
-	ourDsyevUpperVector(&dimension, upperQuadMatrix, &lda, &work1[0], &work2[0], &lwork, &info);
-
-	// Resulting quaternion
-	q[0] = upperQuadMatrix[12];
-	q[1] = upperQuadMatrix[13];
-	q[2] = upperQuadMatrix[14];
-	q[3] = upperQuadMatrix[15];
 }
 
 void RMSDTools::generateLeftRotationMatrixFromNormalizedQuaternion(double q[4], double u[3][3])
@@ -227,49 +200,24 @@ void RMSDTools::generateLeftRotationMatrixFromNormalizedQuaternion(double q[4], 
 	u[2][2] = q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3];
 }
 
-void RMSDTools::ourDsyevUpperVector(int *n, double * eigenVectors, int *lda, double * eigenValues,
-									double * work, int * lwork, int * info)
-{
-	char vector='V';
-	char upper='U';
-	dsyev(&vector, &upper, n, eigenVectors, lda, eigenValues, work, lwork, info);
-}
 
-void RMSDTools::rotate3D(unsigned int numberOfPoints, const double * const x, double * const y, double u[3][3])
-{
-	const unsigned int num_coords = 3 * numberOfPoints;
+void RMSDTools::rotate3D(unsigned int n, double * const x, double u[3][3]){
+	// We go through all selected atoms
+	for(unsigned int i=0; i<n; ++i){
+		int offset = i*3;
+		double x_tmp_0,x_tmp_1,x_tmp_2;
+		x_tmp_0 = x[offset];
+		x_tmp_1 = x[offset+1];
+		x_tmp_2 = x[offset+2];
 
-	// We go through all points
-	for(unsigned int i=0; i<num_coords; i+=3)
-	{
 		// An rotate each of them
-		RMSDTools::rotate3DPoint( (x+i), (y+i), u);
+		x[offset] 	= u[0][0] * x_tmp_0 + u[0][1] * x_tmp_1 + u[0][2] * x_tmp_2;
+		x[offset+1] = u[1][0] * x_tmp_0 + u[1][1] * x_tmp_1 + u[1][2] * x_tmp_2;
+		x[offset+2] = u[2][0] * x_tmp_0 + u[2][1] * x_tmp_1 + u[2][2] * x_tmp_2;
 	}
 }
 
-void RMSDTools::rotate3D(unsigned int n, double * const x, double u[3][3])
-{
-	const unsigned int num_coords = 3 * n;
-
-	double * y = new double[num_coords];
-
-	rotate3D(n, x, y, u);
-
-	std::copy(y, y + num_coords, x);
-
-	if (y!= NULL)
-	delete [] y;
-}
-
-void RMSDTools::rotate3DPoint(const double * const x, double * const y, double u[3][3])
-{
-	*y = u[0][0] * *x + u[0][1] * *(x+1) + u[0][2] * *(x+2);
-	*(y+1) = u[1][0] * *x + u[1][1] * *(x+1) + u[1][2] * *(x+2);
-	*(y+2) = u[2][0] * *x + u[2][1] * *(x+1) + u[2][2] * *(x+2);
-}
-
-double RMSDTools::calcRMS(const double * const x, const double * const y, unsigned int num_atoms)
-{
+double RMSDTools::calcRMS(const double * const x, const double * const y, unsigned int num_atoms){
 	double sum_res = 0.0;
 
 	for(unsigned int i=0; i<num_atoms*3; ++i)
@@ -278,4 +226,106 @@ double RMSDTools::calcRMS(const double * const x, const double * const y, unsign
 	}
 
 	return sqrt(sum_res/num_atoms);
+}
+
+
+void RMSDTools::jacobi(double a[4][4], double d[4], double v[4][4], int nrot){
+	double onorm, dnorm;
+	double b, dma, q, t, c, s;
+	double atemp, vtemp, dtemp;
+	int i, j, k, l;
+
+	for (j = 0; j <= 3; j++) {
+		for (i = 0; i <= 3; i++) {
+			v[i][j] = 0.0;
+		}
+		v[j][j] = 1.0;
+		d[j] = a[j][j];
+	}
+
+	for (l = 1; l <= nrot; l++) {
+		dnorm = 0.0;
+		onorm = 0.0;
+		for (j = 0; j <= 3; j++) {
+			dnorm = dnorm + fabs(d[j]);
+			for (i = 0; i <= j - 1; i++) {
+				onorm = onorm + fabs(a[i][j]);
+			}
+		}
+
+		if((onorm/dnorm) <= 1.0e-12){
+			//goto Exit_now;
+			break;
+		}
+
+		for (j = 1; j <= 3; j++) {
+			for (i = 0; i <= j - 1; i++) {
+				b = a[i][j];
+				if(fabs(b) > 0.0) {
+					dma = d[j] - d[i];
+					if((fabs(dma) + fabs(b)) <=  fabs(dma)) {
+						t = b / dma;
+					}
+					else {
+						q = 0.5 * dma / b;
+						t = 1.0/(fabs(q) + sqrt(1.0+q*q));
+						if(q < 0.0) {
+							t = -t;
+						}
+					}
+					c = 1.0/sqrt(t * t + 1.0);
+					s = t * c;
+					a[i][j] = 0.0;
+					for (k = 0; k <= i-1; k++) {
+						atemp = c * a[k][i] - s * a[k][j];
+						a[k][j] = s * a[k][i] + c * a[k][j];
+						a[k][i] = atemp;
+					}
+					for (k = i+1; k <= j-1; k++) {
+						atemp = c * a[i][k] - s * a[k][j];
+						a[k][j] = s * a[i][k] + c * a[k][j];
+						a[i][k] = atemp;
+					}
+					for (k = j+1; k <= 3; k++) {
+						atemp = c * a[i][k] - s * a[j][k];
+						a[j][k] = s * a[i][k] + c * a[j][k];
+						a[i][k] = atemp;
+					}
+					for (k = 0; k <= 3; k++) {
+						vtemp = c * v[k][i] - s * v[k][j];
+						v[k][j] = s * v[k][i] + c * v[k][j];
+						v[k][i] = vtemp;
+					}
+					dtemp = c*c*d[i] + s*s*d[j] - 2.0*c*s*b;
+					d[j] = s*s*d[i] + c*c*d[j] +  2.0*c*s*b;
+					d[i] = dtemp;
+				}  /* end if */
+			} /* end for i */
+		} /* end for j */
+	} /* end for l */
+
+	//Exit_now:
+
+	nrot = l;
+
+	for (j = 0; j <= 2; j++) {
+		k = j;
+		dtemp = d[k];
+		for (i = j+1; i <= 3; i++) {
+			if(d[i] < dtemp) {
+				k = i;
+				dtemp = d[k];
+			}
+		}
+
+		if(k > j) {
+			d[k] = d[j];
+			d[j] = dtemp;
+			for (i = 0; i <= 3; i++) {
+				dtemp = v[i][k];
+				v[i][k] = v[i][j];
+				v[i][j] = dtemp;
+			}
+		}
+	}
 }
