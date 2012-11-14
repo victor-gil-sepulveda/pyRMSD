@@ -7,25 +7,12 @@ using namespace std;
 
 void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* const coord_ref)
 {
-	double center_fit[3];
-	superposeMatrix(n, coord_fit, coord_ref, center_fit);
-
-	// Shift to the origin
-	RMSDTools::shift3D(n, coord_fit, center_fit, +1.);
-}
-
-void RMSDTools::superposeMatrix(unsigned int n, double * const coord_fit,
-									double* const coord_ref, double * const center_fit){
-	double center_ref[3]={0,0,0};
+	double center_fit[3] = {0.,0.,0.};
+	double center_ref[3] = {0.,0.,0.};
 	double u[3][3];
 	double q[4];
 
-	// Initialize center_fit as (0.0, 0.0, 0.0)
-	center_fit[0] = 0.0;
-	center_fit[1] = 0.0;
-	center_fit[2] = 0.0;
-
-	// Fit specified atoms of fit_molecule to those of ref_molecule
+	//superposeMatrix(n, coord_fit, coord_ref, center_fit);
 
 	// Get rotation matrix
 	getRotationMatrixGetCentersAndShiftMolecules(center_fit, center_ref, n, coord_fit, coord_ref, u, q);
@@ -35,6 +22,13 @@ void RMSDTools::superposeMatrix(unsigned int n, double * const coord_fit,
 
 	// Shift the reference molecule to the geometric center of the fit
 	RMSDTools::shift3D(n, coord_ref, center_fit, +1.);
+	// Shift to the origin
+	RMSDTools::shift3D(n, coord_fit, center_fit, +1.);
+}
+
+void RMSDTools::superposeMatrix(unsigned int n, double * const coord_fit,
+									double* const coord_ref, double * const center_fit){
+
 }
 
 void RMSDTools::getRotationMatrixGetCentersAndShiftMolecules(double * const center_fit, double * const center_ref,
@@ -110,10 +104,6 @@ void RMSDTools::superpositionQuatFit(unsigned int n, const double * const x, con
 void RMSDTools::generateUpperQuadraticMatrix(double upperQuadMatrix[4][4], unsigned int n, const double * const y, const double *const x)
 {
 	//Initialize upperQuadMatrix
-	/*for(unsigned int i=0; i<16; ++i)
-	{
-		upperQuadMatrix[i] = 0.0;
-	}*/
 	for(unsigned int i = 0; i < 4; ++i){
 		for(unsigned int j = 0; j < 4; ++j){
 			upperQuadMatrix[i][j] = 0.0;
@@ -145,20 +135,6 @@ void RMSDTools::generateUpperQuadraticMatrix(double upperQuadMatrix[4][4], unsig
 		xzyy += x[k+2] * y[k+1];
 		xzyz += x[k+2] * y[k+2];
 	}
-
-	/*upperQuadMatrix[0] = xxyx + xyyy + xzyz;
-
-	upperQuadMatrix[4] = xzyy - xyyz;
-	upperQuadMatrix[5] = xxyx - xyyy - xzyz;
-
-	upperQuadMatrix[8] = xxyz - xzyx;
-	upperQuadMatrix[9] = xxyy + xyyx;
-	upperQuadMatrix[10] = xyyy - xzyz - xxyx;
-
-	upperQuadMatrix[12] = xyyx - xxyy;
-	upperQuadMatrix[13] = xzyx + xxyz;
-	upperQuadMatrix[14] = xyyz + xzyy;
-	upperQuadMatrix[15] = xzyz - xxyx - xyyy;*/
 
 	upperQuadMatrix[0][0] = xxyx + xyyy + xzyz;
 
@@ -229,6 +205,25 @@ double RMSDTools::calcRMS(const double * const x, const double * const y, unsign
 }
 
 
+/*
+ David J. Heisterberg
+ The Ohio Supercomputer Center
+ 1224 Kinnear Rd.
+ Columbus, OH  43212-1163
+ (614)292-6036
+ djh@ccl.net    djh@ohstpy.bitnet    ohstpy::djh
+
+ Translated to C from fitest.f program and interfaced with Xmol program
+ by Jan Labanowski,  jkl@ccl.net   jkl@ohstpy.bitnet   ohstpy::jkl
+
+ Some minor changes and indentation by Víctor Gil Sepúlveda
+
+ Copyright: Ohio Supercomputer Center, David J. Heisterberg, 1990.
+ The program can be copied and distributed freely, provided that
+ this copyright in not removed. You may acknowledge the use of the
+ program in published material as:
+ David J. Heisterberg, 1990, unpublished results.
+*/
 void RMSDTools::jacobi(double a[4][4], double d[4], double v[4][4], int nrot){
 	double onorm, dnorm;
 	double b, dma, q, t, c, s;
@@ -254,7 +249,6 @@ void RMSDTools::jacobi(double a[4][4], double d[4], double v[4][4], int nrot){
 		}
 
 		if((onorm/dnorm) <= 1.0e-12){
-			//goto Exit_now;
 			break;
 		}
 
@@ -303,8 +297,6 @@ void RMSDTools::jacobi(double a[4][4], double d[4], double v[4][4], int nrot){
 			} /* end for i */
 		} /* end for j */
 	} /* end for l */
-
-	//Exit_now:
 
 	nrot = l;
 
