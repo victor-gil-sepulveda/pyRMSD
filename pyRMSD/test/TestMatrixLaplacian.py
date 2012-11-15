@@ -24,6 +24,17 @@ class Test(unittest.TestCase):
         laplacian =  matrix.calculate_rw_laplacian()
         
         numpy.testing.assert_array_almost_equal(expected_Laplacian, laplacian, 5)
+        self.fail("to be revisited")
+        
+    def test_degree(self):
+        matrix_data = [1, 4, 6, 2, 5,
+                          3, 9, 7, 2,
+                             4, 1, 1,
+                                9, 3,
+                                   8]
+        self.fail("to be revisited")
+        matrix = CondensedMatrix(matrix_data)
+        self.assertEqual(d(2, matrix),13.0)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
