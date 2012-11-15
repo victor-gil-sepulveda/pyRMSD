@@ -1,7 +1,7 @@
 import numpy.linalg
-import pyRMSD_cfuncs
+import pyRMSD.calculators
 from utils import flattenCoords
-from pyRMSD.Calculators import availableCalculators
+from pyRMSD.availableCalculators import availableCalculators
 
 def oneVsTheOthers(target,coordsets,calcType = "PYTHON_CALCULATOR"):
     if not calcType in availableCalculators():
@@ -20,7 +20,7 @@ def oneVsTheOthers(target,coordsets,calcType = "PYTHON_CALCULATOR"):
         __oneVsTheOthers(target,coordsets[conf_num+1:],rmsd)
         return rmsd
     else:
-        return pyRMSD_cfuncs.oneVsTheOthers(availableCalculators()[calcType],np_coords, number_of_atoms, conf_num, number_of_conformations)
+        return pyRMSD.calculators.oneVsTheOthers(availableCalculators()[calcType],np_coords, number_of_atoms, conf_num, number_of_conformations)
     
     return []
 
@@ -36,7 +36,7 @@ def calculateRMSDCondensedMatrix(coordsets,calcType = "PYTHON_CALCULATOR"):
     if calcType == "PYTHON_CALCULATOR":
         return __calculateRMSDCondensedMatrix(coordsets)
     else:
-        return pyRMSD_cfuncs.calculateRMSDCondensedMatrix(availableCalculators()[calcType],np_coords, number_of_atoms, number_of_conformations)
+        return pyRMSD.calculators.calculateRMSDCondensedMatrix(availableCalculators()[calcType],np_coords, number_of_atoms, number_of_conformations)
     
     return []
 

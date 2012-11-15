@@ -161,7 +161,7 @@ static PyMethodDef pyRMSDMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
-PyMODINIT_FUNC initpyRMSD_cfuncs(void){
-    (void) Py_InitModule("pyRMSD_cfuncs", pyRMSDMethods);
+PyMODINIT_FUNC initcalculators(void){
+    (void) Py_InitModule("calculators", pyRMSDMethods);
     import_array();
 }
