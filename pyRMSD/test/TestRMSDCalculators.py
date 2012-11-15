@@ -1,5 +1,5 @@
 import pyRMSD.RMSD as python_pure_functions
-import pyRMSD.utils
+import pyRMSD.utils.proteinReading
 from pyRMSD.test.tools import checkRMSDs
 
 
@@ -22,8 +22,8 @@ if __name__ == '__main__':
     #######################
     # READING COORDINATES
     ######################
-    coordsets,number_of_conformations,number_of_atoms = pyRMSD.utils.getCoordsetsFromPDB('data/amber_mini.pdb')
-    np_coords = pyRMSD.utils.flattenCoords(coordsets)
+    coordsets,number_of_conformations,number_of_atoms = pyRMSD.utils.proteinReading.getCoordsetsFromPDB('data/amber_mini.pdb')
+    np_coords = pyRMSD.utils.proteinReading.flattenCoords(coordsets)
     
     ########################
     ## TESTING PYTHON FUNCTIONS
@@ -39,8 +39,8 @@ if __name__ == '__main__':
     #######################
     # READING COORDINATES
     ######################
-    coordsets,number_of_conformations,number_of_atoms = pyRMSD.utils.getCoordsetsFromPDB('data/amber_short.pdb')
-    np_coords = pyRMSD.utils.flattenCoords(coordsets)
+    coordsets,number_of_conformations,number_of_atoms = pyRMSD.utils.proteinReading.getCoordsetsFromPDB('data/amber_short.pdb')
+    np_coords = pyRMSD.utils.proteinReading.flattenCoords(coordsets)
     #######################
     # TEST SERIAL
     ######################

@@ -5,6 +5,7 @@ Created on 14/11/2012
 '''
 import collections
 import pyRMSD
+import pyRMSD.utils.proteinReading
 import time
 import os
 import bz2
@@ -21,10 +22,10 @@ if __name__ == '__main__':
     print "\tUncompressing..."
     open("tmp_amber_long.pdb","w").write(bz2.BZ2File("data/amber_long.pdb.tar.bz2").read())
     print "\tLoading..."
-    coordsets,number_of_conformations,number_of_atoms = pyRMSD.utils.getCoordsetsFromPDB('tmp_amber_long.pdb')
+    coordsets,number_of_conformations,number_of_atoms = pyRMSD.utils.proteinReading.getCoordsetsFromPDB('tmp_amber_long.pdb')
     os.system("rm tmp_amber_long.pdb")
     print "\tDeleting temporary file"
-    np_coords = pyRMSD.utils.flattenCoords(coordsets)
+    np_coords = pyRMSD.utils.proteinReading.flattenCoords(coordsets)
     t2 = time.time()
     print 'Loading took %0.3f s' % (t2-t1)
     
