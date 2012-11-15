@@ -1,3 +1,4 @@
+#include "Statistics.h"
 #include <python2.7/Python.h>
 #include <python2.7/structmember.h>
 #include <numpy/arrayobject.h>
@@ -15,14 +16,20 @@ typedef struct {
     int row_length_minus_one;
     int data_size;
     float* data;
+    StatisticsCalculator* statisticsCalculator;
+    bool statistics_already_calculated;
     PyObject* zero;
 } CondensedMatrix;
 
 /*
- * Object destructor. Only has to free memory used for data storage.
+ * Object destructor. Only has to free memory used for data storage and the statistics calculator.
  */
 static void condensedMatrix_dealloc(CondensedMatrix* self){
+
+	// Special for this object
 	delete [] self->data;
+
+	// Python ops
 	Py_XDECREF(self->zero);
     self->ob_type->tp_free((PyObject*)self);
 }
@@ -31,13 +38,15 @@ static void condensedMatrix_dealloc(CondensedMatrix* self){
  *
  */
 static PyObject* condensedMatrix_new(PyTypeObject *type, PyObject *args, PyObject *kwds){
-	CondensedMatrix *self;
+	CondensedMatrix* self;
 	self = (CondensedMatrix*) type->tp_alloc(type, 0);
     if (self != NULL) {
     	self->row_length = 0;
     	self->data_size = 0;
     	self->data = NULL;
     	self->zero =  Py_BuildValue("d", 0); // To be returned always that a 0 is needed
+    	self->statisticsCalculator = NULL;
+    	self->statistics_already_calculated = false;
     }
     return (PyObject *) self;
 }
@@ -47,7 +56,7 @@ static int condensedMatrix_init(CondensedMatrix *self, PyObject *args, PyObject 
 	PyArrayObject* rmsd_numpy_array = NULL;
 	bool numpy = false;
 	if (! PyArg_ParseTuple(args, "O!",&PyArray_Type,&rmsd_numpy_array)){
-		cout<<"[CondensedMatrix] Getting matrix data from sequence."<<endl;
+		//cout<<"[CondensedMatrix] Getting matrix data from sequence."<<endl;
 		if (! PyArg_ParseTuple(args, "O",&input)){
 			PyErr_SetString(PyExc_RuntimeError, "Error parsing parameters.");
 			return -1;
@@ -56,7 +65,7 @@ static int condensedMatrix_init(CondensedMatrix *self, PyObject *args, PyObject 
 		rmsd_numpy_array = (PyArrayObject *) PyArray_ContiguousFromObject(input, PyArray_DOUBLE, 1, 1);
 	}
 	else{
-		cout<<"[CondensedMatrix] Getting matrix data from numpy array."<<endl;
+		//cout<<"[CondensedMatrix] Getting matrix data from numpy array."<<endl;
 		numpy = true;
 	}
 
@@ -76,9 +85,10 @@ static int condensedMatrix_init(CondensedMatrix *self, PyObject *args, PyObject 
 
 	for(int i = 0;i < self->data_size; ++i){
 		self->data[i] = (float) (inner_data[i]);
-//		cout<<self->data[i]<<" ";
 	}
-//	cout<<endl;
+
+	// Let's alloc the statistics object
+	self->statisticsCalculator =  new StatisticsCalculator(self->data,self->data_size);
 
 	if(!numpy){
     	Py_DECREF(rmsd_numpy_array);
@@ -102,10 +112,42 @@ static PyObject* condensedMatrix_get_data(CondensedMatrix* self, PyObject *args)
 	return  PyArray_SimpleNewFromData(1,dims,NPY_FLOAT,self->data);
 }
 
-static PyObject* condensedMatrix_get_stats(CondensedMatrix* self, PyObject *args){
-	npy_intp dims[1] = {self->data_size};
-	return  PyArray_SimpleNewFromData(1,dims,NPY_FLOAT,self->data);
+static void condensedMatrix_calculate_statistics(CondensedMatrix* self, PyObject *args){
+	self->statistics_already_calculated = false;
 }
+
+static PyObject* condensedMatrix_get_mean(CondensedMatrix* self, PyObject *args){
+	if(self->statistics_already_calculated == false){
+		self->statisticsCalculator->calculateStatistics();
+		self->statistics_already_calculated = true;
+	}
+	return Py_BuildValue("d", self->statisticsCalculator->mean);
+}
+
+static PyObject* condensedMatrix_get_variance(CondensedMatrix* self, PyObject *args){
+	if(self->statistics_already_calculated == false){
+		self->statisticsCalculator->calculateStatistics();
+		self->statistics_already_calculated = true;
+	}
+	return Py_BuildValue("d", self->statisticsCalculator->variance);
+}
+
+static PyObject* condensedMatrix_get_skewness(CondensedMatrix* self, PyObject *args){
+	if(self->statistics_already_calculated == false){
+		self->statisticsCalculator->calculateStatistics();
+		self->statistics_already_calculated = true;
+	}
+	return Py_BuildValue("d", self->statisticsCalculator->skewness);
+}
+
+static PyObject* condensedMatrix_get_kurtosis(CondensedMatrix* self, PyObject *args){
+	if(self->statistics_already_calculated == false){
+		self->statisticsCalculator->calculateStatistics();
+		self->statistics_already_calculated = true;
+	}
+	return Py_BuildValue("d", self->statisticsCalculator->kurtosis);
+}
+
 
 /*
  def get_neighbors_for_node(condensed_matrix,node,nodes_left,cutoff):
@@ -352,10 +394,19 @@ static PyObject*  condensedMatrix_calculate_affinity_matrix(CondensedMatrix* sel
 	return PyArray_SimpleNewFromData(2,dims,NPY_DOUBLE,affinity_matrix);
 }
 
-
 static PyMethodDef condensedMatrix_methods[] = {
-	{"get_number_of_rows", (PyCFunction)condensedMatrix_get_number_of_rows, METH_NOARGS,PyDoc_STR("description")},
-	{"get_data", (PyCFunction)condensedMatrix_get_data, METH_NOARGS,PyDoc_STR("description")},
+	// Basic field access
+	{"get_number_of_rows", (PyCFunction) condensedMatrix_get_number_of_rows, METH_NOARGS,PyDoc_STR("description")},
+	{"get_data", (PyCFunction) condensedMatrix_get_data, METH_NOARGS,PyDoc_STR("description")},
+
+	// Statistics
+	{"recalculateStatistics", (PyCFunction) condensedMatrix_calculate_statistics, METH_NOARGS,PyDoc_STR("description")},
+	{"calculateMean", 		(PyCFunction) condensedMatrix_get_mean, METH_NOARGS,PyDoc_STR("description")},
+	{"calculateVariance", 	(PyCFunction) condensedMatrix_get_variance, METH_NOARGS,PyDoc_STR("description")},
+	{"calculateSkewness", 	(PyCFunction) condensedMatrix_get_skewness, METH_NOARGS,PyDoc_STR("description")},
+	{"calculateKurtosis", 	(PyCFunction) condensedMatrix_get_kurtosis, METH_NOARGS,PyDoc_STR("description")},
+
+	// Matrix as graph
 	{"get_neighbors_for_node", (PyCFunction)condensedMatrix_get_neighbors_for_node, METH_VARARGS,PyDoc_STR("description")},
 	{"choose_node_with_higher_cardinality", (PyCFunction)condensedMatrix_choose_node_with_higher_cardinality, METH_VARARGS,PyDoc_STR("description")},
 	{"calculate_rw_laplacian", (PyCFunction)condensedMatrix_calculate_rw_laplacian, METH_NOARGS,PyDoc_STR("description")},

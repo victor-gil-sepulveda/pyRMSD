@@ -53,7 +53,7 @@ if __name__ == '__main__':
     
     files_to_compile_with_gcc = {"src/theobald":["ThRMSDSerial.cpp","kernel_functions_serial.cpp","ThRMSDSerialOmp.cpp"],
                                  "src/serial":["RMSDSerial.cpp","RMSD.cpp","RMSDTools.cpp"],
-                                 "src/matrix":["matrix.cpp"],
+                                 "src/matrix":["Matrix.cpp","Statistics.cpp"],
                                  "src/python":["pyRMSD.cpp","NumpyHelperFuncs.cpp"]}
     
     files_to_compile_with_gcc_and_openmp = {"src/theobald":["kernel_functions_omp.cpp"],
@@ -76,7 +76,7 @@ if __name__ == '__main__':
                     using("g++").\
                     with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
                     using_libs([PYTHON_LIBRARY]).\
-                    this_object_files([files_to_link["matrix"]]).\
+                    this_object_files([files_to_link["Matrix"],files_to_link["Statistics"]]).\
                     to_produce("condensedMatrix.so")
     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            
