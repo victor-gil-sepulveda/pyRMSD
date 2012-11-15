@@ -56,49 +56,19 @@
 #include <algorithm>
 #include <cmath>
 
-class Statistics {
-    public:
-        Statistics(double* inputArray, long n);
-        ~Statistics();
-
-        void calculateStatistics();
-
-        void setData(double* inputArray, long n);
-
-        void setMean();
-        void setMedian();
-        void setMode();
-        void setVariance();
-        void setSkewness();
-        void setKurtosis();
-
-        double getMean() const {
-            return mean;
-        }
-        double getMedian() const {
-            return med;
-        }
-        double getMode() const {
-            return mode;
-        }
-        double getVariance() const {
-            return var;
-        }
-        double getSkewness() const {
-            return skew;
-        }
-        double getKurtosis() const {
-            return kurt;
-        }
-
-    private:
-        double* array; //	double precision array of data elements
-        long count; //	number of elements in the data array
-        double mean, med, mode; //	mean, median, and mode
-        double var, skew, kurt; //	variance, skewness, and kurtosis
-        bool sorted; //	has the array been sorted?
-        bool meanCalculated; //	has the mean been calculated?
-        bool varCalculated; //	has the variance been calculated?
-};
+class StatisticsCalculator {
+	public:
+		Statistics(double* data, int len);
+		~Statistics();
+		void calculateStatistics();
+		int data_size;
+		double* data_array;
+		double mean;
+		double median;
+		double mode;
+		double variance;
+		double skewness;
+		double kurtosis;
+}
 
 #endif

@@ -1,7 +1,7 @@
 import numpy
 import sysconfig
 import os
-from install_utils import compile_a_file_collection, Link
+from build_utils import compile_a_file_collection, Link
 import optparse
 import collections
 
