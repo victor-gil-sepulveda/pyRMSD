@@ -288,111 +288,6 @@ static PyObject*  condensedMatrix_choose_node_with_higher_cardinality(CondensedM
 	return tuple;
 }
 
-/*
- def d(i,condensed_matrix):
-    """
-    Degree of a vertex:
-    d_i = sum_{j=1}^n w_ij
-    """
-    d_val = 0
-    n = condensed_matrix.row_length
-    for j in range(n):
-        d_val += condensed_matrix[i,j]
-    return d_val
- */
-double degree(int element, CondensedMatrix* self){
-	double d_val = 0.;
-	int pos;
-	for (int i = 0;i<self->row_length;++i){
-		if(element<i){
-			pos = calc_vector_pos(element,i,self);
-			d_val += (double) self->data[pos];
-		}
-		else{
-			if (element > i){
-				pos = calc_vector_pos(i,element,self);
-				d_val += (double) self->data[pos];
-			}
-		}
-	}
-	return d_val;
-}
-
-static PyObject*  condensedMatrix_calculate_rw_laplacian(CondensedMatrix* self, PyObject *args){
-	// First calculate D**-1, inverse diagonal matrix of degrees
-	// (inverse of a diagonal matrix is the diagonal matrix in which Dinv(i,i) = 1/D(i,i)
-	// W is indeed the rmsd matrix.
-	// We shall calculate invD*W
-	//	(d1       )     (w11 w21 w31 w41)    (d1*w11 d1*w21 d1*w31 d1*w41)
-	//	(	d2    )  x  (w12 w22 w32 w42)  = (d2*w12 d2*w22 d2*w32 d2*w42)
-	//	(	  d3  )     (w13 w23 w33 w43)    (d3*w13 d3*w23 d3*w33 d3*w43)
-	//  (       d4)     (w14 w24 w34 w44)    (d4*w14 d4*w24 d4*w34 d4*w44)
-	// Then to calculate I-Dinv*W only means to substract 1-Dinv_ij*W_ij for each i,j
-
-	double invD;
-	double * L = new double[self->row_length * self->row_length];
-	double value;
-	int pos;
-	for (int i = 0; i<self->row_length; ++i){
-		invD = 1. / degree(i,self);
-		for (int j = 0; j<self->row_length; ++j){
-			if(i==j){
-				L[j + self->row_length*i] = 1.;
-			}
-			else{
-				if( i<j){
-					pos = calc_vector_pos(i,j,self);
-				}
-				else{
-					pos = calc_vector_pos(j,i,self);
-				}
-				value =self->data[pos];
-				L[j + self->row_length*i] = -1*value*invD;
-			}
-		}
-	}
-	//----------------------------
-	// Is a transposition needed?
-	//----------------------------
-	npy_intp dims[2] = {self->row_length,self->row_length};
-	return PyArray_SimpleNewFromData(2,dims,NPY_DOUBLE,L);
-}
-//dgeev
-//dspevx
-//dpteqr
-static PyObject*  condensedMatrix_calculate_affinity_matrix(CondensedMatrix* self, PyObject *args){
-	double delta;
-
-	if (!PyArg_ParseTuple(args, "d",&delta)){
-		PyErr_SetString(PyExc_RuntimeError, "Error parsing parameters.");
-		return NULL;
-	}
-
-	double value;
-	int pos;
-	double* affinity_matrix = new double[self->row_length * self->row_length];
-	for (int i = 0; i<self->row_length; ++i){
-			for (int j = 0; j<self->row_length; ++j){
-				if(i==j){
-					affinity_matrix[j + self->row_length*i] = 1.;
-				}
-				else{
-					if( i<j){
-						pos = calc_vector_pos(i,j,self);
-					}
-					else{
-						pos = calc_vector_pos(j,i,self);
-					}
-					value =self->data[pos];
-					affinity_matrix[j + self->row_length*i] = exp(-(value*value)/(2*delta*delta));
-				}
-			}
-		}
-
-
-	npy_intp dims[2] = {self->row_length,self->row_length};
-	return PyArray_SimpleNewFromData(2,dims,NPY_DOUBLE,affinity_matrix);
-}
 
 static PyMethodDef condensedMatrix_methods[] = {
 	// Basic field access
@@ -409,8 +304,8 @@ static PyMethodDef condensedMatrix_methods[] = {
 	// Matrix as graph
 	{"get_neighbors_for_node", (PyCFunction)condensedMatrix_get_neighbors_for_node, METH_VARARGS,PyDoc_STR("description")},
 	{"choose_node_with_higher_cardinality", (PyCFunction)condensedMatrix_choose_node_with_higher_cardinality, METH_VARARGS,PyDoc_STR("description")},
-	{"calculate_rw_laplacian", (PyCFunction)condensedMatrix_calculate_rw_laplacian, METH_NOARGS,PyDoc_STR("description")},
-	{"calculate_affinity_matrix", (PyCFunction)condensedMatrix_calculate_affinity_matrix, METH_VARARGS,PyDoc_STR("description")},
+	//{"calculate_rw_laplacian", (PyCFunction)condensedMatrix_calculate_rw_laplacian, METH_NOARGS,PyDoc_STR("description")},
+	//{"calculate_affinity_matrix", (PyCFunction)condensedMatrix_calculate_affinity_matrix, METH_VARARGS,PyDoc_STR("description")},
 	{NULL}  /* Sentinel */
 };
 
