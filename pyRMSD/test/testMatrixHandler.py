@@ -11,9 +11,8 @@ import os
 
 class Test(unittest.TestCase):
 
-
     def test_write_and_load(self):
-        mh = MatrixHandler(None)
+        mh = MatrixHandler(".")
         data = range(1000)
         matrix = CondensedMatrix(data)
         mh.distance_matrix = matrix

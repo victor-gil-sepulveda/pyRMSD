@@ -1,6 +1,6 @@
 import numpy.linalg
 import pyRMSD.calculators
-from utils import flattenCoords
+from pyRMSD.utils.proteinReading import flattenCoords
 from pyRMSD.availableCalculators import availableCalculators
 
 def oneVsTheOthers(target,coordsets,calcType = "PYTHON_CALCULATOR"):
