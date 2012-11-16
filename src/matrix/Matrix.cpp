@@ -28,6 +28,7 @@ static void condensedMatrix_dealloc(CondensedMatrix* self){
 
 	// Special for this object
 	delete [] self->data;
+	delete self->statisticsCalculator;
 
 	// Python ops
 	Py_XDECREF(self->zero);
@@ -44,7 +45,7 @@ static PyObject* condensedMatrix_new(PyTypeObject *type, PyObject *args, PyObjec
     	self->row_length = 0;
     	self->data_size = 0;
     	self->data = NULL;
-    	self->zero =  Py_BuildValue("d", 0); // To be returned always that a 0 is needed
+    	self->zero =  Py_BuildValue("d", 0.); // To be returned always that a 0 is needed
     	self->statisticsCalculator = NULL;
     	self->statistics_already_calculated = false;
     }
@@ -74,7 +75,6 @@ static int condensedMatrix_init(CondensedMatrix *self, PyObject *args, PyObject 
     										"Check that the parameter is a sequence and there's memory available.");
     	return -1;
     }
-
 
     self->data_size = rmsd_numpy_array->dimensions[0];
     self->row_length = (int) (1 + sqrt(1+8*self->data_size))/2;

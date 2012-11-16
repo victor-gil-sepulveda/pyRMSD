@@ -5,8 +5,6 @@ namespace RMSDTools{
 
 	void superpose(unsigned int n, double * const coord_fit, double* const coord_ref);
 	
-	void superposeMatrix(unsigned int n, double * const coord_fit, double* const coord_ref, double * const center_fit);
-	
 	void getRotationMatrixGetCentersAndShiftMolecules(double * const center_fit, double * const center_ref, unsigned int num_atoms, double * const coord_fit, double * const coord_ref, double u[][3], double * const q);
 	
 	void geometricCenter(unsigned int n, const double * const x, double * const center);

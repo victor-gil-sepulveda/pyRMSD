@@ -26,11 +26,6 @@ void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* cons
 	RMSDTools::shift3D(n, coord_fit, center_fit, +1.);
 }
 
-void RMSDTools::superposeMatrix(unsigned int n, double * const coord_fit,
-									double* const coord_ref, double * const center_fit){
-
-}
-
 void RMSDTools::getRotationMatrixGetCentersAndShiftMolecules(double * const center_fit, double * const center_ref,
 							unsigned int num_atoms, double * const coord_fit, double * const coord_ref, double u[][3], double * const q){
 	// Geometrical center of reference coordinates
