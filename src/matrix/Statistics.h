@@ -12,6 +12,8 @@ class StatisticsCalculator {
 		double variance;
 		double skewness;
 		double kurtosis;
+		float max;
+		float min;
 };
 
 #endif

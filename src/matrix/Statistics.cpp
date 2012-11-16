@@ -7,6 +7,7 @@
 
 #include "Statistics.h"
 #include <cmath>
+#include <algorithm>
 
 StatisticsCalculator::StatisticsCalculator(float* data, int len) {
 	data_size = len;
@@ -44,4 +45,7 @@ void StatisticsCalculator::calculateStatistics() {
 	}
 	kurtosis/=double(data_size)*pow(variance, 2.0);
 	kurtosis-=3.0;
+
+	max = *(std::max_element(data_array, data_array+data_size));
+	min = *(std::min_element(data_array, data_array+data_size));
 }

@@ -27,6 +27,13 @@ class Test(unittest.TestCase):
     
     def test_kurtosis(self):
         self.assertAlmostEquals(self.condensedMatrix.calculateKurtosis(), scipy.stats.kurtosis(self.contents))#, delta = 1)
+    
+    def test_max(self):
+        self.assertAlmostEquals(self.condensedMatrix.calculateMax(), numpy.max(self.contents))#, delta = 1)
+
+    def test_min(self):
+        self.assertAlmostEquals(self.condensedMatrix.calculateMin(), numpy.min(self.contents))#, delta = 1)
+
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_mean']
