@@ -15,13 +15,13 @@ import collections
 
 CUDA_BASE = "/usr/local/cuda-4.2"           # Base dir for CUDA installation
 CUDA_INCLUDE = CUDA_BASE+"/include"         # CUDA headers path
-CUDA_LIB_64 = CUDA_BASE+"/lib64"            # CUDA libs path ( /lib if you're running it in a 32b machine)
+CUDA_LIB = CUDA_BASE+"/lib64"            # CUDA libs path ( /lib if you're running it in a 32b machine)
 CUDA_ARCH = "sm_11"                         # CUDA architecture of your card.
+CUDA_LIBRARY = "cudart"
 
 PYTHON_EXTENSION_OPTIONS = "-pthread -fno-strict-aliasing -fmessage-length=0 -O3 -Wall -D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -fPIC"
 OPENMP_OPTION = "-fopenmp"
 PYTHON_LIBRARY = "python2.7"
-CUDA_LIBRARY = "cudart"
 ###############################################
 
 
@@ -86,7 +86,7 @@ if __name__ == '__main__':
                     using("g++").\
                     with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
                     using_libs([PYTHON_LIBRARY,CUDA_LIBRARY]).\
-                    using_lib_locations([CUDA_LIB_64]).\
+                    using_lib_locations([CUDA_LIB]).\
                     this_object_files([files_to_link["ThRMSDSerial"],files_to_link["ThRMSDSerialOmp"],files_to_link["ThRMSDCuda"],files_to_link["kernel_functions_serial"],\
                                        files_to_link["kernel_functions_omp"],files_to_link["kernel_functions_cuda"],files_to_link["NumpyHelperFuncs"],files_to_link["pyRMSD"],\
                                        files_to_link["RMSDomp"],files_to_link["RMSD"],files_to_link["RMSDSerial"],files_to_link["RMSDTools"],]).\
@@ -100,7 +100,7 @@ if __name__ == '__main__':
                         using("g++").\
                         with_options([]).\
                         using_libs([CUDA_LIBRARY]).\
-                        using_lib_locations([CUDA_LIB_64]).\
+                        using_lib_locations([CUDA_LIB]).\
                         this_object_files([files_to_link["ctest"],files_to_link["ThRMSDSerial"],files_to_link["kernel_functions_serial"],files_to_link["ThRMSDCuda"],\
                                            files_to_link["kernel_functions_cuda"],files_to_link["RMSD"]]).\
                         to_produce("test_main")

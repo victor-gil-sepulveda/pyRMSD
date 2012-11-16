@@ -1,6 +1,36 @@
-BRIEF EXPLANATION
+pyRMSD
 ==================
-pyRMSD goal is the fast (and easy!) calculation of rmsd matrices of large ensembles of protein conformations. 
+pyRMSD goal is the fast (and easy!) calculation of rmsd matrices of large ensembles of protein conformations. It also offers a symetric matrix 
+representation which fosters memory access speed over access security and also is very memory efficient. 
+The use of this matrix object can speed up any algorithm using a rmsd matrix a 4-5X. 
+
+Building and Installing
+==================
+Dependencies
+-------------
+Before installing be sure you have Python 2.7, [link numpy](http://numpy.scipy.org/) and [link scipy](http://www.scipy.org/) (if you want to use the tests) and [link prody](http://pypi.python.org/pypi/ProDy/) 
+(if you want to be able parse PDBs... which will be surely the case). All this packages are really easy to install (well... scipy can be a little bit tricky in some
+systems).
+Building
+-----------
+To build the code (over Linux, no Windows support yet) you must execute *install.py*.
+    python install.py
+This will build all serial and OpenMP calculators. *install.py* can be modified to add/remove compiling options (and you know what you're doing).
+If you want to add the CUDA calculators, just use:
+    python install.py --cuda
+and it will also try to build the available CUDA calculators. In this case you will surely have to modify the *CUDA_BASE*, *CUDA_INCLUDE*, *CUDA_LIB*, *CUDA_ARCH* and *CUDA_LIBRARY*
+constants in the file with values according to your CUDA SDK installation.
+Installing
+------------
+Once *install.py* has built all the needed files, you can copy the whole package to a place included in your PYTHONPATH (or change it to add this package's parent folder). See [link this](http://superuser.com/questions/247620/how-to-globally-modify-the-default-pythonpath-sys-path) if you have problems modifying it.
+
+FUTURE IMPROVEMENTS
+============
+If you have used this package and you feel something is missing/incorrect or whatever, you can change it and contribute. Some examples of things that
+need to be improved are:
+* Create an installer using Python distutils (difficult because of the use of CUDA).
+* Add more tests.
+* Add some comments!!
 
 USING IT
 =========
@@ -59,13 +89,6 @@ TESTING
 In order to test your build go to the folder pyRMSD/pyRMSD/test, uncompress amber_long.tar.bz and run test.py (python test.py). It will 
 test all the implementations and do a benchmark on your computer.
 
-FUTURE IMPROVEMENTS
-===================
-Adding CUDA source code or build using Yutong Zhao's released library.
-Adding no-CUDA build.
-Adding more documentation.
-Using distutils for building and installation.
-Improving this README.
 
 Credits and Thanks
 ==================

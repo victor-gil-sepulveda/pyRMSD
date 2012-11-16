@@ -29,7 +29,6 @@ if __name__ == '__main__':
     time_start = time.time()
     neighbors1 = matrix.get_neighbors_for_node(1,remaining_nodes, 0.5)
     time_end = time.time()
-    print len(neighbors1)," neighbors found."
     print "Fast Neighbor search for Fast matrix took %.3fs"%(time_end-time_start)
     
     time_start = time.time()
