@@ -1,6 +1,6 @@
 pyRMSD
 ==================
-pyRMSD goal is the fast (and easy!) calculation of rmsd matrices of large ensembles of protein conformations. It also offers a symetric matrix 
+pyRMSD goal is the fast (and easy!) calculation of rmsd matrices of large ensembles of protein conformations. It also offers a symmetric matrix 
 representation which fosters memory access speed over access security and also is very memory efficient. 
 The use of this matrix object can speed up any algorithm using a rmsd matrix a 4-5X. 
 
@@ -8,36 +8,39 @@ Building and Installing
 ==================
 Dependencies
 -------------
-Before installing be sure you have Python 2.7, [link numpy](http://numpy.scipy.org/) and [link scipy](http://www.scipy.org/) (if you want to use the tests) and [link prody](http://pypi.python.org/pypi/ProDy/) 
+Before installing be sure you have Python 2.7, [numpy](http://numpy.scipy.org/) and [scipy](http://www.scipy.org/) (if you want to use the tests) and [prody](http://pypi.python.org/pypi/ProDy/) 
 (if you want to be able parse PDBs... which will be surely the case). All this packages are really easy to install (well... scipy can be a little bit tricky in some
 systems).
 Building
 -----------
-To build the code (over Linux, no Windows support yet) you must execute *install.py*.
-    python install.py
-This will build all serial and OpenMP calculators. *install.py* can be modified to add/remove compiling options (and you know what you're doing).
-If you want to add the CUDA calculators, just use:
-    python install.py --cuda
-and it will also try to build the available CUDA calculators. In this case you will surely have to modify the *CUDA_BASE*, *CUDA_INCLUDE*, *CUDA_LIB*, *CUDA_ARCH* and *CUDA_LIBRARY*
-constants in the file with values according to your CUDA SDK installation.
+To build the code (over Linux, no Windows support yet) you must execute *install.py*.  
+    python install.py  
+This will build all serial and OpenMP calculators. *install.py* can be modified to add/remove compiling options (and you know what you're doing).  
+If you want to add the CUDA calculators, just use:  
+    python install.py --cuda  
+and it will also try to build the available CUDA calculators. In this case you will surely have to modify the *CUDA_BASE*, *CUDA_INCLUDE*, *CUDA_LIB*, *CUDA_ARCH* and *CUDA_LIBRARY* constants in the file with values according to your CUDA SDK installation.
 Installing
 ------------
-Once *install.py* has built all the needed files, you can copy the whole package to a place included in your PYTHONPATH (or change it to add this package's parent folder). See [link this](http://superuser.com/questions/247620/how-to-globally-modify-the-default-pythonpath-sys-path) if you have problems modifying it.
-
-FUTURE IMPROVEMENTS
-============
-If you have used this package and you feel something is missing/incorrect or whatever, you can change it and contribute. Some examples of things that
-need to be improved are:
-* Create an installer using Python distutils (difficult because of the use of CUDA).
-* Add more tests.
-* Add some comments!!
+Once *install.py* has built all the needed files, you can copy the whole package to a place included in your PYTHONPATH (or change it to add this package's parent folder). See [this](http://superuser.com/questions/247620/how-to-globally-modify-the-default-pythonpath-sys-path) if you have problems modifying it.
+Testing
+--------
+Once installed you can run the tests in *pyRMSD/test* using:  
+    python -m unittest  
 
 USING IT
 =========
 To use the module the first thing will be to extract all the coordinates from a PDB file. Coordinates must be stored in the same 
-storage format that Prody does. So if you don't have it yet, get it! (unless you want to replicate their job :P).
+storage format that prody does. So if you don't have it yet, get it! (unless you want to replicate their job :P).
 In fact, you can use prody through a wrapper in 'utils.py' (see 'pyRMSD/pyRMSD/test/test.py for a usage example).
 
+FUTURE IMPROVEMENTS
+============
+If you have used this package and you feel something is missing/incorrect or whatever, you can change it and contribute. Some examples of things that need to be improved are:  
+* Adding number of threads option for any OpenMP calculator.  
+* Adding  number of blocks and threads per block option in CUDA calculator.  
+* Create an installer using Python distutils (difficult because of the use of CUDA).  
+* Add more tests.  
+* Add more comments!!  
 
 (coordinates_set, number_of_conformations, atoms_per_conformation)  = getCoorsetsFromPDB(pdb_path)
 --------------------------------------------------------------------------------------------------
@@ -67,22 +70,7 @@ For both functions possible calculator types (calcType) are:
 "OMP_CALCULATOR" 	- To use the C Serial implementation with OpenMP.
 "CUDA_CALCULATOR" 	- To use the CUDA implementation.
 
-DEPENDENCIES
-=============
-You will need Numpy, Lapack, the Cuda stuff and maybe some other things just to make it run. You will also need 
 
-INSTALLATION
-=============
-To install it just copy the pyRMSD folder (the one with an __init__.py file inside) wherever you want. Just remember to add it to your 
-PYTHONPATH in order to be able to use it from outside.
-
-BUILDING
-=========
-In the case you need to rebuild it, use the build.sh shell script to do it. This script will generate all the needed objects for the C
-extensions and will place the library to import into the pyRMSD package folder (in this case pyRMSD/pyRMSD/).
-I haven't used distutils as it was giving me lots of problems. 
-Note that, because we don't have CUDA source code, at this time 
-If you want to build you will also need [[numpy development package]] with the headers and [[LAPACK]].
 
 TESTING
 ========
@@ -94,7 +82,7 @@ Credits and Thanks
 ==================
 - Yutong Zhao for its cuda rmsd code (unreleased yet). One can get the compiled objets from his blog (http://proteneer.com/blog/) .
 
-- Manuel Rivero, Ryoji Takahasi and Israel Cabeza de Vaca for the serial rmsd code (part of PELE++ project).
+- Manuel Rivero, Ryoji Takahasi and Israel Cabeza de Vaca for the initial code for the serial rmsd code (part of PELE++ project).
 
 - Helper functions where extracted from http://www.scipy.org/Cookbook/C_Extensions/NumPy_arrays, by Lou Pecora if I'm not wrong.
 
