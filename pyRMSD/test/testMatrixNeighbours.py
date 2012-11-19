@@ -6,7 +6,7 @@ Created on 15/02/2012
 import unittest
 from pyRMSD.condensedMatrix import CondensedMatrix
 
-class Test(unittest.TestCase):
+class TestMatrixNeighbours(unittest.TestCase):
 
     def test_get_neighbors_for_node(self):
         

@@ -7,7 +7,7 @@ import unittest
 import random
 from pyRMSD.condensedMatrix import CondensedMatrix
 
-class Test(unittest.TestCase):
+class TestCondensedMatrix(unittest.TestCase):
 
     def test_get_number_of_rows(self):
         random.seed()

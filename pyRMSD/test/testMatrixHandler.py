@@ -9,7 +9,7 @@ from pyRMSD.condensedMatrix import CondensedMatrix
 import numpy
 import os
 
-class Test(unittest.TestCase):
+class TestMatrixHandler(unittest.TestCase):
 
     def test_write_and_load(self):
         mh = MatrixHandler(".")

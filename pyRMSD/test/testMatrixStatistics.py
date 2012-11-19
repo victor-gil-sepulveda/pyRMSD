@@ -9,7 +9,7 @@ import random
 import numpy
 import scipy.stats
 
-class Test(unittest.TestCase):
+class testMatrixStatistics(unittest.TestCase):
     
     def setUp(self):
         num_elems = 50*49/2;
