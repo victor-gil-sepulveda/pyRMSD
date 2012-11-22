@@ -3,6 +3,48 @@ import pyRMSD.calculators
 from pyRMSD.utils.proteinReading import flattenCoords
 from pyRMSD.availableCalculators import availableCalculators
 
+
+class RMSDCalculator(object):
+    def __init__(self,coordsets, calculatorType):
+        """
+        """
+        self.calculatorType = calculatorType
+    
+    def pairwise(self,coordsets, first_conformation, second_conformation):
+        """
+        Documentation
+        @param param: 
+        @author: 
+        @date:
+        """
+        first_coords = coordsets[first_conformation]
+        second_coords = coordsets[second_conformation]
+        
+    
+    def oneVsTheOthers(self):
+        """
+        """
+        pass
+    
+    def oneVsNext(self):
+        """
+        """
+        pass
+    
+    def pairwiseRMSDMatrix(self):
+        """
+        """
+        pass
+    
+    def setNumberOfOpenMPThreads(self):
+        pass
+    
+    def setNumberOfCUDAThreadsPerBlock(self):
+        pass
+    
+    def setNumberOfBlocksPerGrid(self):
+        pass
+    
 def oneVsTheOthers(target,coordsets,calcType = "PYTHON_CALCULATOR"):
     if not calcType in availableCalculators():
         print "Calculator ",calcType, " is not a calculator."
