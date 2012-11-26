@@ -3,7 +3,7 @@ Created on 19/09/2012
 
 @author: victor
 '''
-import pyRMSD.RMSD
+import pyRMSD.RMSDCalculator
 import pickle
 from pyRMSD.condensedMatrix import CondensedMatrix #@UnresolvedImport
 
@@ -15,7 +15,7 @@ class MatrixHandler(object):
 
     def createMatrix(self, pdb_coordsets, calculator = "THEOBALD_SERIAL_OMP_CALCULATOR"):
         print "Calculating matrix..."
-        rmsd = pyRMSD.RMSD.calculateRMSDCondensedMatrix(pdb_coordsets, calculator)
+        rmsd = pyRMSD.RMSDCalculator.calculateRMSDCondensedMatrix(pdb_coordsets, calculator)
         self.distance_matrix = CondensedMatrix(rmsd)
         self.distance_matrix.recalculateStatistics()
         self.__save_statistics()

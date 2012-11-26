@@ -12,7 +12,7 @@ import pyRMSD.benchmark.alias.CythonCondensedMatrix as CythonCondensedMatrixes #
 if __name__ == '__main__':
     
     print "Creating data..."
-    row_size = 1000
+    row_size = 10000
     matrix_elem_size = row_size*(row_size-1)/2
     contents = random.sample(xrange(matrix_elem_size+1),matrix_elem_size)
     matrixes = {}

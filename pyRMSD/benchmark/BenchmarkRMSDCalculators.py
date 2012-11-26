@@ -4,7 +4,6 @@ Created on 14/11/2012
 @author: victor
 '''
 import collections
-import pyRMSD
 import pyRMSD.utils.proteinReading
 import time
 import os
@@ -12,7 +11,7 @@ import bz2
 from pyRMSD.test.TestRMSDCalculators import checkRMSDs
 
 if __name__ == '__main__':
-    using_cuda = "THEOBALD_CUDA_CALCULATOR" in pyRMSD.RMSD.availableCalculators()
+    using_cuda = "THEOBALD_CUDA_CALCULATOR" in pyRMSD.RMSDCalculator.availableCalculators()
     
     ######################
     # BENCHMARKING
@@ -53,7 +52,7 @@ if __name__ == '__main__':
     for CALC_TYPE in types:
         print "Calculating RMSD with ", CALC_TYPE
         t1 = time.time()
-        rmsds[CALC_TYPE] = pyRMSD.RMSD.calculateRMSDCondensedMatrix(coordsets, CALC_TYPE)
+        rmsds[CALC_TYPE] = pyRMSD.RMSDCalculator.calculateRMSDCondensedMatrix(coordsets, CALC_TYPE)
         t2 = time.time()
         times[CALC_TYPE] = t2-t1
         print "\tRmsd array generated. ", len(rmsds[CALC_TYPE]), " elements."

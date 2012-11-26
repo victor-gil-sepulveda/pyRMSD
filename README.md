@@ -49,8 +49,8 @@ Using the calculator is very straighforward. Use **calculateRMSDCondensedMatrix*
     rmsd_matrix = CondensedMatrix(rmsd)
 
 Will calculate the all vs all rmsd matrix (with ALL the pairwise superpositions). As the resulting matrix is symmetric and its 
-diagonal is 0, it will store only the upper diagonal triangle (condensed matrix), in the same way scipy.spatial.distance.pdist
-does (http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html). **calculator_type** can be one of theese:  
+diagonal is 0, it will store only the upper diagonal triangle (condensed matrix), in the same way [scipy.spatial.distance.pdist](http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html)
+does. **calculator_type** can be one of these:  
 
 * PYTHON_CALCULATOR
 * SERIAL_CALCULATOR
@@ -59,7 +59,7 @@ does (http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance
 * THEOBALD_SERIAL_CALCULATOR
 * THEOBALD_SERIAL_OMP_CALCULATOR
 
-Available calculators can be seen with:  
+One can see the available calculators with:  
     
     import pyRMSD.RMSD
     print pyRMSD.RMSD.availableCalculators()
@@ -92,7 +92,7 @@ If you have used this package and you feel something is missing/incorrect or wha
 * Create an installer using Python distutils (difficult because of the use of CUDA).  
 * Add more tests.  
 * Add more comments...  
-* And improve this README!!  
+* and improving this README!!  
 
 ##CREDITS
 - Helper functions where extracted from http://www.scipy.org/Cookbook/C_Extensions/NumPy_arrays, by Lou Pecora if I'm not wrong.
