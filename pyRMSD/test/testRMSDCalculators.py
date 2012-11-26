@@ -70,6 +70,22 @@ class TestRMSDCalculators(unittest.TestCase):
             for j in range(i+1, len(self.coordsets_mini)):
                 rmsd.append(calculator.pairwise(i, j))
         numpy.testing.assert_array_almost_equal(rmsd, expected_rmsd_data,4)
+    
+    def test_one_vs_others_python(self):
+        """
+        Calculates the reference vs the others with the python functions.
+        """
+        expected = [0.88785042, 0.82416178, 1.02156795, 0.69628994, 1.04059251, 0.77859792, 0.74962628, 0.73856698, 0.70444404, 0.92168545]
+        rmsd = pyRMSD.RMSDCalculator.RMSDCalculator(self.coordsets, "PYTHON_CALCULATOR").oneVsTheOthers(3)
+        numpy.testing.assert_array_almost_equal(rmsd, expected,8)
+        
+    def test_one_vs_others_serial_omp(self):
+        """
+        Calculates the reference vs the others with the OpenMP functions.
+        """
+        expected = [0.88785042, 0.82416178, 1.02156795, 0.69628994, 1.04059251, 0.77859792, 0.74962628, 0.73856698, 0.70444404, 0.92168545]
+        rmsd = pyRMSD.RMSDCalculator.RMSDCalculator(self.coordsets, "OMP_CALCULATOR").oneVsTheOthers(3)
+        numpy.testing.assert_array_almost_equal(rmsd, expected,8)
         
     def test_mini_python_serial(self):
         """
