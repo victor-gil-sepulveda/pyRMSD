@@ -8,7 +8,7 @@ class RMSD{
 	public:
 		RMSD(int numberOfConformations, int atomsPerConformation, double* allCoordinates);
 		virtual ~RMSD(){};
-		virtual void oneVsTheOthers(int conformation, double* rmsd) = 0;
+		virtual void oneVsFollowing(int conformation, double* rmsd) = 0;
 		virtual void calculateRMSDCondensedMatrix(std::vector<double>& rmsd) = 0;
 
 	protected:

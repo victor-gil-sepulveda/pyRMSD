@@ -9,7 +9,7 @@ class RMSDSerial: public RMSD{
 	public:
 		RMSDSerial(int numberOfConformations, int atomsPerConformation, double* allCoordinates);
 		~RMSDSerial();
-		void oneVsTheOthers(int conformation, double* rmsd);
+		void oneVsFollowing(int conformation, double* rmsd);
 		void calculateRMSDCondensedMatrix(std::vector<double>& rmsd);
 };
 

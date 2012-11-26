@@ -60,7 +60,7 @@ ThRMSDSerial::~ThRMSDSerial(){
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-void ThRMSDSerial::oneVsTheOthers(int conformation, double* rmsd_result) {
+void ThRMSDSerial::oneVsFollowing(int conformation, double* rmsd_result) {
 	if (conformation < numberOfConformations){
 		//cout<<conformation<<" vs the others"<<endl;
 		
@@ -90,7 +90,7 @@ void ThRMSDSerial::calculateRMSDCondensedMatrix(vector<double>& rmsd){
 	for(int conformation_number = 0;conformation_number < numberOfConformations; ++conformation_number){ 
 		int number_of_rmsds = numberOfConformations - conformation_number-1;
 		double* rmsd_tmp = new double[number_of_rmsds];
-		oneVsTheOthers(conformation_number,rmsd_tmp);
+		oneVsFollowing(conformation_number,rmsd_tmp);
 		for (int i = 0; i < number_of_rmsds; ++i){
 			rmsd.push_back(rmsd_tmp[i]);
 		}

@@ -15,7 +15,7 @@ ThRMSDSerialOmp::ThRMSDSerialOmp(int numberOfConformations, int atomsPerConforma
     
 }
 
-void ThRMSDSerialOmp::oneVsTheOthers(int conformation, double* rmsd_result) {
+void ThRMSDSerialOmp::oneVsFollowing(int conformation, double* rmsd_result) {
 	if (conformation < numberOfConformations){
 		//cout<<conformation<<" vs the others"<<endl;
 		

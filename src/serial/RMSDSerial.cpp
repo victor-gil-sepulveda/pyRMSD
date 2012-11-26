@@ -11,7 +11,7 @@ RMSDSerial::RMSDSerial(int numberOfConformations, int atomsPerConformation, doub
 
 RMSDSerial::~RMSDSerial(){}
  
-void RMSDSerial::oneVsTheOthers(int conformation, double* rmsd){
+void RMSDSerial::oneVsFollowing(int conformation, double* rmsd){
 	if(conformation>=numberOfConformations){
 		cout<<"Error, this conformation doesn't exist ("<<conformation<<")"<<endl;
 	}
@@ -36,7 +36,7 @@ void RMSDSerial::calculateRMSDCondensedMatrix(vector<double>& rmsd){
 		//cout<<"Calculating "<<conformation_number<<"th conformation ("<<conformation_number*100./numberOfConformations<<"%)"<<endl<<flush;
 		int number_of_rmsds = numberOfConformations-conformation_number-1;
 		double* rmsd_tmp = new double[number_of_rmsds];
-    	oneVsTheOthers(conformation_number,rmsd_tmp);
+    	oneVsFollowing(conformation_number,rmsd_tmp);
 		for (int i = 0; i < number_of_rmsds; ++i){
 			rmsd.push_back(rmsd_tmp[i]);
 		}

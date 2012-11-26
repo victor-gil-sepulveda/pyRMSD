@@ -86,9 +86,9 @@ class RMSDCalculator(object):
         np_coords = flattenCoords(self.coordsets)
         if self.calculatorType == "PYTHON_CALCULATOR":
             target = self.coordsets[conformation_number]
-            return p_oneVsTheOthers(target, self.coordsets[conformation_number+1:])
+            return p_oneVsFollowing(target, self.coordsets[conformation_number+1:])
         else:
-            return pyRMSD.calculators.oneVsTheOthers(availableCalculators()[self.calculatorType], np_coords, self.number_of_atoms, conformation_number, self.number_of_conformations)
+            return pyRMSD.calculators.oneVsFollowing(availableCalculators()[self.calculatorType], np_coords, self.number_of_atoms, conformation_number, self.number_of_conformations)
         return []
         
     def pairwiseRMSDMatrix(self):
@@ -165,10 +165,10 @@ def p_calculateRMSDCondensedMatrix(coordsets):
     """
     rmsd_data = []
     for i, coords in enumerate(coordsets[:-1]):
-        rmsd_data.extend(p_oneVsTheOthers(coords,coordsets[i+1:]))
+        rmsd_data.extend(p_oneVsFollowing(coords,coordsets[i+1:]))
     return rmsd_data
 
-def p_oneVsTheOthers(reference_conformation, coordsets):
+def p_oneVsFollowing(reference_conformation, coordsets):
     """
     Modified Prody's code for  Kabsch's superposition algorithm.
     

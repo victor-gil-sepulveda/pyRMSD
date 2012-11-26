@@ -26,7 +26,7 @@ void RMSDomp::calculateRMSDCondensedMatrix(std::vector<double> & rmsd){
 
 		for(int conformation_number = 0;conformation_number<numberOfConformations;++conformation_number){
 			int offset = conformation_number*(numberOfConformations-1)- (((conformation_number-1)*conformation_number)/2) ;
-			oneVsTheOthers(conformation_number,&(rmsd_tmp[offset]));
+			oneVsFollowing(conformation_number,&(rmsd_tmp[offset]));
 		}
 
 		for (int i = 0; i < num_of_rmsds; ++i){
@@ -36,7 +36,7 @@ void RMSDomp::calculateRMSDCondensedMatrix(std::vector<double> & rmsd){
 		delete [] rmsd_tmp;
 }
 
-void RMSDomp::oneVsTheOthers(int conformation, double *rmsd){
+void RMSDomp::oneVsFollowing(int conformation, double *rmsd){
 	if(conformation>=numberOfConformations){
 		cout<<"Error, this conformation doesn't exist ("<<conformation<<")"<<endl;
 	}

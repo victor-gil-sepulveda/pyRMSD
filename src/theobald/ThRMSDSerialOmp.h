@@ -11,7 +11,7 @@ class ThRMSDSerialOmp: public ThRMSDSerial{
 
 	public:
 		ThRMSDSerialOmp(int numberOfConformations, int atomsPerConformation, double* coords);
-		void oneVsTheOthers(int conformation, double* rmsd_result);
+		void oneVsFollowing(int conformation, double* rmsd_result);
 };
 
 #endif

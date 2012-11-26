@@ -123,7 +123,7 @@ ThRMSDCuda::~ThRMSDCuda(){
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-void ThRMSDCuda::oneVsTheOthers(int conformation, double* rmsd_result) {
+void ThRMSDCuda::oneVsFollowing(int conformation, double* rmsd_result) {
 	if (conformation < numberOfConformations){
 	    calcRMSDOfOneVsOthers<<<numberOfBlocks,threadsPerBlock>>>(this->deviceCoords, conformation, conformation + 1, 
 	    															numberOfConformations, atomsPerConformation, 

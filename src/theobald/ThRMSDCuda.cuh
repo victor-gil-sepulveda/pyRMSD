@@ -13,7 +13,7 @@ class ThRMSDCuda: public RMSD{
 	public:
 		ThRMSDCuda(int numberOfConformations, int atomsPerConformation, double* coords, int threads_per_block = 32, int number_of_blocks = 512);
 		~ThRMSDCuda();
-		void oneVsTheOthers(int conformation, double* rmsd_result );
+		void oneVsFollowing(int conformation, double* rmsd_result );
 		void calculateRMSDCondensedMatrix(std::vector<double>& rmsd);
 		
 		// For debug purposes 

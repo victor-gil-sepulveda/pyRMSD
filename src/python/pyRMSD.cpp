@@ -116,7 +116,7 @@ RMSD* getCalculator(calcType cType, int numberOfConformations, int atomsPerConfo
 	}
 }
 
-static PyObject* oneVsTheOthers(PyObject *self, PyObject *args){
+static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 
 	int conformation_number;
 	int atoms_per_conformation;
@@ -129,7 +129,7 @@ static PyObject* oneVsTheOthers(PyObject *self, PyObject *args){
     rmsd.resize(number_of_conformations-conformation_number-1);
 
     RMSD* rmsdCalculator = getCalculator(cType, number_of_conformations, atoms_per_conformation, all_coordinates);
-	rmsdCalculator->oneVsTheOthers(conformation_number,&(rmsd[0]));
+	rmsdCalculator->oneVsFollowing(conformation_number,&(rmsd[0]));
 
 	PyArrayObject* rmsds_list_obj = embed_rmsd_data(rmsd);
 	delete rmsdCalculator;
@@ -156,8 +156,9 @@ static PyObject* calculateRMSDCondensedMatrix(PyObject *self, PyObject *args){
 }
 
 static PyMethodDef pyRMSDMethods[] = {
-    {"oneVsTheOthers",  oneVsTheOthers, METH_VARARGS,""},
+    {"oneVsFollowing",  oneVsFollowing, METH_VARARGS,""},
     {"calculateRMSDCondensedMatrix",  calculateRMSDCondensedMatrix, METH_VARARGS,""},
+
     {NULL, NULL, 0, NULL}
 };
 

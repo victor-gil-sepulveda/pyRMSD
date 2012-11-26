@@ -15,7 +15,7 @@ class RMSDomp: public RMSD{
 	public:
 		RMSDomp(int numberOfConformations, int atomsPerConformation, double* allCoordinates);
 		virtual ~RMSDomp();
-		void oneVsTheOthers(int conformation, double* rmsd);
+		void oneVsFollowing(int conformation, double* rmsd);
 		void calculateRMSDCondensedMatrix(std::vector<double>& rmsd);
 };
 

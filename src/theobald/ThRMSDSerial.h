@@ -12,7 +12,7 @@ class ThRMSDSerial: public RMSD{
 	public:
 		ThRMSDSerial(int numberOfConformations, int atomsPerConformation, double* coords);
 		virtual ~ThRMSDSerial();
-		virtual void oneVsTheOthers(int conformation, double* rmsd_result);
+		virtual void oneVsFollowing(int conformation, double* rmsd_result);
 		virtual void calculateRMSDCondensedMatrix(std::vector<double>& rmsd);
 		
 		// For debug purposes
