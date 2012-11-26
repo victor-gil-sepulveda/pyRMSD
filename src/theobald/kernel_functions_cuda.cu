@@ -249,7 +249,7 @@ __device__ floating_point_type calcRMSDOfTwoConformations(floating_point_type* f
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-__global__ void calcRMSDOfOneVsOthers(floating_point_type* all_coordinates,
+__global__ void calcRMSDOfOneVsFollowing(floating_point_type* all_coordinates,
 									 const int base_conformation_id,
 									 const int other_conformations_starting_id,
 									 const int number_of_conformations,

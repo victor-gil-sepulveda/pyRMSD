@@ -247,7 +247,7 @@ floating_point_type ThRMSDSerialKernel::calcRMSDOfTwoConformations(	floating_poi
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-void ThRMSDSerialKernel::calcRMSDOfOneVsOthers(floating_point_type* all_coordinates,
+void ThRMSDSerialKernel::calcRMSDOfOneVsFollowing(floating_point_type* all_coordinates,
 									 int base_conformation_id,
 									 int other_conformations_starting_id,
 									 int number_of_conformations,

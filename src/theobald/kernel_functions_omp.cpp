@@ -33,7 +33,7 @@ using namespace std;
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-void ThRMSDSerialOmpKernel::calcRMSDOfOneVsOthers(floating_point_type* all_coordinates,
+void ThRMSDSerialOmpKernel::calcRMSDOfOneVsFollowing(floating_point_type* all_coordinates,
 									 int base_conformation_id,
 									 int other_conformations_starting_id,
 									 int number_of_conformations,

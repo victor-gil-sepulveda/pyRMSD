@@ -125,7 +125,7 @@ ThRMSDCuda::~ThRMSDCuda(){
 ///////////////////////////////////////////////////////////////
 void ThRMSDCuda::oneVsFollowing(int conformation, double* rmsd_result) {
 	if (conformation < numberOfConformations){
-	    calcRMSDOfOneVsOthers<<<numberOfBlocks,threadsPerBlock>>>(this->deviceCoords, conformation, conformation + 1, 
+	    calcRMSDOfOneVsFollowing<<<numberOfBlocks,threadsPerBlock>>>(this->deviceCoords, conformation, conformation + 1, 
 	    															numberOfConformations, atomsPerConformation, 
 	    															atomsPerConformation*3, this->deviceRMSDs);
 	    
@@ -175,7 +175,7 @@ void ThRMSDCuda::calculateRMSDCondensedMatrix(vector<double>& rmsd){
 		for(int conformation_number = 0;conformation_number < numberOfConformations; ++conformation_number){ 
 			numberOfCalculatedRmsds = numberOfConformations-(conformation_number+1);
 	    	
-	    	calcRMSDOfOneVsOthers<<<numberOfBlocks,
+	    	calcRMSDOfOneVsFollowing<<<numberOfBlocks,
 	    						threadsPerBlock,
 	    						0,execution_stream>>>(deviceCoords, conformation_number, conformation_number + 1, 
 	    																					numberOfConformations, atomsPerConformation, 

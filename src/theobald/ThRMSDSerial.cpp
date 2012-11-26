@@ -64,7 +64,7 @@ void ThRMSDSerial::oneVsFollowing(int conformation, double* rmsd_result) {
 	if (conformation < numberOfConformations){
 		//cout<<conformation<<" vs the others"<<endl;
 		
-		ThRMSDSerialKernel::calcRMSDOfOneVsOthers(convertedCoords, conformation, conformation + 1,
+		ThRMSDSerialKernel::calcRMSDOfOneVsFollowing(convertedCoords, conformation, conformation + 1,
 	    			numberOfConformations, atomsPerConformation, this->tmpRMSDs);
 	    
 	    // Do the copy to the output vector (needs to have the correct size)
