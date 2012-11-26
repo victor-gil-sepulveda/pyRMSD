@@ -28,7 +28,7 @@ int main(int argc, char **argv){
 
 	// Calculate
 	ThRMSDSerial serial(11,66,&(serial_coordinates[0]));
-	serial.oneVsTheOthers(0, rmsd_serial);
+	serial.oneVsFollowing(0, rmsd_serial);
 	print_vector("Serial:",rmsd_serial,11);
 
 //	ThRMSDCuda cuda(11,66,&(cuda_coordinates[0]));

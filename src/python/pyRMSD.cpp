@@ -21,12 +21,14 @@ enum calcType{
 
 void parse_params_for_one_vs_others(PyObject *args, calcType& cType,
     		int& number_of_atoms, int& conformation_number, int& number_of_conformations,
+    		int& number_of_threads, int& threads_per_block,int& blocks_per_grid,
     		double*& coords_list){
 	
 	PyArrayObject* coords_list_obj;
 	
-	if (!PyArg_ParseTuple(args, "iO!iii",&cType,&PyArray_Type, &coords_list_obj,
-	&number_of_atoms, &conformation_number, &number_of_conformations)){
+	if (!PyArg_ParseTuple(args, "iO!iiiiii",&cType,&PyArray_Type, &coords_list_obj,
+	&number_of_atoms, &conformation_number, &number_of_conformations,
+	&number_of_threads, &threads_per_block, &blocks_per_grid)){
     	PyErr_SetString(PyExc_RuntimeError, "Error parsing parameters");
     }
 
@@ -48,12 +50,14 @@ void parse_params_for_one_vs_others(PyObject *args, calcType& cType,
 
 void parse_params_for_condensed_matrix(PyObject *args,calcType& cType,
     		int& number_of_atoms, int& number_of_conformations,
+    		int& number_of_threads, int& threads_per_block,int& blocks_per_grid,
     		double*& coords_list){
 
 	PyArrayObject* coords_list_obj;
 
-	if (!PyArg_ParseTuple(args, "iO!ii",&cType,&PyArray_Type, &coords_list_obj,
-	&number_of_atoms, &number_of_conformations)){
+	if (!PyArg_ParseTuple(args, "iO!iiiii",&cType,&PyArray_Type, &coords_list_obj,
+	&number_of_atoms, &number_of_conformations,
+	&number_of_threads, &threads_per_block, &blocks_per_grid)){
     	PyErr_SetString(PyExc_RuntimeError, "Error parsing parameters");
     }
 
@@ -86,7 +90,9 @@ PyArrayObject* embed_rmsd_data(vector<double>& rmsd){
 	return rmsds_list_obj;
 }
 
-RMSD* getCalculator(calcType cType, int numberOfConformations, int atomsPerConformation, double* Coordinates){
+RMSD* getCalculator(calcType cType, int numberOfConformations, int atomsPerConformation,
+		int number_of_threads, int threads_per_block, int blocks_per_grid,
+		double* Coordinates){
 
 	switch(cType){
 
@@ -100,7 +106,7 @@ RMSD* getCalculator(calcType cType, int numberOfConformations, int atomsPerConfo
 
 #ifdef USE_CUDA
 		case THEOBALD_CUDA_CALCULATOR:
-			return new ThRMSDCuda(numberOfConformations, atomsPerConformation, Coordinates, 32, 8);
+			return new ThRMSDCuda(numberOfConformations, atomsPerConformation, Coordinates, threads_per_block, blocks_per_grid);
 			break;
 #endif
 		case THEOBALD_SERIAL_CALCULATOR:
@@ -121,15 +127,23 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 	int conformation_number;
 	int atoms_per_conformation;
 	int number_of_conformations;
+	int number_of_threads;
+	int threads_per_block;
+	int blocks_per_grid;
+
 	calcType cType;
 	double* all_coordinates;
 	vector<double> rmsd;
 
-	parse_params_for_one_vs_others(args, cType, atoms_per_conformation, conformation_number, number_of_conformations, all_coordinates);
-    rmsd.resize(number_of_conformations-conformation_number-1);
+	parse_params_for_one_vs_others(args, cType, atoms_per_conformation, conformation_number, number_of_conformations,
+			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
 
-    RMSD* rmsdCalculator = getCalculator(cType, number_of_conformations, atoms_per_conformation, all_coordinates);
-	rmsdCalculator->oneVsFollowing(conformation_number,&(rmsd[0]));
+	rmsd.resize(number_of_conformations-conformation_number-1);
+
+    RMSD* rmsdCalculator = getCalculator(cType, number_of_conformations, atoms_per_conformation,
+    		number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
+
+    rmsdCalculator->oneVsFollowing(conformation_number,&(rmsd[0]));
 
 	PyArrayObject* rmsds_list_obj = embed_rmsd_data(rmsd);
 	delete rmsdCalculator;
@@ -140,13 +154,19 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 static PyObject* calculateRMSDCondensedMatrix(PyObject *self, PyObject *args){
 	int atoms_per_conformation;
 	int number_of_conformations;
+	int number_of_threads;
+	int threads_per_block;
+	int blocks_per_grid;
 	double* all_coordinates;
 	calcType cType;
 	vector<double> rmsd;
 
-	parse_params_for_condensed_matrix(args, cType, atoms_per_conformation, number_of_conformations, all_coordinates);
+	parse_params_for_condensed_matrix(args, cType, atoms_per_conformation, number_of_conformations,
+			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
 
-	RMSD* rmsdCalculator = getCalculator(cType, number_of_conformations, atoms_per_conformation, all_coordinates);
+	RMSD* rmsdCalculator = getCalculator(cType, number_of_conformations, atoms_per_conformation,
+			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
+
 	rmsdCalculator->calculateRMSDCondensedMatrix(rmsd);
 
 	PyArrayObject* rmsds_list_obj = embed_rmsd_data(rmsd);
@@ -158,11 +178,11 @@ static PyObject* calculateRMSDCondensedMatrix(PyObject *self, PyObject *args){
 static PyMethodDef pyRMSDMethods[] = {
     {"oneVsFollowing",  oneVsFollowing, METH_VARARGS,""},
     {"calculateRMSDCondensedMatrix",  calculateRMSDCondensedMatrix, METH_VARARGS,""},
-
     {NULL, NULL, 0, NULL}
 };
 
 PyMODINIT_FUNC initcalculators(void){
     (void) Py_InitModule("calculators", pyRMSDMethods);
+
     import_array();
 }

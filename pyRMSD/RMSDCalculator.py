@@ -27,6 +27,9 @@ class RMSDCalculator(object):
             self.coordsets = coordsets
             self.number_of_conformations = len(coordsets)
             self.number_of_atoms = len(coordsets[0])
+            self.__threads_per_block = 32
+            self.__blocks_per_grid = 8
+            self.__number_of_threads = 8
     
     def pairwise(self, first_conformation_number, second_conformation_number):
         """
@@ -88,7 +91,9 @@ class RMSDCalculator(object):
             target = self.coordsets[conformation_number]
             return p_oneVsFollowing(target, self.coordsets[conformation_number+1:])
         else:
-            return pyRMSD.calculators.oneVsFollowing(availableCalculators()[self.calculatorType], np_coords, self.number_of_atoms, conformation_number, self.number_of_conformations)
+            return pyRMSD.calculators.oneVsFollowing(availableCalculators()[self.calculatorType], np_coords, 
+                                                     self.number_of_atoms, conformation_number, self.number_of_conformations,
+                                                     self.__threads_per_block, self.__blocks_per_grid, self.__blocks_per_grid)
         return []
         
     def pairwiseRMSDMatrix(self):
@@ -104,7 +109,9 @@ class RMSDCalculator(object):
         if self.calculatorType == "PYTHON_CALCULATOR":
             return p_calculateRMSDCondensedMatrix(self.coordsets)
         else:
-            return pyRMSD.calculators.calculateRMSDCondensedMatrix(availableCalculators()[self.calculatorType], np_coords, self.number_of_atoms, self.number_of_conformations)
+            return pyRMSD.calculators.calculateRMSDCondensedMatrix(availableCalculators()[self.calculatorType], np_coords, 
+                                                                   self.number_of_atoms, self.number_of_conformations,
+                                                                   self.__threads_per_block, self.__blocks_per_grid, self.__blocks_per_grid)
     
     def setNumberOfOpenMPThreads(self, number_of_threads):
         """
@@ -116,29 +123,16 @@ class RMSDCalculator(object):
         @date: 26/11/2012
         """
         if ("OMP" in self.calculatorType):
-            pass
+            self.__number_of_threads = number_of_threads
         else:
             print "Cannot set any OpenMP related parameter using this calculator: ", self.calculatorType
             raise KeyError
     
-    def setNumberOfCUDAThreadsPerBlock(self, number_of_threads):
+    def setCUDAKernelThreadsPerBlock(self, number_of_threads, number_of_blocks):
         """
-        Sets the number of threads per block in CUDA calculators.
+        Sets the number of threads per block and blocks per grid in CUDA calculators.
         
         @param number_of_threads: Number of threads per block to be used when launching CUDA Kernels.
-        
-        @author: vgil
-        @date: 26/11/2012
-        """
-        if ("CUDA" in self.calculatorType):
-            pass
-        else:
-            print "Cannot set any CUDA related parameter using this calculator: ", self.calculatorType
-            raise KeyError
-    
-    def setNumberOfBlocksPerGrid(self, number_of_blocks):
-        """
-        Sets the number of blocks in CUDA calculators.
         
         @param number_of_blocks: Number of blocks per grid to be used when launching CUDA Kernels.
         
@@ -146,10 +140,12 @@ class RMSDCalculator(object):
         @date: 26/11/2012
         """
         if ("CUDA" in self.calculatorType):
-            pass
+            self.__threads_per_block = number_of_threads
+            self.__blocks_per_grid = number_of_blocks
         else:
             print "Cannot set any CUDA related parameter using this calculator: ", self.calculatorType
             raise KeyError
+    
             
 
 def p_calculateRMSDCondensedMatrix(coordsets):
@@ -202,5 +198,3 @@ def p_oneVsFollowing(reference_conformation, coordsets):
         rmsd_data.append(numpy.sqrt(((coordsets[i]-reference_conformation) ** 2).sum() * divByN))
     
     return rmsd_data
-        
-        
