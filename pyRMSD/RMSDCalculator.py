@@ -151,42 +151,6 @@ class RMSDCalculator(object):
             print "Cannot set any CUDA related parameter using this calculator: ", self.calculatorType
             raise KeyError
             
-def oneVsTheOthers(target,coordsets,calcType = "PYTHON_CALCULATOR"):
-    if not calcType in availableCalculators():
-        print "Calculator ",calcType, " is not a calculator."
-        raise  KeyError
-    
-    # TODO: Check for availability of the device ie. CUDA
-    number_of_conformations = len(coordsets)
-    number_of_atoms = len(coordsets[0])
-    conf_num = target
-    np_coords = flattenCoords(coordsets)
-    
-    if calcType == "PYTHON_CALCULATOR":
-        rmsd = []
-        target = coordsets[conf_num]
-        p_oneVsTheOthers(target,coordsets[conf_num+1:],rmsd)
-        return rmsd
-    else:
-        return pyRMSD.calculators.oneVsTheOthers(availableCalculators()[calcType],np_coords, number_of_atoms, conf_num, number_of_conformations)
-    
-    return []
-
-def calculateRMSDCondensedMatrix(coordsets,calcType = "PYTHON_CALCULATOR"):
-    if not calcType in availableCalculators():
-        print "Calculator ",calcType, " is not a calculator."
-        raise KeyError
-    
-    # TODO: Check for availability of the device ie. CUDA
-    number_of_conformations = len(coordsets)
-    number_of_atoms = len(coordsets[0])
-    np_coords = flattenCoords(coordsets)
-    if calcType == "PYTHON_CALCULATOR":
-        return p_calculateRMSDCondensedMatrix(coordsets)
-    else:
-        return pyRMSD.calculators.calculateRMSDCondensedMatrix(availableCalculators()[calcType],np_coords, number_of_atoms, number_of_conformations)
-    
-    return []
 
 def p_calculateRMSDCondensedMatrix(coordsets):
     """

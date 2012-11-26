@@ -4,18 +4,19 @@ Created on 14/11/2012
 @author: victor
 '''
 import collections
+import numpy.testing
+import pyRMSD.RMSDCalculator
 import pyRMSD.utils.proteinReading
 import time
 import os
 import bz2
-from pyRMSD.test.TestRMSDCalculators import checkRMSDs
 
 if __name__ == '__main__':
     using_cuda = "THEOBALD_CUDA_CALCULATOR" in pyRMSD.RMSDCalculator.availableCalculators()
     
     ######################
     # BENCHMARKING
-    #####################
+    ######################
     print "Loading file..."
     t1 = time.time()
     print "\tUncompressing..."
@@ -30,14 +31,9 @@ if __name__ == '__main__':
     
     #######################
     # CALCULATION
-    #####################
-    types = [\
-             "SERIAL_CALCULATOR",\
-             "THEOBALD_SERIAL_CALCULATOR",\
-             "THEOBALD_SERIAL_OMP_CALCULATOR",\
-             "OMP_CALCULATOR",\
-             #"PYTHON_CALCULATOR"
-             ]
+    #######################
+    types = pyRMSD.RMSDCalculator.availableCalculators()
+    
     DEFAULT_PRECISSION = 1e-8
     precissions = collections.defaultdict(lambda:DEFAULT_PRECISSION)
     
@@ -52,7 +48,8 @@ if __name__ == '__main__':
     for CALC_TYPE in types:
         print "Calculating RMSD with ", CALC_TYPE
         t1 = time.time()
-        rmsds[CALC_TYPE] = pyRMSD.RMSDCalculator.calculateRMSDCondensedMatrix(coordsets, CALC_TYPE)
+        pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, CALC_TYPE)
+        rmsds[CALC_TYPE] = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, CALC_TYPE).pairwiseRMSDMatrix()
         t2 = time.time()
         times[CALC_TYPE] = t2-t1
         print "\tRmsd array generated. ", len(rmsds[CALC_TYPE]), " elements."
@@ -65,7 +62,7 @@ if __name__ == '__main__':
         if CALC_TYPE != golden:
             print "Comparing results (%s vs %s)..."%(golden, CALC_TYPE)
             t1 = time.time()
-            checkRMSDs(rmsds[golden], rmsds[CALC_TYPE],precissions[CALC_TYPE])
+            numpy.testing.assert_array_almost_equal(rmsds[golden], rmsds[CALC_TYPE],precissions[CALC_TYPE])
             t2 = time.time()
             print 'Comparison took %0.3fs' % (t2-t1)
     
