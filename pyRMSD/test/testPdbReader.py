@@ -103,7 +103,7 @@ class Test(unittest.TestCase):
     def test_prody_vs_lite_reading_differences(self):
         """
         This illustrates the reading differences between prody and lite reader. Prody will not read unknown residues, while
-        the lite reader, as its simpler, will read everything. This makes the read coordinates different.
+        the lite reader, as its simpler, will read everything. This makes the read coordinates different, and then the RMSD results.
         """
         prody_reader = Reader("PRODY_READER").readThisFile('data/amber_short.pdb').gettingOnlyCAs()
         prody_coordinates = prody_reader.read() 
