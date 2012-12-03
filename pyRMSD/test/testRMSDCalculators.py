@@ -4,7 +4,7 @@ Created on 16/11/2012
 @author: victor
 '''
 import unittest
-import pyRMSD.utils
+import pyRMSD.utils.proteinReading
 import pyRMSD.RMSDCalculator
 import numpy
 
@@ -28,12 +28,18 @@ class TestRMSDCalculators(unittest.TestCase):
                                        1.00029474,1.01622641,1.10694473,0.68347196,0.83819283,0.7589582,
                                        0.93694602,0.76944618,0.82288799,0.91196003,0.75938856,0.68278426,
                                        0.76302383]
-        self.coordsets_mini, nconf, natoms = pyRMSD.utils.proteinReading.getCoordsetsFromPDB('data/amber_mini.pdb') #@UnusedVariable
         
-        self.coordsets,self.number_of_conformations,self.number_of_atoms = pyRMSD.utils.proteinReading.getCoordsetsFromPDB('data/amber_short.pdb')
-        self.np_coords = pyRMSD.utils.proteinReading.flattenCoords(self.coordsets)
+        reader = pyRMSD.utils.proteinReading.Reader("PRODY_READER")
+        reader.readThisFile('data/amber_mini.pdb').gettingOnlyCAs()
+        self.coordsets_mini =  reader.read()
+        
+        reader = pyRMSD.utils.proteinReading.Reader("PRODY_READER")
+        reader.readThisFile('data/amber_short.pdb').gettingOnlyCAs()
+        self.coordsets =  reader.read()
+        self.number_of_conformations = reader.numberOfFrames
+        self.number_of_atoms = reader.numberOfAtoms
     
-    
+
     def test_python_pairwise(self):
         """
         Calculates all matrix elements one by one with the pairwise operation.

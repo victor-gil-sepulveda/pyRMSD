@@ -93,7 +93,7 @@ class RMSDCalculator(object):
         else:
             return pyRMSD.calculators.oneVsFollowing(availableCalculators()[self.calculatorType], np_coords, 
                                                      self.number_of_atoms, conformation_number, self.number_of_conformations,
-                                                     self.__threads_per_block, self.__blocks_per_grid, self.__blocks_per_grid)
+                                                     self.__number_of_threads, self.__threads_per_block, self.__blocks_per_grid)
         return []
         
     def pairwiseRMSDMatrix(self):
@@ -111,7 +111,7 @@ class RMSDCalculator(object):
         else:
             return pyRMSD.calculators.calculateRMSDCondensedMatrix(availableCalculators()[self.calculatorType], np_coords, 
                                                                    self.number_of_atoms, self.number_of_conformations,
-                                                                   self.__threads_per_block, self.__blocks_per_grid, self.__blocks_per_grid)
+                                                                   self.__number_of_threads, self.__blocks_per_grid, self.__blocks_per_grid)
     
     def setNumberOfOpenMPThreads(self, number_of_threads):
         """
@@ -146,8 +146,6 @@ class RMSDCalculator(object):
             print "Cannot set any CUDA related parameter using this calculator: ", self.calculatorType
             raise KeyError
     
-            
-
 def p_calculateRMSDCondensedMatrix(coordsets):
     """
     Calculates the pairwise RMSD matrix for all conformations in the coordinates set.
@@ -166,7 +164,7 @@ def p_calculateRMSDCondensedMatrix(coordsets):
 
 def p_oneVsFollowing(reference_conformation, coordsets):
     """
-    Modified Prody's code for  Kabsch's superposition algorithm.
+    Slightly modified Prody's code for  Kabsch's superposition algorithm.
     
     @param reference_conformation: The id of the reference conformation.
     

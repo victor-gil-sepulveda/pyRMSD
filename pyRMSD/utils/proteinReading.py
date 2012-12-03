@@ -1,44 +1,191 @@
 from prody.ensemble import PDBEnsemble
 from prody.proteins import parsePDB
 import numpy
-
-def getCoordsetsFromPDB(pdb_path,selection_string=""):
-    pdb = parsePDB(pdb_path, subset='calpha')
-    print "PDB parsed (",pdb_path,")"
-    if selection_string != "":
-        selection = pdb.select(selection_string)
-        pdb = selection.copy()
-    coordsets = pdb.getCoordsets()
-    number_of_conformations = len(coordsets)
-    number_of_atoms = len(pdb)
-    return coordsets, number_of_conformations, number_of_atoms
-
-def getCoordsetsFromTwoPDBs(pdb_path1,pdb_path2,selection_string=""):
-    coords1,num_conf1,num_atoms1 = getCoordsetsFromPDB(pdb_path1,selection_string)
-    coords2,num_conf2,num_atoms2 = getCoordsetsFromPDB(pdb_path2,selection_string)
-    complete_coordset =  numpy.append(coords1,coords2,axis=0)   
-    if(num_atoms1 != num_atoms2):
-        print "[WARNING] pdb1 and pdb2 have different number of CA atoms (",num_atoms1,",",num_atoms2,")"
-    return complete_coordset, num_conf1+num_conf2, num_atoms1+num_atoms2
+import pyRMSD.pdbReader
 
 def flattenCoords(coordsets):
-    ca_coords_list = []
+    """
+    Class constructor. Initializes the small DSL props.
+    
+    @param readerType: One of the types in 'availableReaderTypes'
+     
+    @author: vgil
+    @date: 30/11/2012
+    """
+#    ca_coords_list = []
+#    for coords in coordsets:
+#        for coord_triplet in coords:
+#            ca_coords_list.append(coord_triplet[0]) 
+#            ca_coords_list.append(coord_triplet[1]) 
+#            ca_coords_list.append(coord_triplet[2])
+#             
+#    return numpy.array(ca_coords_list)
+    flattened = numpy.zeros(len(coordsets)*len(coordsets[0])*3, dtype=numpy.float64)
+    i = 0
     for coords in coordsets:
         for coord_triplet in coords:
-            ca_coords_list.append(coord_triplet[0]) 
-            ca_coords_list.append(coord_triplet[1]) 
-            ca_coords_list.append(coord_triplet[2]) 
-    return numpy.array(ca_coords_list)
-
-def coalesceCoords(coordsets, number_of_conformations, number_of_atoms):
-    ca_coords_list = [0]*(number_of_conformations*number_of_atoms*3)
-    confId = 0
-    for coords in coordsets:
-        atomId = 0
-        for coord_triplet in coords:
-            ca_coords_list[atomId*number_of_conformations*3+0*number_of_conformations+confId] = coord_triplet[0]
-            ca_coords_list[atomId*number_of_conformations*3+1*number_of_conformations+confId] = coord_triplet[1]
-            ca_coords_list[atomId*number_of_conformations*3+2*number_of_conformations+confId] = coord_triplet[2]
-            atomId += 1
-        confId += 1
-    return numpy.array(ca_coords_list)
+            flattened[i] = coord_triplet[0]; i = i+1
+            flattened[i] = coord_triplet[1]; i = i+1 
+            flattened[i] = coord_triplet[2]; i = i+1
+    return flattened
+    
+class Reader(object):
+    
+    @staticmethod
+    def availableReaderTypes(): return ["PRODY_READER","LITE_READER"]
+    
+    def __init__ (self, readerType):
+        """
+        Class constructor. Initializes the small DSL props.
+        
+        @param readerType: One of the types in 'availableReaderTypes'
+         
+        @author: vgil
+        @date: 30/11/2012
+        """
+        self.readerType = readerType
+        self.numberOfFrames = 0
+        self.numberOfAtoms = None
+        self.onlyCA = False
+        self.filesToRead = []
+        self.selectionString = ""
+        if(not readerType in Reader.availableReaderTypes()):
+            print "The reader type ",readerType, " is not an available reader."
+            raise KeyError
+        
+    def readThisFile(self, file_path):
+        """
+        Class constructor. Initializes the small DSL props.
+        
+        @param file_path: The path of the file.
+         
+        @return: itself, to chain calls.
+        
+        @author: vgil
+        @date: 30/11/2012
+        """
+        self.filesToRead.append(file_path)
+        return self
+    
+    #azucaaarr
+    def andThisOtherFile(self, file_path):
+        """
+        Syntactic sugar.
+        @see: readThisFile
+        
+        @param file_path: The path of the file.
+         
+        @return: itself, to chain calls.
+        
+        @author: vgil
+        @date: 30/11/2012
+        """
+        return self.readThisFile(file_path)
+    
+    def gettingOnlyCAs(self):
+        """
+        If used, the reader will only read CAs (speeding up the reading process a lot).
+        
+        @return: itself, to chain calls.
+        
+        @author: vgil
+        @date: 30/11/2012
+        """
+        self.onlyCA = True
+        return self
+    
+    def usingThisSelection(self,sel_string):
+        """
+        Applies a selection to the read. Only used by the "PRODY_READER" type (prody has a great selection engine).
+        
+        @param sel_string: The path of the file.
+         
+        @return: itself, to chain calls.
+        
+        @author: vgil
+        @date: 30/11/2012
+        """
+        if self.readerType == "PRODY_READER":
+            self.selectionString = sel_string
+        else:
+            print "Your current Reader (",self.readerType,") does not allow the use of selections. Please use the prody (http://www.csb.pitt.edu/prody/) reader for this."
+    
+    def read(self, verbose = False):
+        """
+        Does the actual reading using the parameters of the DSL.
+        
+        @param verbose: If switched on some output is generated.
+         
+        @return: The read coordinates in the way prody generates.
+        
+        @author: vgil
+        @date: 30/11/2012
+        """
+        coordinates = numpy.array([])
+        
+        if self.readerType == "PRODY_READER":
+            for pdb_path in self.filesToRead:
+                if self.onlyCA:
+                    pdb = parsePDB(pdb_path, subset='calpha')
+                else:
+                    pdb = parsePDB(pdb_path)
+                
+                if verbose: print "PDB parsed (",pdb_path,")"
+                
+                if self.selectionString != "":
+                    selection = pdb.select(self.selectionString)
+                    pdb = selection.copy()
+                
+                coordsets = pdb.getCoordsets()
+                self.numberOfFrames += len(coordsets)
+                atoms_in_this_trajectory = len(pdb)
+                
+                if not self.__checkAndUpdateNumberOfAtoms(atoms_in_this_trajectory,pdb_path):
+                    return None
+                
+                if len(coordinates) == 0:
+                    coordinates = coordsets
+                else:
+                    coordinates = numpy.append(coordinates, coordsets, axis=0)
+            #coordinates.shape = (self.numberOfFrames,self.numberOfAtoms,3)
+            return coordinates
+            
+        elif self.readerType == "LITE_READER":
+            for path in self.filesToRead:
+                if self.onlyCA:
+                    coordsets, num_frames, atoms_in_this_trajectory = pyRMSD.pdbReader.readPDB(path," CA ")
+                else:
+                    coordsets, num_frames, atoms_in_this_trajectory = pyRMSD.pdbReader.readPDB(path)
+                
+                self.numberOfFrames += num_frames
+                
+                if not self.__checkAndUpdateNumberOfAtoms(atoms_in_this_trajectory,path):
+                    return None
+                
+                if verbose: print "PDB parsed (",path,")"
+                
+                coordinates = numpy.append(coordinates, coordsets, axis=0)
+            coordinates.shape = (self.numberOfFrames, self.numberOfAtoms, 3)
+            return coordinates
+        
+    def __checkAndUpdateNumberOfAtoms(self, atoms_in_this_trajectory, path):
+        """
+        Checks if the new read trajectory has models with the same number of atoms.
+        
+        @param atoms_in_this_trajectory: The number of atoms of the newly read trajectory.
+        
+        @return: True or false depending if coherence is maintained or not.
+        
+        @author: vgil
+        @date: 30/11/2012
+        """
+        if( self.numberOfAtoms != None):
+            if self.numberOfAtoms != atoms_in_this_trajectory:
+                print "[Error :: Reader.read] The number of atoms of ", path, " is different from the number of atoms of the first trajectory."
+                return False
+            else:
+                return True
+        else:
+            self.numberOfAtoms = atoms_in_this_trajectory
+            return True
+    

@@ -10,7 +10,7 @@ import pyRMSD.utils.proteinReading
 import time
 import os
 import bz2
-
+import pyRMSD.pdbReader
 if __name__ == '__main__':
     using_cuda = "THEOBALD_CUDA_CALCULATOR" in pyRMSD.RMSDCalculator.availableCalculators()
     
@@ -23,6 +23,7 @@ if __name__ == '__main__':
     open("tmp_amber_long.pdb","w").write(bz2.BZ2File("data/amber_long.pdb.tar.bz2").read())
     print "\tLoading..."
     coordsets,number_of_conformations,number_of_atoms = pyRMSD.utils.proteinReading.getCoordsetsFromPDB('tmp_amber_long.pdb')
+    pyRMSD.pdbReader.readPDB('tmp_amber_long.pdb'," CA ")
     os.system("rm tmp_amber_long.pdb")
     print "\tDeleting temporary file"
     np_coords = pyRMSD.utils.proteinReading.flattenCoords(coordsets)

@@ -54,7 +54,8 @@ if __name__ == '__main__':
     files_to_compile_with_gcc = {"src/theobald":["ThRMSDSerial.cpp","kernel_functions_serial.cpp","ThRMSDSerialOmp.cpp"],
                                  "src/serial":["RMSDSerial.cpp","RMSD.cpp","RMSDTools.cpp"],
                                  "src/matrix":["Matrix.cpp","Statistics.cpp"],
-                                 "src/python":["pyRMSD.cpp","NumpyHelperFuncs.cpp"]}
+                                 "src/python":["pyRMSD.cpp","NumpyHelperFuncs.cpp","readerLite.cpp"],
+                                 "src/pdbreaderlite":["PDBReader.cpp"]}
     
     files_to_compile_with_gcc_and_openmp = {"src/theobald":["kernel_functions_omp.cpp"],
                                             "src/serial":["RMSDomp.cpp"]}
@@ -78,6 +79,16 @@ if __name__ == '__main__':
                     using_libs([PYTHON_LIBRARY]).\
                     this_object_files([files_to_link["Matrix"],files_to_link["Statistics"]]).\
                     to_produce("condensedMatrix.so")
+    
+    os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            
+    os.system( linkDSL.getLinkingCommand())
+    
+    linkDSL = Link().\
+                    using("g++").\
+                    with_options([PYTHON_EXTENSION_LINKING_OPTIONS]).\
+                    using_libs([PYTHON_LIBRARY]).\
+                    this_object_files([files_to_link["PDBReader"],files_to_link["readerLite"]]).\
+                    to_produce("pdbReader.so")
     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            
     os.system( linkDSL.getLinkingCommand())
@@ -110,6 +121,7 @@ if __name__ == '__main__':
     
     os.system("mv calculators.so pyRMSD/")
     os.system("mv condensedMatrix.so pyRMSD/")
+    os.system("mv pdbReader.so pyRMSD/")
     if options.use_cuda:
         os.system("mv test_main src/theobald/test/")
     

@@ -28,8 +28,6 @@ class TestMatrixHandler(unittest.TestCase):
         # Clean it!
         os.system("rm matrix.bin")
         
-
-
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_write_and_load']
     unittest.main()
