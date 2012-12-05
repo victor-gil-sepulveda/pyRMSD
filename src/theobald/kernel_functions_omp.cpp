@@ -1,6 +1,5 @@
 #include "kernel_functions_serial.h"
 #include "kernel_functions_omp.h"
-
 #include <cmath>
 #include <iostream>
 
@@ -38,7 +37,8 @@ void ThRMSDSerialOmpKernel::calcRMSDOfOneVsFollowing(floating_point_type* all_co
 									 int other_conformations_starting_id,
 									 int number_of_conformations,
 									 int number_of_atoms,
-									 floating_point_type* rmsd){
+									 floating_point_type* rmsd,
+									 int omp_threads){
 
 	int coordinates_per_conformation = number_of_atoms * 3;
 	floating_point_type* first_conformation_coords = &(all_coordinates[base_conformation_id*coordinates_per_conformation]);

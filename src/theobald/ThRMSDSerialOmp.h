@@ -10,8 +10,11 @@
 class ThRMSDSerialOmp: public ThRMSDSerial{
 
 	public:
-		ThRMSDSerialOmp(int numberOfConformations, int atomsPerConformation, double* coords);
+		ThRMSDSerialOmp(int numberOfConformations, int atomsPerConformation, double* coords, int omp_threads);
 		void oneVsFollowing(int conformation, double* rmsd_result);
+
+	private:
+		int omp_threads;
 };
 
 #endif

@@ -1,15 +1,15 @@
 #include <python2.7/Python.h>
 #include <numpy/arrayobject.h>
-#include "NumpyHelperFuncs.h"
 #include "../serial/RMSDSerial.h"
 #include "../serial/RMSDomp.h"
 #include "../theobald/ThRMSDCuda.cuh"
 #include "../theobald/ThRMSDSerial.h"
 #include "../theobald/ThRMSDSerialOmp.h"
-#include <omp.h>
 #include <vector>
 #include <iostream>
 using namespace std;
+
+
 
 enum calcType{
 	SERIAL_CALCULATOR = 0,
@@ -32,12 +32,12 @@ void parse_params_for_one_vs_others(PyObject *args, calcType& cType,
     	PyErr_SetString(PyExc_RuntimeError, "Error parsing parameters");
     }
 
-    if (not_doublevector(coords_list_obj)){
+    if (coords_list_obj->descr->type_num != NPY_DOUBLE || coords_list_obj->nd != 1){
     	PyErr_SetString(PyExc_RuntimeError, "First parameters must be a double array.");
     }
 
     // Get the data pointer
-    coords_list = pyvector_to_Carrayptrs(coords_list_obj);
+    coords_list = (double *) (coords_list_obj->data);
 
     // Length of the vector
     int coords_list_len = coords_list_obj->dimensions[0];
@@ -61,12 +61,12 @@ void parse_params_for_condensed_matrix(PyObject *args,calcType& cType,
     	PyErr_SetString(PyExc_RuntimeError, "Error parsing parameters");
     }
 
-    if (not_doublevector(coords_list_obj)){
+    if (coords_list_obj->descr->type_num != NPY_DOUBLE || coords_list_obj->nd != 1){
     	PyErr_SetString(PyExc_RuntimeError, "First parameters must be a double array.");
     }
 
     // Get the data pointer
-    coords_list = pyvector_to_Carrayptrs(coords_list_obj);
+    coords_list = (double *) (coords_list_obj->data);
 
     // Length of the vector
     int coords_list_len = coords_list_obj->dimensions[0];
@@ -78,15 +78,23 @@ void parse_params_for_condensed_matrix(PyObject *args,calcType& cType,
 }
 
 PyArrayObject* embed_rmsd_data(vector<double>& rmsd){
-	PyArrayObject* rmsds_list_obj;
-	// Possible leak?
-	double* rmsd_data = new double[rmsd.size()];
+//	PyArrayObject* rmsds_list_obj;
+//
+//	double* rmsd_data = new double[rmsd.size()];
+//	for (unsigned int i =0; i<rmsd.size(); i++){
+//		rmsd_data[i] = rmsd[i];
+//	}
+//
+//	npy_intp dims[1] = {rmsd.size()};
+//    rmsds_list_obj = (PyArrayObject *) PyArray_SimpleNewFromData(1,dims,NPY_DOUBLE,rmsd_data);
+	npy_intp dims[1] = {rmsd.size()};
+	PyArrayObject* rmsds_list_obj = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_DOUBLE);
+
+	double* rmsd_data = (double*) (rmsds_list_obj->data);
 	for (unsigned int i =0; i<rmsd.size(); i++){
 		rmsd_data[i] = rmsd[i];
 	}
 	
-	npy_intp dims[1] = {rmsd.size()};
-    rmsds_list_obj = (PyArrayObject *) PyArray_SimpleNewFromData(1,dims,NPY_DOUBLE,rmsd_data);
 	return rmsds_list_obj;
 }
 
@@ -109,12 +117,13 @@ RMSD* getCalculator(calcType cType, int numberOfConformations, int atomsPerConfo
 			return new ThRMSDCuda(numberOfConformations, atomsPerConformation, Coordinates, threads_per_block, blocks_per_grid);
 			break;
 #endif
+
 		case THEOBALD_SERIAL_CALCULATOR:
 			return new ThRMSDSerial(numberOfConformations,atomsPerConformation,Coordinates);
 			break;
 
 		case THEOBALD_SERIAL_OMP_CALCULATOR:
-			return new ThRMSDSerialOmp(numberOfConformations,atomsPerConformation,Coordinates);
+			return new ThRMSDSerialOmp(numberOfConformations,atomsPerConformation,Coordinates,number_of_threads);
 			break;
 
 		default:
