@@ -21,10 +21,10 @@ if __name__ == '__main__':
         print "Reading file data/"+pdb_file
         sys.stdout.flush()
         
-        prody_reader = Reader("LITE_READER").readThisFile("data/"+pdb_file).gettingOnlyCAs()
-        coordsets = prody_reader.read() 
-        number_of_atoms = prody_reader.numberOfAtoms
-        number_of_conformations = prody_reader.numberOfFrames
+        reader = Reader("LITE_READER").readThisFile("data/"+pdb_file).gettingOnlyCAs()
+        coordsets = reader.read() 
+        number_of_atoms = reader.numberOfAtoms
+        number_of_conformations = reader.numberOfFrames
         
         times = []
         for i in range(20):

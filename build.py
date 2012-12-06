@@ -17,8 +17,8 @@ CUDA_LIBRARIES_FOLDER = CUDA_BASE+"/lib64"            # CUDA libs path ( /lib if
 CUDA_ARCHITECHTURE = "sm_11"                         # CUDA architecture of your card.
 CUDA_LIBRARY = "cudart"
 PYTHON_EXTENSION_OPTIONS = "-pthread -fno-strict-aliasing -fmessage-length=0 -O3 -Wall -D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -fPIC"
-PYTHON_LIBRARY_FOLDER = os.path.dirname(sysconfig.get_paths()['include'])
-PYTHON_INCLUDE_FOLDER = os.path.dirname(sysconfig.get_paths()['stdlib'])
+PYTHON_INCLUDE_FOLDER = os.path.dirname(sysconfig.get_paths()['include'])
+PYTHON_LIBRARY_FOLDER = os.path.dirname(sysconfig.get_paths()['stdlib'])
 PYTHON_LIBRARY = "python2.7"
 OPENMP_OPTION = "-fopenmp"
 ###############################################
@@ -75,6 +75,7 @@ if __name__ == '__main__':
                     using("g++").\
                     with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
                     using_libs([PYTHON_LIBRARY]).\
+                    using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
                     this_object_files([files_to_link["Matrix"],files_to_link["Statistics"]]).\
                     to_produce("condensedMatrix.so")
     
@@ -85,21 +86,33 @@ if __name__ == '__main__':
                     using("g++").\
                     with_options([PYTHON_EXTENSION_LINKING_OPTIONS]).\
                     using_libs([PYTHON_LIBRARY]).\
+                    using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
                     this_object_files([files_to_link["PDBReader"],files_to_link["readerLite"]]).\
                     to_produce("pdbReader.so")
     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            
     os.system( linkDSL.getLinkingCommand())
     
-    linkDSL = Link().\
-                    using("g++").\
-                    with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
-                    using_libs([PYTHON_LIBRARY,CUDA_LIBRARY]).\
-                    using_lib_locations([CUDA_LIBRARIES_FOLDER]).\
-                    this_object_files([files_to_link["ThRMSDSerial"],files_to_link["ThRMSDSerialOmp"],files_to_link["ThRMSDCuda"],files_to_link["kernel_functions_serial"],\
-                                       files_to_link["kernel_functions_omp"],files_to_link["kernel_functions_cuda"],files_to_link["pyRMSD"],\
-                                       files_to_link["RMSDomp"],files_to_link["RMSD"],files_to_link["RMSDSerial"],files_to_link["RMSDTools"],]).\
-                    to_produce("calculators.so")
+    if options.use_cuda:
+        linkDSL = Link().\
+                        using("g++").\
+                        with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
+                        using_libs([PYTHON_LIBRARY,CUDA_LIBRARY]).\
+                        using_lib_locations([CUDA_LIBRARIES_FOLDER,PYTHON_LIBRARY_FOLDER]).\
+                        this_object_files([files_to_link["ThRMSDSerial"],files_to_link["ThRMSDSerialOmp"],files_to_link["ThRMSDCuda"],files_to_link["kernel_functions_serial"],\
+                                           files_to_link["kernel_functions_omp"],files_to_link["kernel_functions_cuda"],files_to_link["pyRMSD"],\
+                                           files_to_link["RMSDomp"],files_to_link["RMSD"],files_to_link["RMSDSerial"],files_to_link["RMSDTools"],]).\
+                        to_produce("calculators.so")
+    else:
+        linkDSL = Link().\
+                        using("g++").\
+                        with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
+                        using_libs([PYTHON_LIBRARY]).\
+                        using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
+                        this_object_files([files_to_link["ThRMSDSerial"],files_to_link["ThRMSDSerialOmp"],files_to_link["kernel_functions_serial"],\
+                                           files_to_link["kernel_functions_omp"],files_to_link["pyRMSD"],\
+                                           files_to_link["RMSDomp"],files_to_link["RMSD"],files_to_link["RMSDSerial"],files_to_link["RMSDTools"],]).\
+                        to_produce("calculators.so")
     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
     os.system(linkDSL.getLinkingCommand())
@@ -120,8 +133,8 @@ if __name__ == '__main__':
     os.system("mv calculators.so pyRMSD/")
     os.system("mv condensedMatrix.so pyRMSD/")
     os.system("mv pdbReader.so pyRMSD/")
-    if options.use_cuda:
-        os.system("mv test_main src/theobald/test/")
+#    if options.use_cuda:
+#        os.system("mv test_main src/theobald/test/")
     
     ##Calculators
     if options.use_cuda:

@@ -21,10 +21,10 @@ if __name__ == '__main__':
     print "\tUncompressing..."
     open("tmp_amber_long.pdb","w").write(bz2.BZ2File("data/amber_long.pdb.tar.bz2").read())
     print "\tLoading..."
-    prody_reader = Reader("PRODY_READER").readThisFile('tmp_amber_long.pdb').gettingOnlyCAs()
-    coordsets = prody_reader.read() 
-    number_of_atoms = prody_reader.numberOfAtoms
-    number_of_conformations = prody_reader.numberOfFrames
+    reader = Reader("PRODY_READER").readThisFile('tmp_amber_long.pdb').gettingOnlyCAs()
+    coordsets = reader.read() 
+    number_of_atoms = reader.numberOfAtoms
+    number_of_conformations = reader.numberOfFrames
     os.system("rm tmp_amber_long.pdb")
     print "\tDeleting temporary file"
     t2 = time.time()

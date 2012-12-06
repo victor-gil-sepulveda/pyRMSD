@@ -1,0 +1,47 @@
+Download Python-2.7.3.tgz, numpy-1.7.0b2.tar.gz and ProDy-1.4.tar.gz
+
+Installing Python (to install the other packages):
+	# Place to put all the python stuff (inside home directory)
+	mkdir ~/Python
+	
+	# Uncompress
+	tar -zxvf  Python-2.7.3.tgz
+	
+	# Enter the directory
+	cd Python-2.7.3
+	
+	# to generate the shared library (.so)
+	./configure --enable-shared
+	
+	# And 'install' in the folder we created
+	make altinstall prefix=~/Python exec-prefix=~/Python
+	
+	# Create an alias
+	alias python="~/Python/bin/python2.7"
+	
+	# Modify .bashrc adding:
+	vi ~/.bashrc
+	add this line to the bottom -> export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/bsc72/bsc72476/Python/lib
+	source ~./bashrc
+	
+Installing Numpy (mandatory):
+	# Uncompress
+	tar -zxvf  numpy-1.7.0b2.tar.gz
+	
+	# Install
+	cd numpy-1.7.0b2
+	python setup.py install --prefix=~/Python
+
+Installing Prody (optional):
+	tar -zxvf ProDy-1.4.tar.gz ç
+	cd ProDy-1.4
+	python setup.py install
+	
+Installing Python Again (to create the shared lib):
+	# to generate the shared library (.so)
+	./configure --enable-shared
+	
+	# And 'install' in the folder we created
+	make altinstall prefix=~/Python exec-prefix=~/Python
+	
+	

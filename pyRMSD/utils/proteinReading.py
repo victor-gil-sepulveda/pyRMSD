@@ -1,5 +1,12 @@
-from prody.ensemble import PDBEnsemble
-from prody.proteins import parsePDB
+# Conditional import
+try:
+    from prody.ensemble import PDBEnsemble
+    from prody.proteins import parsePDB
+    prody_available = True
+
+except ImportError:
+    prody_available = False
+    
 import numpy
 import pyRMSD.pdbReader
 
@@ -52,6 +59,9 @@ class Reader(object):
         if(not readerType in Reader.availableReaderTypes()):
             print "The reader type ",readerType, " is not an available reader."
             raise KeyError
+        if(self.readerType == "PRODY_READER" and not prody_available):
+            print "PRODY_READER is not available, changing to  LITE_READER."
+            self.readerType = "LITE_READER"
         
     def readThisFile(self, file_path):
         """
