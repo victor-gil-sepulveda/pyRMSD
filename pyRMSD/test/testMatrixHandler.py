@@ -28,6 +28,9 @@ class TestMatrixHandler(unittest.TestCase):
         # Clean it!
         os.system("rm matrix.bin")
         
+    def test_create_with_reader(self):
+        self.fail("TODO")
+        
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_write_and_load']
     unittest.main()

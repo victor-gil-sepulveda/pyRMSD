@@ -6,6 +6,7 @@ Created on 19/09/2012
 import pyRMSD.RMSDCalculator
 import pickle
 from pyRMSD.condensedMatrix import CondensedMatrix #@UnresolvedImport
+from pyRMSD.utils.proteinReading import Reader
 
 class MatrixHandler(object):
     
@@ -14,6 +15,23 @@ class MatrixHandler(object):
         self.statistics_folder = statistics_folder
 
     def createMatrix(self, pdb_coordsets, calculator = "THEOBALD_SERIAL_OMP_CALCULATOR"):
+        print "Calculating matrix..."
+        rmsd = pyRMSD.RMSDCalculator.RMSDCalculator(pdb_coordsets, calculator).pairwiseRMSDMatrix()
+        self.distance_matrix = CondensedMatrix(rmsd)
+        self.distance_matrix.recalculateStatistics()
+        self.__save_statistics()
+        print " Done\n"
+    
+    def createMatrixReadingOnlyCAs(self, pdb_file, reader_type = "LITE_READER", calculator = "THEOBALD_SERIAL_OMP_CALCULATOR"):
+        reader = Reader(reader_type).readThisFile(pdb_file).gettingOnlyCAs()
+        self.__createMatrixWithReader(reader, calculator)
+    
+    def createMatrixWithReader(self, pdb_file, reader_type = "LITE_READER", calculator = "THEOBALD_SERIAL_OMP_CALCULATOR"):
+        reader = Reader(reader_type).readThisFile(pdb_file)
+        self.__createMatrixWithReader(reader, calculator)
+    
+    def __createMatrixWithReader(self, reader, calculator = "THEOBALD_SERIAL_OMP_CALCULATOR"):
+        pdb_coordsets = reader.read()
         print "Calculating matrix..."
         rmsd = pyRMSD.RMSDCalculator.RMSDCalculator(pdb_coordsets, calculator).pairwiseRMSDMatrix()
         self.distance_matrix = CondensedMatrix(rmsd)

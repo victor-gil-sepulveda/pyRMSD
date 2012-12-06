@@ -1,6 +1,7 @@
 import matplotlib.pyplot
 from matplotlib.ticker import FormatStrFormatter
 import pylab
+import numpy
 
 files =  ["out/cuda5-35.out","out/openmp5-35.out","out/serial5-35.out"]
 tags = {"out/cuda5-35.out":"Cuda","out/openmp5-35.out":"OpenMP","out/serial5-35.out":"Serial"}
@@ -14,7 +15,20 @@ for filename in files:
 	for line in handler:
 		if line[:4]== "With":
 			times.append(float(line.split()[4]));
-	file_times[tags[filename]] = times
+	file_times[tags[filename]] = numpy.array(times)
+
+
+# Calculate speedups
+speedups = {}
+for i in range(len(tags)):
+	first = tags[tags.keys()[i]]
+	for j in range(i+1,len(tags)):
+		second = tags[tags.keys()[j]]
+		speedups[(first,second)] = file_times[first] /file_times[second]
+
+for key in speedups:
+	print key
+	print speedups[key]
 
 # Draw the plot
 colors = {"Cuda": 'r',"OpenMP": 'b' , "Serial":'g'}
