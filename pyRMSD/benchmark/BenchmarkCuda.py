@@ -10,7 +10,7 @@ import numpy
 import sys
 
 if __name__ == '__main__':
-    using_cuda = "THEOBALD_CUDA_CALCULATOR" in pyRMSD.RMSDCalculator.availableCalculators()
+    using_cuda = "QCP_CUDA_CALCULATOR" in pyRMSD.RMSDCalculator.availableCalculators()
     
     if not using_cuda:
         print "Build it using --cuda."
@@ -28,7 +28,7 @@ if __name__ == '__main__':
         
         times = []
         for i in range(20):
-            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "THEOBALD_CUDA_CALCULATOR")
+            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_CUDA_CALCULATOR")
             calculator.setCUDAKernelThreadsPerBlock(128, 64)
             t1 = time.time()
             rmsd = calculator.pairwiseRMSDMatrix()

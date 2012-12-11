@@ -23,7 +23,7 @@ if __name__ == '__main__':
         
         times = []
         for i in range(10):
-            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "THEOBALD_SERIAL_CALCULATOR")
+            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_SERIAL_CALCULATOR")
             t1 = time.time()
             rmsd = calculator.pairwiseRMSDMatrix()
             t2 = time.time()

@@ -23,7 +23,7 @@ if __name__ == '__main__':
         
         times = []
         for i in range(20):
-            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "THEOBALD_SERIAL_OMP_CALCULATOR")
+            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_OMP_CALCULATOR")
             calculator.setNumberOfOpenMPThreads(6)
             t1 = time.time()
             rmsd = calculator.pairwiseRMSDMatrix()

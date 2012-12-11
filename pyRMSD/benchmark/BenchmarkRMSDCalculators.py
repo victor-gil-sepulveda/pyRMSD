@@ -11,7 +11,7 @@ import os
 import bz2
 from pyRMSD.utils.proteinReading import Reader
 if __name__ == '__main__':
-    using_cuda = "THEOBALD_CUDA_CALCULATOR" in pyRMSD.RMSDCalculator.availableCalculators()
+    using_cuda = "QCP_CUDA_CALCULATOR" in pyRMSD.RMSDCalculator.availableCalculators()
     
     ######################
     # BENCHMARKING
@@ -39,11 +39,11 @@ if __name__ == '__main__':
     precissions = collections.defaultdict(lambda:DEFAULT_PRECISSION)
     
     if using_cuda:
-        precissions["THEOBALD_CUDA_CALCULATOR"] = 1e-4
+        precissions["QCP_CUDA_CALCULATOR"] = 1e-4
     
     rmsds = {}
     times = {}
-    golden = "OMP_CALCULATOR"
+    golden = "QTRFIT_OMP_CALCULATOR"
     
     for CALC_TYPE in types:
         if not "PYTHON" in CALC_TYPE:

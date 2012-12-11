@@ -10,7 +10,7 @@ import bz2
 from pyRMSD.utils.proteinReading import Reader
 
 if __name__ == '__main__':
-    using_cuda = "THEOBALD_CUDA_CALCULATOR" in pyRMSD.RMSDCalculator.availableCalculators()
+    using_cuda = "QCP_CUDA_CALCULATOR" in pyRMSD.RMSDCalculator.availableCalculators()
     
     if not using_cuda:
         print "Build it using --cuda."
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     print 'Loading took %0.3f s' % (t2-t1)
     
     for number_of_threads in range(1,13):
-        calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "THEOBALD_SERIAL_OMP_CALCULATOR")
+        calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_OMP_CALCULATOR")
         calculator.setNumberOfOpenMPThreads(number_of_threads)
         t1 = time.time()
         rmsd = calculator.pairwiseRMSDMatrix()
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     # Do test
     for number_of_threads in threads:
         for number_of_blocks in blocks:
-            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "THEOBALD_CUDA_CALCULATOR")
+            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_CUDA_CALCULATOR")
             calculator.setCUDAKernelThreadsPerBlock(number_of_threads, number_of_blocks)
             t1 = time.time()
             rmsd = calculator.pairwiseRMSDMatrix()

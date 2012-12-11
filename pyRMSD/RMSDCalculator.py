@@ -46,8 +46,8 @@ class RMSDCalculator(object):
         """
         first_coords = self.coordsets[first_conformation_number]
         second_coords = self.coordsets[second_conformation_number]
-        tmp_coordset = numpy.array([first_coords,second_coords])
-        return RMSDCalculator(tmp_coordset, self.calculatorType).oneVsFollowing(0)[0]
+        tmp_coordsets = numpy.array([first_coords,second_coords])
+        return RMSDCalculator(tmp_coordsets, self.calculatorType).oneVsFollowing(0)[0]
     
     def oneVsTheOthers(self, conformation_number):
         """
@@ -86,11 +86,11 @@ class RMSDCalculator(object):
         @author: vgil
         @date: 26/11/2012
         """     
-        np_coords = flattenCoords(self.coordsets)
-        if self.calculatorType == "PYTHON_CALCULATOR":
+        if "PYTHON" in self.calculatorType:
             target = self.coordsets[conformation_number]
             return p_oneVsFollowing(target, self.coordsets[conformation_number+1:])
         else:
+            np_coords = flattenCoords(self.coordsets)
             return pyRMSD.calculators.oneVsFollowing(availableCalculators()[self.calculatorType], np_coords, 
                                                      self.number_of_atoms, conformation_number, self.number_of_conformations,
                                                      self.__number_of_threads, self.__threads_per_block, self.__blocks_per_grid)
@@ -105,10 +105,10 @@ class RMSDCalculator(object):
         @author: vgil
         @date: 26/11/2012
         """
-        np_coords = flattenCoords(self.coordsets)
-        if self.calculatorType == "PYTHON_CALCULATOR":
+        if "PYTHON" in self.calculatorType :
             return p_calculateRMSDCondensedMatrix(self.coordsets)
         else:
+            np_coords = flattenCoords(self.coordsets)
             return pyRMSD.calculators.calculateRMSDCondensedMatrix(availableCalculators()[self.calculatorType], np_coords, 
                                                                    self.number_of_atoms, self.number_of_conformations,
                                                                    self.__number_of_threads, self.__blocks_per_grid, self.__blocks_per_grid)
