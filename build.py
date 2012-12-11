@@ -140,12 +140,12 @@ if __name__ == '__main__':
     if options.use_cuda:
         calcs_str = """
 def availableCalculators():
-    return {"PYTHON_CALCULATOR":-1,"SERIAL_CALCULATOR":0,"OMP_CALCULATOR":1,"THEOBALD_CUDA_CALCULATOR":2,"THEOBALD_SERIAL_CALCULATOR":3,"THEOBALD_SERIAL_OMP_CALCULATOR":4}
+    return {"KABSCH_PYTHON_CALCULATOR":-1,"QTRFIT_SERIAL_CALCULATOR":0,"QTRFIT_OMP_CALCULATOR":1,"QCP_CUDA_CALCULATOR":2,"QCP_SERIAL_CALCULATOR":3,"QCP_OMP_CALCULATOR":4}
 """
     else:
         calcs_str = """
 def availableCalculators():
-    return {"PYTHON_CALCULATOR":-1,"SERIAL_CALCULATOR":0,"OMP_CALCULATOR":1,"THEOBALD_SERIAL_CALCULATOR":3,"THEOBALD_SERIAL_OMP_CALCULATOR":4}
+    return {"KABSCH_PYTHON_CALCULATOR":-1,"QTRFIT_SERIAL_CALCULATOR":0,"QTRFIT_OMP_CALCULATOR":1,"QCP_SERIAL_CALCULATOR":3,"QCP_OMP_CALCULATOR":4}
 """
     os.system('echo "\033[33mWriting available calculators...\033[0m"')
     open("pyRMSD/availableCalculators.py","w").write(calcs_str)

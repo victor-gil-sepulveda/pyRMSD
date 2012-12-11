@@ -7,7 +7,7 @@ import unittest
 import numpy
 from pyRMSD.utils.proteinReading import flattenCoords, Reader
 
-class Test(unittest.TestCase):
+class testPdbReader(unittest.TestCase):
     
     @classmethod
     def setUpClass(self):

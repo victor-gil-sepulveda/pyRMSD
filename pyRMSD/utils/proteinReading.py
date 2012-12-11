@@ -12,9 +12,9 @@ import pyRMSD.pdbReader
 
 def flattenCoords(coordsets):
     """
-    Class constructor. Initializes the small DSL props.
+    Flattens a coordinate set in Prody's array format into a 1D array.
     
-    @param readerType: One of the types in 'availableReaderTypes'
+    @param coordsets: The coodinates in Prody's array format
      
     @author: vgil
     @date: 30/11/2012
@@ -65,7 +65,7 @@ class Reader(object):
         
     def readThisFile(self, file_path):
         """
-        Class constructor. Initializes the small DSL props.
+        Specifies the file to be read.
         
         @param file_path: The path of the file.
          

@@ -13,6 +13,9 @@ class MatrixHandler(object):
     def __init__(self,statistics_folder=None):
         self.distance_matrix = None
         self.statistics_folder = statistics_folder
+        
+    def getMatrix(self):
+        return self.distance_matrix
 
     def createMatrix(self, pdb_coordsets, calculator = "THEOBALD_SERIAL_OMP_CALCULATOR"):
         print "Calculating matrix..."
@@ -21,14 +24,15 @@ class MatrixHandler(object):
         self.distance_matrix.recalculateStatistics()
         self.__save_statistics()
         print " Done\n"
+        return self.distance_matrix
     
     def createMatrixReadingOnlyCAs(self, pdb_file, reader_type = "LITE_READER", calculator = "THEOBALD_SERIAL_OMP_CALCULATOR"):
         reader = Reader(reader_type).readThisFile(pdb_file).gettingOnlyCAs()
-        self.__createMatrixWithReader(reader, calculator)
+        return self.__createMatrixWithReader(reader, calculator)
     
     def createMatrixWithReader(self, pdb_file, reader_type = "LITE_READER", calculator = "THEOBALD_SERIAL_OMP_CALCULATOR"):
         reader = Reader(reader_type).readThisFile(pdb_file)
-        self.__createMatrixWithReader(reader, calculator)
+        return self.__createMatrixWithReader(reader, calculator)
     
     def __createMatrixWithReader(self, reader, calculator = "THEOBALD_SERIAL_OMP_CALCULATOR"):
         pdb_coordsets = reader.read()
@@ -38,6 +42,7 @@ class MatrixHandler(object):
         self.distance_matrix.recalculateStatistics()
         self.__save_statistics()
         print " Done\n"
+        return self.distance_matrix
         
     def saveMatrix(self, matrix_file_without_extension):
         print "Writing matrix data (in "+matrix_file_without_extension+".bin) ..."
