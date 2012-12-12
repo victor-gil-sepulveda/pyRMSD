@@ -17,7 +17,7 @@ class MatrixHandler(object):
     def getMatrix(self):
         return self.distance_matrix
 
-    def createMatrix(self, pdb_coordsets, calculator = "THEOBALD_SERIAL_OMP_CALCULATOR"):
+    def createMatrix(self, pdb_coordsets, calculator = "QCP_SERIAL_OMP_CALCULATOR"):
         print "Calculating matrix..."
         rmsd = pyRMSD.RMSDCalculator.RMSDCalculator(pdb_coordsets, calculator).pairwiseRMSDMatrix()
         self.distance_matrix = CondensedMatrix(rmsd)
@@ -26,15 +26,15 @@ class MatrixHandler(object):
         print " Done\n"
         return self.distance_matrix
     
-    def createMatrixReadingOnlyCAs(self, pdb_file, reader_type = "LITE_READER", calculator = "THEOBALD_SERIAL_OMP_CALCULATOR"):
+    def createMatrixReadingOnlyCAs(self, pdb_file, reader_type = "LITE_READER", calculator = "QCP_SERIAL_OMP_CALCULATOR"):
         reader = Reader(reader_type).readThisFile(pdb_file).gettingOnlyCAs()
         return self.__createMatrixWithReader(reader, calculator)
     
-    def createMatrixWithReader(self, pdb_file, reader_type = "LITE_READER", calculator = "THEOBALD_SERIAL_OMP_CALCULATOR"):
+    def createMatrixWithReader(self, pdb_file, reader_type = "LITE_READER", calculator = "QCP_SERIAL_OMP_CALCULATOR"):
         reader = Reader(reader_type).readThisFile(pdb_file)
         return self.__createMatrixWithReader(reader, calculator)
     
-    def __createMatrixWithReader(self, reader, calculator = "THEOBALD_SERIAL_OMP_CALCULATOR"):
+    def __createMatrixWithReader(self, reader, calculator = "QCP_SERIAL_OMP_CALCULATOR"):
         pdb_coordsets = reader.read()
         print "Calculating matrix..."
         rmsd = pyRMSD.RMSDCalculator.RMSDCalculator(pdb_coordsets, calculator).pairwiseRMSDMatrix()
