@@ -33,7 +33,7 @@ To use the module the first thing will be to extract all the coordinates from a 
     Conformation: [Atom 1, Atom 2,..., Atom M]  
     Atom: [x,y,z]  
 
-In order to do this there's a convenience class function in *pyRMSD/utils/proteinReading.py* called **Reader**. This will read a pdb file using the built in reader ("LITE_READER") or Prody ("PPRODY_READER"), allowing to use its powerful selection language.  
+In order to do this there's a convenience class function in *pyRMSD/utils/proteinReading.py* called **Reader**. This will read a pdb file using the built in reader ("LITE_READER") or Prody ("PRODY_READER"), allowing to use its powerful selection language.  
   
     from pyRMSD.utils.proteinReading import Reader    
     reader = Reader("LITE_READER").readThisFile("my_trajectory.pdb").gettingOnlyCAs()
