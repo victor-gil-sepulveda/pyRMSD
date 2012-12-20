@@ -1,5 +1,5 @@
 # pyRMSD
-pyRMSD goal is the fast (and easy!) calculation of rmsd collective operations, specially matrices of large ensembles of protein conformations. It also offers a symmetric matrix representation which fosters access speed over access security and also is very memory efficient.
+pyRMSD goal is the fast (and easy!) calculation of rmsd collective operations, specially matrices of large ensembles of protein conformations. It also offers a symmetric matrix representation which fosters access speed over access security and is also very memory efficient.
 
 ## Building and Installing
 ### Dependencies

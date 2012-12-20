@@ -9,11 +9,11 @@ from pyRMSD.condensedMatrix import CondensedMatrix
 class TestMatrixNeighbours(unittest.TestCase):
 
     def test_get_neighbors_for_node(self):
+        condensed_matrix = CondensedMatrix( [0.2, 1.0, 0.3,  .0,
+                                                  0.5, 0.6, 0.7,
+                                                       0.9, 0.8,
+                                                            0.4])
         
-        condensed_matrix = CondensedMatrix( [0.2,  1.,  0.3,  .0, 
-                                                  0.5,  0.6, 0.7,
-                                                        0.9, 0.8,
-                                                             0.4])
         self.assertItemsEqual([0,2],condensed_matrix.get_neighbors_for_node(1,range(5),0.5))
 
     

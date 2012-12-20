@@ -30,6 +30,9 @@ for key in speedups:
 	print key
 	print speedups[key]
 
+matplotlib.rc('xtick', labelsize=18) 
+matplotlib.rc('ytick', labelsize=18)
+
 # Draw the plot
 colors = {"Cuda": 'r',"OpenMP": 'b' , "Serial":'g'}
 axis = matplotlib.pyplot.subplot(111)
@@ -39,11 +42,11 @@ legend_lines = []
 legend_keys = []
 for key in tags:
 	line, = axis.plot(numberOfStructures, file_times[tags[key]],colors[tags[key]])
-	matplotlib.pyplot.setp(line, linewidth = 2)
+	matplotlib.pyplot.setp(line, linewidth = 3)
 	legend_lines.append(line)
 	legend_keys.append(tags[key])
 	line, = axis.plot(numberOfStructures, file_times[tags[key]],colors[tags[key]]+'o')
-
+	matplotlib.pyplot.setp(line, linewidth = 3)
 # Axis labels
 matplotlib.pyplot.xlabel('Number Of Structures')
 matplotlib.pyplot.ylabel('Calculation Time')
