@@ -78,15 +78,6 @@ void parse_params_for_condensed_matrix(PyObject *args,calcType& cType,
 }
 
 PyArrayObject* embed_rmsd_data(vector<double>& rmsd){
-//	PyArrayObject* rmsds_list_obj;
-//
-//	double* rmsd_data = new double[rmsd.size()];
-//	for (unsigned int i =0; i<rmsd.size(); i++){
-//		rmsd_data[i] = rmsd[i];
-//	}
-//
-//	npy_intp dims[1] = {rmsd.size()};
-//    rmsds_list_obj = (PyArrayObject *) PyArray_SimpleNewFromData(1,dims,NPY_DOUBLE,rmsd_data);
 	npy_intp dims[1] = {rmsd.size()};
 	PyArrayObject* rmsds_list_obj = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_DOUBLE);
 
@@ -160,6 +151,31 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
     return PyArray_Return(rmsds_list_obj);
 }
 
+static PyObject* iterativeSuperposition(PyObject *self, PyObject *args){
+	int atoms_per_conformation;
+	int number_of_conformations;
+	int number_of_threads;
+	int threads_per_block;
+	int blocks_per_grid;
+
+	calcType cType;
+	double* all_coordinates;
+	vector<double> rmsd;
+
+	parse_params_for_condensed_matrix(args, cType, atoms_per_conformation, number_of_conformations,
+			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
+
+	RMSD* rmsdCalculator = getCalculator(cType, number_of_conformations, atoms_per_conformation,
+			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
+
+	rmsdCalculator->iterativeSuperposition(1e-4);
+
+	delete rmsdCalculator;
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject* calculateRMSDCondensedMatrix(PyObject *self, PyObject *args){
 	int atoms_per_conformation;
 	int number_of_conformations;
@@ -187,6 +203,7 @@ static PyObject* calculateRMSDCondensedMatrix(PyObject *self, PyObject *args){
 static PyMethodDef pyRMSDMethods[] = {
     {"oneVsFollowing",  oneVsFollowing, METH_VARARGS,""},
     {"calculateRMSDCondensedMatrix",  calculateRMSDCondensedMatrix, METH_VARARGS,""},
+    {"iterativeSuperposition",  iterativeSuperposition, METH_VARARGS,""},
     {NULL, NULL, 0, NULL}
 };
 

@@ -191,14 +191,55 @@ void RMSDTools::rotate3D(unsigned int n, double * const x, double u[3][3]){
 double RMSDTools::calcRMS(const double * const x, const double * const y, unsigned int num_atoms){
 	double sum_res = 0.0;
 
-	for(unsigned int i=0; i<num_atoms*3; ++i)
-	{
+	for(unsigned int i=0; i<num_atoms*3; ++i){
 		sum_res += (x[i] - y[i]) * (x[i] - y[i]);
 	}
 
 	return sqrt(sum_res/num_atoms);
 }
 
+void RMSDTools::initializeTo(double* array, double value, int array_len){
+//	#pragma omp parallel for
+//	for(int i = 0; i < array_len; ++i){
+//		array[i] = value;
+//	}
+	fill(array, array+array_len, value);
+}
+
+//array1 = array2
+void RMSDTools::copyArrays(double* array1, double* array2, int array_len){
+//	#pragma omp parallel for
+//	for(int i = 0; i < array_len; ++i){
+//		array1[i] = array2[i];
+//	}
+	copy(array2,array2+array_len,array1);
+}
+
+void RMSDTools::calculateMeanCoordinates(double* meanCoordinates, double* allCoordinates,
+											int numberOfConformations, int atomsPerConformation){
+
+	// Zero mean coordinates
+	RMSDTools::initializeTo(meanCoordinates, 0.0, atomsPerConformation*3);
+
+	// Do calculation
+	for (int i  = 0; i <  numberOfConformations; ++i){
+		int conformation_offset = i*atomsPerConformation*3;
+		#pragma omp parallel for shared(meanCoordinates)
+		for (int j = 0; j < atomsPerConformation; ++j){
+			int atom_offset = 3*j;
+			int offset = conformation_offset + atom_offset;
+			meanCoordinates[atom_offset] += allCoordinates[ offset ];
+			meanCoordinates[atom_offset+1] += allCoordinates[ offset + 1];
+			meanCoordinates[atom_offset+2] += allCoordinates[ offset + 2];
+		}
+	}
+
+	// Divide by the number of conformations
+	#pragma omp parallel for shared(meanCoordinates)
+	for (int i = 0; i < atomsPerConformation*3; ++i){
+		meanCoordinates[i] /= numberOfConformations;
+	}
+}
 
 /*
  David J. Heisterberg

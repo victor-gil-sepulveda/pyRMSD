@@ -50,13 +50,14 @@ if __name__ == '__main__':
     
     
     files_to_compile_with_gcc = {"src/theobald":["ThRMSDSerial.cpp","kernel_functions_serial.cpp","ThRMSDSerialOmp.cpp"],
-                                 "src/serial":["RMSDSerial.cpp","RMSD.cpp","RMSDTools.cpp"],
+                                 "src/serial":["RMSDSerial.cpp","RMSD.cpp"],
                                  "src/matrix":["Matrix.cpp","Statistics.cpp"],
                                  "src/python":["pyRMSD.cpp","readerLite.cpp"],
                                  "src/pdbreaderlite":["PDBReader.cpp"]}
     
     files_to_compile_with_gcc_and_openmp = {"src/theobald":["kernel_functions_omp.cpp"],
-                                            "src/serial":["RMSDomp.cpp"]}
+                                            "src/serial":["RMSDomp.cpp","RMSDTools.cpp"],
+                                            "src/serial/test":["TestRMSDTools.cpp"]}
     #########################################
     
     files_to_link = collections.defaultdict(str)
@@ -129,10 +130,23 @@ if __name__ == '__main__':
 #                        
 #        os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
 #        os.system(linkDSL.getLinkingCommand())
+    linkDSL = Link().\
+                    using("g++").\
+                    with_options([OPENMP_OPTION]).\
+                    using_libs([]).\
+                    using_lib_locations([]).\
+                    this_object_files([files_to_link["TestRMSDTools"],files_to_link["RMSDTools"],files_to_link["RMSDomp"],
+                                       files_to_link["RMSD"]]).\
+                    to_produce("test_rmsdtools_main")
+                    
+    os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
+    os.system(linkDSL.getLinkingCommand())
     
     os.system("mv calculators.so pyRMSD/")
     os.system("mv condensedMatrix.so pyRMSD/")
     os.system("mv pdbReader.so pyRMSD/")
+    os.system("mv test_rmsdtools_main src/serial/test")
+    
 #    if options.use_cuda:
 #        os.system("mv test_main src/theobald/test/")
     

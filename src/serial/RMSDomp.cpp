@@ -13,6 +13,9 @@
 #include <algorithm>
 using namespace std;
 
+#include <sstream>
+#include <fstream>
+
 RMSDomp::RMSDomp(int numberOfConformations, int atomsPerConformation, double *allCoordinates):
 		RMSD(numberOfConformations, atomsPerConformation,allCoordinates){
 }
@@ -70,40 +73,86 @@ void RMSDomp::oneVsFollowing(int conformation, double *rmsd){
 	}
 }
 
-void void RMSDomp::iterativeSuperposition(double rmsd_diff_to_stop = 0.001){
-	// In the first step, reference is the first conformation
-	double* mean_coords = new double[coordinatesPerConformation];
+//////////////////////////////
+/// Tools for diff with prody
+//////////////////////////////
+// In prody (ensemble.py, iterpose) add:
+//
+//    for (i, conf) in enumerate(self._confs):
+//		myfile.write("Conformation "+str(i)+"\n")
+//		for atom in conf:
+//		    myfile.write("%f\n%f\n%f\n"%(atom[0],atom[1],atom[2]))
+//	    myfile.close()
+//
+//void stringToFile(const char *path, const std::string & contents){
+//       ofstream newFile(path, ios::app);
+//       newFile << contents;
+//       newFile.close();
+//}
+//
+//void save_vector(double *vector, const char * dataPath, int size, char* message, int number_of_conf, int iteration){
+//       std::ostringstream oss(std::ostringstream::out);
+//
+//       oss << message << " "<<number_of_conf<<" "<<iteration<<std::endl;
+//
+//       for(int i=0; i<size; ++i){
+//               oss << vector[i] << std::endl;
+//       }
+//
+//       stringToFile(dataPath, oss.str());
+//}
 
-	double* reference = allCoordinates;
-	copy(reference, reference+coordinatesPerConformation, mean_coords);
+// reference coords is already a copy, in a different memory space than allCoordinates
+void RMSDomp::superpositionChangingCoordinates(double* reference, double* rmsds){
+	// Superpose all conformations with the reference conformation
+	#pragma omp parallel for shared(rmsds)
+	for (int i = 0; i < numberOfConformations; ++i){
+		double* working_conformation = &(allCoordinates[i*coordinatesPerConformation]);
 
-	double last_rmsd = 10000.0; // Big number
-	double rmsd_diff = 0.0;
-	double	rmsds[numberOfConformations];
-	double old_rmsds[numberOfConformations];
-	do{
-		// Superpose all conformations with the reference conformation
-		for (int i = 0; i < numberOfConformations; ++i){
-			double* working_conformation = &(allCoordinates[i*coordinatesPerConformation]);
-			RMSDTools::superpose(atomsPerConformation, mean_coords, working_conformation);
-			rmsds[i] = RMSDTools::calcRMS(mean_coords, working_conformation, atomsPerConformation);
-		}
-		// Zero mean coordinates
-		for (int i  = 0; i <  coordinatesPerConformation; ++i){
-			mean_coords[i] = 0;
-		}
-		// Calculate new mean coords
-		for (int i  = 0; i <  numberOfConformations; ++i){
-			int conformation_offset = i*coordinatesPerConformation;
-			for (int j = 0; j < atomsPerConformation; ++j){
-				int atom_offset = 3*j;
-				int offset = conformation_offset + atom_offset;
-				mean_coords[atom_offset] += allCoordinates[ offset ];
-				mean_coords[atom_offset+1] += allCoordinates[ offset + 1];
-				mean_coords[atom_offset+2] += allCoordinates[ offset + 2];
-			}
+		double* reference_tmp = new double[coordinatesPerConformation];
+		copy(reference, reference+coordinatesPerConformation, reference_tmp);
+
+		RMSDTools::superpose(atomsPerConformation, reference_tmp, working_conformation);
+
+		if (rmsds != NULL){
+			rmsds[i] = RMSDTools::calcRMS(reference_tmp, working_conformation, atomsPerConformation);
 		}
 
-	}while(rmsd_diff > rmsd_diff_to_stop);
+		delete reference_tmp;
+	}
 }
 
+void RMSDomp::iterativeSuperposition(double rmsd_diff_to_stop = 1e-4){
+	// In the first step, reference is the first conformation
+	double MAX_ITERATIONS = 200;
+	double* reference_coords = new double[coordinatesPerConformation];
+	double* mean_coords = new double[coordinatesPerConformation];
+
+	double rmsd_difference = 0.0;
+	int current_iteration = 0;
+
+	// reference = coordinates[0]
+	RMSDTools::copyArrays(reference_coords, allCoordinates, coordinatesPerConformation);
+	do{
+		// Superpose all conformations with the reference conformation
+		superpositionChangingCoordinates(reference_coords, NULL);
+
+//		for(int i = 0; i < numberOfConformations; ++i ){
+//			double* coords = &(allCoordinates[i*coordinatesPerConformation]);
+//			save_vector(coords, "coordinates_pyrmsd", coordinatesPerConformation,"Conformation ", i, current_iteration);
+//		}
+
+		// Calculate new mean coords, which will be the next reference
+		RMSDTools::calculateMeanCoordinates(mean_coords, allCoordinates,
+											numberOfConformations, atomsPerConformation);
+
+		// rmsd(reference,mean)
+		rmsd_difference = RMSDTools::calcRMS(reference_coords, mean_coords, atomsPerConformation);
+
+		// reference = mean
+		RMSDTools::copyArrays(reference_coords, mean_coords, coordinatesPerConformation);
+
+		cout<< "rmsd diff: "<<current_iteration<<" "<<rmsd_difference<<endl;
+		current_iteration++;
+	}while(rmsd_difference > rmsd_diff_to_stop and current_iteration < MAX_ITERATIONS);
+}

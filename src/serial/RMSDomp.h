@@ -17,7 +17,8 @@ class RMSDomp: public RMSD{
 		virtual ~RMSDomp();
 		void oneVsFollowing(int conformation, double* rmsd);
 		void calculateRMSDCondensedMatrix(std::vector<double>& rmsd);
-		void iterativeSuperposition();
+		void superpositionChangingCoordinates(double*, double*);
+		void iterativeSuperposition(double);
 };
 
 #endif /* RMSDOMP_H_ */

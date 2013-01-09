@@ -24,6 +24,12 @@ namespace RMSDTools{
 	double calcRMS(const double * const x, const double * const y, unsigned int num_atoms);
 
 	void jacobi(double a[4][4], double d[4], double v[4][4], int nrot = 30);
+
+	void initializeTo(double*, double, int);
+
+	void copyArrays(double*, double*, int);
+
+	void calculateMeanCoordinates(double* , double* , int , int );
 }
 
 #endif
