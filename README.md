@@ -98,6 +98,7 @@ The CondensedMatrix class also offers an efficient way to ask for the most commo
 
 ## FUTURE IMPROVEMENTS
 If you have used this package and you feel something is missing/incorrect or whatever, you can change it and contribute. Some examples of things that need to be improved are:  
+* Solving bug in the CondensedMatrix object (erroneous creation when using a numpy array)
 * Adding number of threads option for any OpenMP calculator.  **DONE**
 * Adding  number of blocks and threads per block option in CUDA calculator.  **DONE**
 * Create an installer using Python distutils (difficult because of the use of CUDA).  
@@ -112,5 +113,5 @@ If you have used this package and you feel something is missing/incorrect or wha
 
 - QCP superposition method code was adapted from the code [here](http://theobald.brandeis.edu/qcp/)
 
-- The statistics function code was adapted from the work of jjhaag@dreamincode.net (available [here](http://www.dreamincode.net/code/snippet1447.htm).
+- The statistics function code was adapted from the work of jjhaag@dreamincode.net (available [here](http://www.dreamincode.net/code/snippet1447.htm) ).
 

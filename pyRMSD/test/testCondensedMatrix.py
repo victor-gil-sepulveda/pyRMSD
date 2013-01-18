@@ -6,9 +6,22 @@ Created on 30/01/2012
 import unittest
 import random
 from pyRMSD.condensedMatrix import CondensedMatrix
+import numpy
 
 class TestCondensedMatrix(unittest.TestCase):
 
+    def test_list_creation(self):
+        MAX_ELEMENTS = 30
+        DATA_LEN = (MAX_ELEMENTS * (MAX_ELEMENTS-1))/2
+        numpy_matrix_data = numpy.abs(numpy.random.rand(DATA_LEN))
+        np_matrix = CondensedMatrix(numpy_matrix_data)
+        ls_matrix = CondensedMatrix(list(numpy_matrix_data))
+        ls_matrix_2 = CondensedMatrix([3.]*DATA_LEN)
+        numpy.testing.assert_almost_equal(numpy_matrix_data, ls_matrix.get_data(), 7)
+        numpy.testing.assert_almost_equal(numpy_matrix_data, np_matrix.get_data(), 7)
+        numpy.testing.assert_equal(np_matrix.get_data(), ls_matrix.get_data())
+        numpy.testing.assert_equal(ls_matrix_2.get_data(), [3.]*DATA_LEN)
+    
     def test_get_number_of_rows(self):
         random.seed()
         for i in range(20): #@UnusedVariable
