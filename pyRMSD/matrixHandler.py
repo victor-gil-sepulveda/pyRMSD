@@ -17,7 +17,7 @@ class MatrixHandler(object):
     def getMatrix(self):
         return self.distance_matrix
 
-    def createMatrix(self, pdb_coordsets, calculator = "QCP_SERIAL_OMP_CALCULATOR"):
+    def createMatrix(self, pdb_coordsets, calculator = "QCP_OMP_CALCULATOR"):
         print "Calculating matrix..."
         rmsd = pyRMSD.RMSDCalculator.RMSDCalculator(pdb_coordsets, calculator).pairwiseRMSDMatrix()
         self.distance_matrix = CondensedMatrix(rmsd)
