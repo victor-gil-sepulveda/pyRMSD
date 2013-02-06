@@ -7,6 +7,7 @@ import pyRMSD.RMSDCalculator
 import pickle
 from pyRMSD.condensedMatrix import CondensedMatrix #@UnresolvedImport
 from pyRMSD.utils.proteinReading import Reader
+import json
 
 class MatrixHandler(object):
     
@@ -26,15 +27,15 @@ class MatrixHandler(object):
         print " Done\n"
         return self.distance_matrix
     
-    def createMatrixReadingOnlyCAs(self, pdb_file, reader_type = "LITE_READER", calculator = "QCP_SERIAL_OMP_CALCULATOR"):
+    def createMatrixReadingOnlyCAs(self, pdb_file, reader_type = "LITE_READER", calculator = "QCP_OMP_CALCULATOR"):
         reader = Reader(reader_type).readThisFile(pdb_file).gettingOnlyCAs()
         return self.__createMatrixWithReader(reader, calculator)
     
-    def createMatrixWithReader(self, pdb_file, reader_type = "LITE_READER", calculator = "QCP_SERIAL_OMP_CALCULATOR"):
+    def createMatrixWithReader(self, pdb_file, reader_type = "LITE_READER", calculator = "QCP_OMP_CALCULATOR"):
         reader = Reader(reader_type).readThisFile(pdb_file)
         return self.__createMatrixWithReader(reader, calculator)
     
-    def __createMatrixWithReader(self, reader, calculator = "QCP_SERIAL_OMP_CALCULATOR"):
+    def __createMatrixWithReader(self, reader, calculator = "QCP_OMP_CALCULATOR"):
         pdb_coordsets = reader.read()
         print "Calculating matrix..."
         rmsd = pyRMSD.RMSDCalculator.RMSDCalculator(pdb_coordsets, calculator).pairwiseRMSDMatrix()
@@ -63,15 +64,11 @@ class MatrixHandler(object):
         
     def __save_statistics(self):
         if self.statistics_folder!=None:
-            print "SAVING"
-            file_handler = open(self.statistics_folder+"/"+"statistics.txt","w")
-            file_handler.write( "--------------\n")
-            file_handler.write( "Matrix values\n") 
-            file_handler.write( "-------------\n")
-            file_handler.write( "Minimum:      %.5f\n"%(self.distance_matrix.calculateMax()))
-            file_handler.write( "Maximum:      %.5f\n"%(self.distance_matrix.calculateMin()))
-            file_handler.write( "Mean:         %.5f\n"%(self.distance_matrix.calculateMean()))
-            file_handler.write( "Std. Dev.:    %.5f\n"%(self.distance_matrix.calculateVariance()))
-            file_handler.write( "Skewness:     %.5f\n"%(self.distance_matrix.calculateSkewness()))
-            file_handler.write( "Kurtosis:     %.5f\n"%(self.distance_matrix.calculateKurtosis()))
-            file_handler.close()
+            stats_dic = {}
+            stats_dic["Minimum"] =  self.distance_matrix.calculateMax() 
+            stats_dic["Maximum"] =  self.distance_matrix.calculateMin()
+            stats_dic["Mean"] =     self.distance_matrix.calculateMean()
+            stats_dic["Std. Dev."] =self.distance_matrix.calculateVariance()
+            stats_dic["Skewness"] = self.distance_matrix.calculateSkewness()
+            stats_dic["Kurtosis"] = self.distance_matrix.calculateKurtosis()
+            open( self.statistics_folder+"/"+"statistics.json","w").write(json.dumps(stats_dic,indent=4, separators=(',', ': ')))
