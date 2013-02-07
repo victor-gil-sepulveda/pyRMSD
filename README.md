@@ -58,12 +58,12 @@ This is a code snippet that shows one possible use scenario in which the calcula
 
 As the resulting matrix is symmetric and its diagonal is 0, the rmsd_matrix object will store only the upper diagonal triangle (condensed matrix), in the same way [scipy.spatial.distance.pdist](http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html)
 does.  
-The available calculator types in a CUDA capable machine can be one of these:  
+The calculator types can be one of these:  
 
 * KABSCH_PYTHON_CALCULATOR
 * QTRFIT_SERIAL_CALCULATOR
 * QTRFIT_OMP_CALCULATOR
-* QCP_CUDA_CALCULATOR
+* QCP_CUDA_CALCULATOR (in CUDA capable machines)
 * QCP_SERIAL_CALCULATOR
 * QCP_OMP_CALCULATOR
 
@@ -109,7 +109,7 @@ If you have used this package and you feel something is missing/incorrect or wha
 ##CREDITS
 - Some Numpy helper functions were first seen in  http://www.scipy.org/Cookbook/C_Extensions/NumPy_arrays, by Lou Pecora (if I'm not wrong).
 
-- The Python implementation of superposition was extracted from Prody source code (by [Ahmet Bakan](http://www.csb.pitt.edu/People/abakan/)) and modified, with the only goal of provide a python example to compare performance and stability.
+- The Python implementation of superposition was extracted from Prody source code (by [Ahmet Bakan](http://www.csb.pitt.edu/People/abakan/)) and modified, with the only goal of providing a python example to compare performance and stability.
 
 - QCP superposition method code was adapted from the code [here](http://theobald.brandeis.edu/qcp/)
 
