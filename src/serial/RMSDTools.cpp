@@ -5,14 +5,14 @@
 #include <cmath>
 using namespace std;
 
+
+
 void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* const coord_ref)
 {
 	double center_fit[3] = {0.,0.,0.};
 	double center_ref[3] = {0.,0.,0.};
 	double u[3][3];
 	double q[4];
-
-	//superposeMatrix(n, coord_fit, coord_ref, center_fit);
 
 	// Get rotation matrix
 	getRotationMatrixGetCentersAndShiftMolecules(center_fit, center_ref, n, coord_fit, coord_ref, u, q);
@@ -22,8 +22,28 @@ void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* cons
 
 	// Shift the reference molecule to the geometric center of the fit
 	RMSDTools::shift3D(n, coord_ref, center_fit, +1.);
+
 	// Shift to the origin
 	RMSDTools::shift3D(n, coord_fit, center_fit, +1.);
+}
+
+void RMSDTools::superpose(unsigned int fit_n, double * const fit_coords, double* const fit_ref_coords, unsigned int rmsd_n, double* const rmsd_coords, double* const rmsd_ref_coords){
+	double center_fit[3] = {0.,0.,0.};
+	double center_ref[3] = {0.,0.,0.};
+	double u[3][3];
+	double q[4];
+
+	// Get rotation matrix
+	getRotationMatrixGetCentersAndShiftMolecules(center_fit, center_ref, fit_n, fit_coords, fit_ref_coords, u, q);
+
+	// Rotate the reference molecule by the rotation matrix u
+	RMSDTools::rotate3D(rmsd_n, fit_ref_coords, u);
+
+	// Shift the reference molecule to the geometric center of the fit
+	RMSDTools::shift3D(rmsd_n, rmsd_ref_coords, center_fit, +1.);
+
+	// Shift to the origin
+	RMSDTools::shift3D(rmsd_n, rmsd_coords, center_fit, +1.);
 }
 
 void RMSDTools::getRotationMatrixGetCentersAndShiftMolecules(double * const center_fit, double * const center_ref,

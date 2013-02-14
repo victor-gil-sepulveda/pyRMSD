@@ -4,6 +4,8 @@
 namespace RMSDTools{
 
 	void superpose(unsigned int n, double * const coord_fit, double* const coord_ref);
+
+	void superpose(unsigned int fit_n, double * const fit_coords, double* const fit_ref_coords, unsigned int rmsd_n, double* const rmsd_coords, double* const rmsd_ref_coords);
 	
 	void getRotationMatrixGetCentersAndShiftMolecules(double * const center_fit, double * const center_ref, unsigned int num_atoms, double * const coord_fit, double * const coord_ref, double u[][3], double * const q);
 	

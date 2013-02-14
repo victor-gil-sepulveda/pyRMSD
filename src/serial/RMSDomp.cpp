@@ -73,6 +73,7 @@ void RMSDomp::oneVsFollowing(int conformation, double *rmsd){
 	}
 }
 
+
 //////////////////////////////
 /// Tools for diff with prody
 //////////////////////////////
