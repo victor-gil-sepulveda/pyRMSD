@@ -71,7 +71,7 @@ class MatrixHandler(object):
         return CondensedMatrix(list(rmsd_data))
     
     @classmethod
-    def save_statistics(cls, statistics_folder = None, distance_matrix):
+    def save_statistics(cls, statistics_folder , distance_matrix):
         if statistics_folder!=None:
             stats_dic = {}
             stats_dic["Minimum"] =  distance_matrix.calculateMax() 

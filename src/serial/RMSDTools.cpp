@@ -6,7 +6,7 @@
 using namespace std;
 
 
-
+// After the function both coordinate sets are modified
 void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* const coord_ref)
 {
 	double center_fit[3] = {0.,0.,0.};
@@ -14,8 +14,20 @@ void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* cons
 	double u[3][3];
 	double q[4];
 
+	// Geometrical center of reference coordinates
+	RMSDTools::geometricCenter(n, coord_ref, center_ref);
+
+	// Geometric center of fitted coordinates
+	RMSDTools::geometricCenter(n, coord_fit, center_fit);
+
+	// Shift reference coordinates to origin
+	RMSDTools::shift3D(n, coord_ref, center_ref, -1.);
+
+	// Shift fit coordinates to the origin
+	RMSDTools::shift3D(n, coord_fit, center_fit, -1.);
+
 	// Get rotation matrix
-	getRotationMatrixGetCentersAndShiftMolecules(center_fit, center_ref, n, coord_fit, coord_ref, u, q);
+	RMSDTools::superpositionQuatFit(n, coord_ref, coord_fit, q, u);
 
 	// Rotate the reference molecule by the rotation matrix u
 	RMSDTools::rotate3D(n, coord_ref, u);
@@ -27,43 +39,37 @@ void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* cons
 	RMSDTools::shift3D(n, coord_fit, center_fit, +1.);
 }
 
-void RMSDTools::superpose(unsigned int fit_n, double * const fit_coords, double* const fit_ref_coords, unsigned int rmsd_n, double* const rmsd_coords, double* const rmsd_ref_coords){
+// superposes calc_coords over ref_coords and leaves them @ origin
+// Once finished,
+void RMSDTools::superpose(unsigned int fit_n, double * const fit_coords, double* const fit_ref_coords,
+							unsigned int calc_n, double* const calc_coords, double* const calc_reference){
 	double center_fit[3] = {0.,0.,0.};
 	double center_ref[3] = {0.,0.,0.};
 	double u[3][3];
 	double q[4];
 
-	// Get rotation matrix
-	getRotationMatrixGetCentersAndShiftMolecules(center_fit, center_ref, fit_n, fit_coords, fit_ref_coords, u, q);
+	// Calculate geometrical center of both fit coordinate sets and move them to the origin.
+	RMSDTools::geometricCenter(fit_n, fit_ref_coords, center_ref);
+	RMSDTools::geometricCenter(fit_n, fit_coords, center_fit);
+	RMSDTools::shift3D(fit_n, fit_ref_coords, center_ref, -1.);
+	RMSDTools::shift3D(fit_n, fit_coords, center_fit, -1.);
 
-	// Rotate the reference molecule by the rotation matrix u
-	RMSDTools::rotate3D(rmsd_n, fit_ref_coords, u);
-
-	// Shift the reference molecule to the geometric center of the fit
-	RMSDTools::shift3D(rmsd_n, rmsd_ref_coords, center_fit, +1.);
-
-	// Shift to the origin
-	RMSDTools::shift3D(rmsd_n, rmsd_coords, center_fit, +1.);
-}
-
-void RMSDTools::getRotationMatrixGetCentersAndShiftMolecules(double * const center_fit, double * const center_ref,
-							unsigned int num_atoms, double * const coord_fit, double * const coord_ref, double u[][3], double * const q){
-	// Geometrical center of reference coordinates
-	RMSDTools::geometricCenter(num_atoms, coord_ref, center_ref);
-
-	// Geometric center of fitted coordinates
-	RMSDTools::geometricCenter(num_atoms, coord_fit, center_fit);
-
-	// Shift reference coordinates to origin
-	RMSDTools::shift3D(num_atoms, coord_ref, center_ref, -1.);
-
-	// Shift fit coordinates to the origin
-	RMSDTools::shift3D(num_atoms, coord_fit, center_fit, -1.);
+	// Now we have to shift the coords we want to use in calculations to the origin too, we
+	// assume that this coords come from a superset of the fitting coords.
+	RMSDTools::shift3D(calc_n, calc_reference, center_ref, -1.);
+	RMSDTools::shift3D(calc_n, calc_coords, center_fit, -1.);
 
 	// Get rotation matrix
-	RMSDTools::superpositionQuatFit(num_atoms, coord_ref, coord_fit, q, u);
-}
+	RMSDTools::superpositionQuatFit(fit_n, fit_ref_coords, fit_coords, q, u);
 
+	// Rotate the calculation coordinate set using rotation matrix u
+	RMSDTools::rotate3D(calc_n, calc_coords, u);
+
+	// Returning to one of the centers is not needed as it doesn't affect RMSD calculation.
+	// Moreover, this behaviour will help to have all molecules nicely centered.
+
+	// At this point, calc_coords and calc_reference are ready for RMSD calculation
+}
 
 void RMSDTools::geometricCenter(unsigned int n, const double * const x, double * const center){
 	unsigned int i;

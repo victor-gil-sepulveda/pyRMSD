@@ -72,6 +72,43 @@ void test_superposition_with_coordinates_change(){
 	compareVectors("Testing reference: ", expected_reference, reference_coordinates, number_of_atoms*3, 1e-10);
 }
 
+void test_vector_len(vector<double>& v, int expected_len, const char* name){
+	if(v.size()!= expected_len){
+		cout<<name<<" size is "<<v.size()<<" instead of "<<expected_len<<endl;
+	}
+}
+
+void test_superposition_with_different_fit_and_calc_coordsets(){
+	int number_of_coordsets = 5;
+	int number_of_atoms = 3239;
+	int number_of_CAs = 224;
+	// rmsds 1 vs others [ 0.        ,  1.86745533,  2.07960877,  3.60601759,  2.18942902]
+	vector<double> not_aligned_CA;
+	vector<double> not_aligned_coordinates;
+	vector<double> aligned_coordinates;
+	double rmsds[5];
+	RMSDTools::initializeTo(rmsds, 0., 5);
+
+	load_vector(not_aligned_CA, "data/ligand_mini_CAs");
+	load_vector(not_aligned_coordinates, "data/ligand_mini_all");
+	load_vector(aligned_coordinates, "data/ligand_mini_all_aligned");
+
+	test_vector_len(not_aligned_CA, number_of_CAs*number_of_coordsets*3, "not aligned CAs");
+	test_vector_len(not_aligned_coordinates, number_of_atoms*number_of_coordsets*3, "all not aligned atoms");
+	test_vector_len(aligned_coordinates, number_of_atoms*number_of_coordsets*3, "all aligned atoms");
+
+	RMSDomp calculator(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
+	calculator.setCalculationCoordinates(number_of_atoms, &(not_aligned_coordinates[0]));
+	calculator.oneVsFollowing(0, rmsds);
+	print_vector("rmsd:",rmsds, 5);
+	//[ 0.        ,  1.86745533,  2.07960877,  3.60601759,  2.18942902]
+
+	RMSDomp calculator2(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
+	calculator2.oneVsFollowing(0, rmsds);
+	print_vector("rmsd:",rmsds, 5);
+	// 0.76798947,  0.88398446,  0.41780633,  0.33836885
+	// 0.767948 0.883864 0.417772 0.338332
+}
 
 int main(int argc, char **argv){
 
@@ -79,6 +116,7 @@ int main(int argc, char **argv){
 	test_copy_array();
 	test_coordinates_mean();
 	test_superposition_with_coordinates_change();
+	test_superposition_with_different_fit_and_calc_coordsets();
 
 	return 0;
 }
@@ -120,7 +158,7 @@ void print_vector(const char*message, double*  rmsd_vec, int len){
 	for(int i =0; i< len; ++i){
 		cout<<rmsd_vec[i]<<" ";
 	}
-	cout<<endl;
+	cout<<flush<<endl;
 }
 
 

@@ -16,7 +16,7 @@ ThRMSDSerialOmp::ThRMSDSerialOmp(int numberOfConformations, int atomsPerConforma
 				ThRMSDSerial(numberOfConformations, atomsPerConformation, coords){
     this->omp_threads = omp_threads;
 	omp_set_num_threads(this->omp_threads);
-	cout<<"Setting omp threads to "<<this->omp_threads<<endl;
+	//cout<<"Setting omp threads to "<<this->omp_threads<<endl;
 }
 
 void ThRMSDSerialOmp::oneVsFollowing(int conformation, double* rmsd_result) {
