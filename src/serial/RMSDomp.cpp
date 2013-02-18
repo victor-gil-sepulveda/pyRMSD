@@ -55,14 +55,15 @@ void RMSDomp::oneVsFollowing(int conformation, double *rmsd){
 }
 
 void RMSDomp::_one_vs_following_fit_equals_calc_coords(int conformation, double *rmsd){
-	int coordsOffset = conformation*coordinatesPerConformation;
-	double* reference = &(allCoordinates[coordsOffset]);
+	double* reference = &(allCoordinates[conformation*coordinatesPerConformation]);
+
+	//RMSDTools::centerAll(atomsPerConformation, numberOfConformations, allCoordinates);
 
 	#pragma omp parallel for shared(rmsd)
 	for (int i = conformation+1; i < numberOfConformations; ++i){
 		int rmsd_index = i-(conformation+1);
 
-		coordsOffset = i*coordinatesPerConformation;
+		int coordsOffset = i*coordinatesPerConformation;
 
 		double* conformation_coords = &(allCoordinates[coordsOffset]);
 
@@ -84,41 +85,40 @@ void RMSDomp::_one_vs_following_fit_equals_calc_coords(int conformation, double 
 }
 
 void RMSDomp::_one_vs_following_fit_differs_calc_coords(int conformation, double *rmsd){
-	int fitCoordsOffset = conformation*coordinatesPerConformation;
-	int calcCoordsOffset = conformation*coordinatesPerRMSDConformation;
+	double* fitReference = &(allCoordinates[conformation*coordinatesPerConformation]);
+	double* calcReference = &(allRMSDCoordinates[conformation*coordinatesPerRMSDConformation]);
 
-	double* fitReference = &(allCoordinates[fitCoordsOffset]);
-	double* calcReference = &(allRMSDCoordinates[calcCoordsOffset]);
+	double* fitCenters = new double[numberOfConformations*3];
+	double* calcCenters = new double[numberOfConformations*3];
 
-	#pragma omp parallel for shared(rmsd)
+	RMSDTools::centerAllToOrigin(atomsPerConformation, numberOfConformations, allCoordinates,fitCenters);
+	RMSDTools::centerAllToOrigin(atomsPerRMSDConformation, numberOfConformations, allRMSDCoordinates,calcCenters);
+
+	//#pragma omp parallel for shared(rmsd)
 	for (int i = conformation+1; i < numberOfConformations; ++i){
-		fitCoordsOffset = i*coordinatesPerConformation;
-		calcCoordsOffset = i*coordinatesPerRMSDConformation;
-
+		int fitCoordsOffset = i*coordinatesPerConformation;
 		double* fit_conformation_coords = &(allCoordinates[fitCoordsOffset]);
-		double* fit_reference_tmp = new double[coordinatesPerConformation];
 		double* fit_conformation_coords_tmp = new double[coordinatesPerConformation];
-		copy(fitReference, fitReference+coordinatesPerConformation, fit_reference_tmp);
 		copy(fit_conformation_coords,fit_conformation_coords+coordinatesPerConformation,fit_conformation_coords_tmp);
 
+		int calcCoordsOffset = i*coordinatesPerRMSDConformation;
 		double* calc_conformation_coords = &(allRMSDCoordinates[calcCoordsOffset]);
-		double* calc_reference_tmp = new double[coordinatesPerRMSDConformation];
 		double* calc_conformation_coords_tmp = new double[coordinatesPerRMSDConformation];
-		copy(calcReference, calcReference+coordinatesPerRMSDConformation, calc_reference_tmp);
 		copy(calc_conformation_coords, calc_conformation_coords+coordinatesPerRMSDConformation, calc_conformation_coords_tmp);
 
-		RMSDTools::superpose(atomsPerConformation, 	   fit_conformation_coords_tmp,  fit_reference_tmp,
-							 atomsPerRMSDConformation, calc_conformation_coords_tmp, calc_reference_tmp);
+		RMSDTools::superpose(atomsPerConformation, 	   fit_conformation_coords_tmp,  fitReference,
+							 atomsPerRMSDConformation, calc_conformation_coords_tmp, calcReference);
 
-		rmsd[i-(conformation+1)] = RMSDTools::calcRMS(calc_reference_tmp, calc_conformation_coords_tmp, atomsPerRMSDConformation);
+		rmsd[i-(conformation+1)] = RMSDTools::calcRMS(calcReference, calc_conformation_coords_tmp, atomsPerRMSDConformation);
 
-		delete [] fit_reference_tmp;
 		delete [] fit_conformation_coords_tmp;
-
-		delete [] calc_reference_tmp;
 		delete [] calc_conformation_coords_tmp;
 	}
+
+	delete [] fitCenters;
+	delete [] calcCenters;
 }
+
 //////////////////////////////
 /// Tools for diff with prody
 //////////////////////////////
@@ -164,7 +164,7 @@ void RMSDomp::superpositionChangingCoordinates(double* reference, double* rmsds)
 			rmsds[i] = RMSDTools::calcRMS(reference_tmp, working_conformation, atomsPerConformation);
 		}
 
-		delete reference_tmp;
+		delete [] reference_tmp;
 	}
 }
 

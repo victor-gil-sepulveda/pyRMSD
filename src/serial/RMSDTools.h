@@ -8,6 +8,9 @@ namespace RMSDTools{
 	void superpose(unsigned int fit_n, double * const fit_coords, double* const fit_ref_coords,
 			unsigned int rmsd_n, double* const calc_coords, double* const calc_reference);
 	
+	void centerAllToOrigin(unsigned int atomsPerConformation, unsigned int numberOfConformations,
+					double * const all_coords, double* const translations);
+
 	void geometricCenter(unsigned int n, const double * const x, double * const center);
 	
 	void shift3D(unsigned int numberOfPoints, double * const x, double trans[3], double scalar);

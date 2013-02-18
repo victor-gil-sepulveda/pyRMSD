@@ -9,6 +9,7 @@ RMSD::RMSD(int numberOfConformations, int atomsPerConformation, double* allCoord
 	this->coordinatesPerConformation = atomsPerConformation*3;
 	this->allRMSDCoordinates = NULL;
 }
+
 /*
  * Sets a different set of coordinates for RMSD calculation and fit.
  */

@@ -108,7 +108,16 @@ void test_superposition_with_different_fit_and_calc_coordsets(){
 	print_vector("rmsd:",rmsds, 5);
 	// 0.76798947,  0.88398446,  0.41780633,  0.33836885
 	// 0.767948 0.883864 0.417772 0.338332
+
+	RMSDomp calculator3(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
+	calculator.setCalculationCoordinates(number_of_CAs, &(not_aligned_CA[0]));
+	calculator.oneVsFollowing(0, rmsds);
+	print_vector("rmsd:",rmsds, 5);
 }
+
+/*void test_center(){
+
+}*/
 
 int main(int argc, char **argv){
 

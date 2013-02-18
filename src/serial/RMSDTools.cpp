@@ -7,8 +7,7 @@ using namespace std;
 
 
 // After the function both coordinate sets are modified
-void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* const coord_ref)
-{
+void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* const coord_ref){
 	double center_fit[3] = {0.,0.,0.};
 	double center_ref[3] = {0.,0.,0.};
 	double u[3][3];
@@ -27,49 +26,48 @@ void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* cons
 	RMSDTools::shift3D(n, coord_fit, center_fit, -1.);
 
 	// Get rotation matrix
-	RMSDTools::superpositionQuatFit(n, coord_ref, coord_fit, q, u);
+	RMSDTools::superpositionQuatFit(n, coord_fit, coord_ref, q, u);
 
 	// Rotate the reference molecule by the rotation matrix u
-	RMSDTools::rotate3D(n, coord_ref, u);
+	RMSDTools::rotate3D(n, coord_fit, u);
 
 	// Shift the reference molecule to the geometric center of the fit
-	RMSDTools::shift3D(n, coord_ref, center_fit, +1.);
+	RMSDTools::shift3D(n, coord_ref, center_ref, +1.);
 
 	// Shift to the origin
-	RMSDTools::shift3D(n, coord_fit, center_fit, +1.);
+	RMSDTools::shift3D(n, coord_fit, center_ref, +1.);
 }
 
 // superposes calc_coords over ref_coords and leaves them @ origin
 // Once finished,
 void RMSDTools::superpose(unsigned int fit_n, double * const fit_coords, double* const fit_ref_coords,
 							unsigned int calc_n, double* const calc_coords, double* const calc_reference){
-	double center_fit[3] = {0.,0.,0.};
-	double center_ref[3] = {0.,0.,0.};
 	double u[3][3];
 	double q[4];
 
-	// Calculate geometrical center of both fit coordinate sets and move them to the origin.
-	RMSDTools::geometricCenter(fit_n, fit_ref_coords, center_ref);
-	RMSDTools::geometricCenter(fit_n, fit_coords, center_fit);
-	RMSDTools::shift3D(fit_n, fit_ref_coords, center_ref, -1.);
-	RMSDTools::shift3D(fit_n, fit_coords, center_fit, -1.);
-
-	// Now we have to shift the coords we want to use in calculations to the origin too, we
-	// assume that this coords come from a superset of the fitting coords.
-	RMSDTools::shift3D(calc_n, calc_reference, center_ref, -1.);
-	RMSDTools::shift3D(calc_n, calc_coords, center_fit, -1.);
-
 	// Get rotation matrix
-	RMSDTools::superpositionQuatFit(fit_n, fit_ref_coords, fit_coords, q, u);
+	RMSDTools::superpositionQuatFit(fit_n,  fit_coords, fit_ref_coords,q, u);
 
 	// Rotate the calculation coordinate set using rotation matrix u
 	RMSDTools::rotate3D(calc_n, calc_coords, u);
-
-	// Returning to one of the centers is not needed as it doesn't affect RMSD calculation.
-	// Moreover, this behaviour will help to have all molecules nicely centered.
-
-	// At this point, calc_coords and calc_reference are ready for RMSD calculation
 }
+/*
+ * Centers all the conformations to origin and stores the movement vectors.
+ *
+ */
+void RMSDTools::centerAllToOrigin(unsigned int atomsPerConformation, unsigned int numberOfConformations, double * const all_coords, double* const translations){
+	unsigned int coordsPerConformation = atomsPerConformation * 3;
+	for (unsigned int i = 0; i < numberOfConformations; ++i){
+		double* center = &(translations[3*i]);
+		double* coords = &(all_coords[coordsPerConformation*i]);
+		RMSDTools::geometricCenter(atomsPerConformation, coords, center);
+		RMSDTools::shift3D(atomsPerConformation, coords, center, -1.);
+	}
+}
+
+//void RMSDTools::applyTranslationToAll(){
+//
+//}
 
 void RMSDTools::geometricCenter(unsigned int n, const double * const x, double * const center){
 	unsigned int i;
@@ -107,13 +105,13 @@ void RMSDTools::shift3D(unsigned int numberOfPoints, double * const x, double tr
 	}
 }
 
-void RMSDTools::superpositionQuatFit(unsigned int n, const double * const x, const double * const y, double q[4], double u[3][3])
+void RMSDTools::superpositionQuatFit(unsigned int n, const double * const structure_to_fit, const double * const reference, double q[4], double u[3][3])
 {
 	//vector<double> upperQuadMatrix(16, 0);
 	double upperQuadMatrix[4][4];
 
 	// Generate the upper triangle of the quadratic matrix
-	generateUpperQuadraticMatrix(upperQuadMatrix, n, y, x);
+	generateUpperQuadraticMatrix(upperQuadMatrix, n, reference, structure_to_fit);
 
 	// Compute quaternion
 	computeFittedQuaternionFromUpperQuadraticMatrix(&upperQuadMatrix[0], q);
@@ -122,8 +120,11 @@ void RMSDTools::superpositionQuatFit(unsigned int n, const double * const x, con
 	generateLeftRotationMatrixFromNormalizedQuaternion(q, u);
 }
 
-void RMSDTools::generateUpperQuadraticMatrix(double upperQuadMatrix[4][4], unsigned int n, const double * const y, const double *const x)
-{
+void RMSDTools::generateUpperQuadraticMatrix(double upperQuadMatrix[4][4], unsigned int n, const double * const reference, const double *const structure_to_fit){
+
+	const double* y = reference;
+	const double* const x = structure_to_fit;
+
 	//Initialize upperQuadMatrix
 	for(unsigned int i = 0; i < 4; ++i){
 		for(unsigned int j = 0; j < 4; ++j){
