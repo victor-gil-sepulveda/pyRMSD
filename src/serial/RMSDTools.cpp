@@ -8,22 +8,10 @@ using namespace std;
 
 // After the function both coordinate sets are modified
 void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* const coord_ref){
-	double center_fit[3] = {0.,0.,0.};
-	double center_ref[3] = {0.,0.,0.};
+	//double center_fit[3] = {0.,0.,0.};
+	//double center_ref[3] = {0.,0.,0.};
 	double u[3][3];
 	double q[4];
-
-	// Geometrical center of reference coordinates
-	RMSDTools::geometricCenter(n, coord_ref, center_ref);
-
-	// Geometric center of fitted coordinates
-	RMSDTools::geometricCenter(n, coord_fit, center_fit);
-
-	// Shift reference coordinates to origin
-	RMSDTools::shift3D(n, coord_ref, center_ref, -1.);
-
-	// Shift fit coordinates to the origin
-	RMSDTools::shift3D(n, coord_fit, center_fit, -1.);
 
 	// Get rotation matrix
 	RMSDTools::superpositionQuatFit(n, coord_fit, coord_ref, q, u);
@@ -31,11 +19,11 @@ void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* cons
 	// Rotate the reference molecule by the rotation matrix u
 	RMSDTools::rotate3D(n, coord_fit, u);
 
-	// Shift the reference molecule to the geometric center of the fit
+	/*// Shift the reference molecule to the geometric center of the fit
 	RMSDTools::shift3D(n, coord_ref, center_ref, +1.);
 
 	// Shift to the origin
-	RMSDTools::shift3D(n, coord_fit, center_ref, +1.);
+	RMSDTools::shift3D(n, coord_fit, center_ref, +1.);*/
 }
 
 // superposes calc_coords over ref_coords and leaves them @ origin
@@ -56,7 +44,10 @@ void RMSDTools::superpose(unsigned int fit_n, double * const fit_coords, double*
  *
  */
 void RMSDTools::centerAllToOrigin(unsigned int atomsPerConformation, unsigned int numberOfConformations, double * const all_coords, double* const translations){
+
 	unsigned int coordsPerConformation = atomsPerConformation * 3;
+
+	#pragma omp parallel for
 	for (unsigned int i = 0; i < numberOfConformations; ++i){
 		double* center = &(translations[3*i]);
 		double* coords = &(all_coords[coordsPerConformation*i]);

@@ -57,7 +57,8 @@ void RMSDomp::oneVsFollowing(int conformation, double *rmsd){
 void RMSDomp::_one_vs_following_fit_equals_calc_coords(int conformation, double *rmsd){
 	double* reference = &(allCoordinates[conformation*coordinatesPerConformation]);
 
-	//RMSDTools::centerAll(atomsPerConformation, numberOfConformations, allCoordinates);
+	double* centers = new double[numberOfConformations*3];
+	RMSDTools::centerAllToOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
 
 	#pragma omp parallel for shared(rmsd)
 	for (int i = conformation+1; i < numberOfConformations; ++i){
@@ -82,6 +83,7 @@ void RMSDomp::_one_vs_following_fit_equals_calc_coords(int conformation, double 
 
 		rmsd[rmsd_index] = rmsd_val;
 	}
+	delete [] centers;
 }
 
 void RMSDomp::_one_vs_following_fit_differs_calc_coords(int conformation, double *rmsd){
@@ -91,10 +93,10 @@ void RMSDomp::_one_vs_following_fit_differs_calc_coords(int conformation, double
 	double* fitCenters = new double[numberOfConformations*3];
 	double* calcCenters = new double[numberOfConformations*3];
 
-	RMSDTools::centerAllToOrigin(atomsPerConformation, numberOfConformations, allCoordinates,fitCenters);
-	RMSDTools::centerAllToOrigin(atomsPerRMSDConformation, numberOfConformations, allRMSDCoordinates,calcCenters);
+	RMSDTools::centerAllToOrigin(atomsPerConformation, numberOfConformations, allCoordinates, fitCenters);
+	RMSDTools::centerAllToOrigin(atomsPerRMSDConformation, numberOfConformations, allRMSDCoordinates, calcCenters);
 
-	//#pragma omp parallel for shared(rmsd)
+	#pragma omp parallel for shared(rmsd)
 	for (int i = conformation+1; i < numberOfConformations; ++i){
 		int fitCoordsOffset = i*coordinatesPerConformation;
 		double* fit_conformation_coords = &(allCoordinates[fitCoordsOffset]);
@@ -119,34 +121,7 @@ void RMSDomp::_one_vs_following_fit_differs_calc_coords(int conformation, double
 	delete [] calcCenters;
 }
 
-//////////////////////////////
-/// Tools for diff with prody
-//////////////////////////////
-// In prody (ensemble.py, iterpose) add:
-//
-//    for (i, conf) in enumerate(self._confs):
-//		myfile.write("Conformation "+str(i)+"\n")
-//		for atom in conf:
-//		    myfile.write("%f\n%f\n%f\n"%(atom[0],atom[1],atom[2]))
-//	    myfile.close()
-//
-//void stringToFile(const char *path, const std::string & contents){
-//       ofstream newFile(path, ios::app);
-//       newFile << contents;
-//       newFile.close();
-//}
-//
-//void save_vector(double *vector, const char * dataPath, int size, char* message, int number_of_conf, int iteration){
-//       std::ostringstream oss(std::ostringstream::out);
-//
-//       oss << message << " "<<number_of_conf<<" "<<iteration<<std::endl;
-//
-//       for(int i=0; i<size; ++i){
-//               oss << vector[i] << std::endl;
-//       }
-//
-//       stringToFile(dataPath, oss.str());
-//}
+
 
 // reference coords is already a copy, in a different memory space than allCoordinates
 void RMSDomp::superpositionChangingCoordinates(double* reference, double* rmsds){
