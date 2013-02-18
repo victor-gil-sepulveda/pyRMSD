@@ -62,26 +62,16 @@ void RMSDomp::_one_vs_following_fit_equals_calc_coords(int conformation, double 
 
 	#pragma omp parallel for shared(rmsd)
 	for (int i = conformation+1; i < numberOfConformations; ++i){
-		int rmsd_index = i-(conformation+1);
 
-		int coordsOffset = i*coordinatesPerConformation;
-
-		double* conformation_coords = &(allCoordinates[coordsOffset]);
-
-		double* reference_tmp = new double[coordinatesPerConformation];
+		double* conformation_coords = &(allCoordinates[i*coordinatesPerConformation]);
 		double* conformation_coords_tmp = new double[coordinatesPerConformation];
-
-		copy(reference,reference+coordinatesPerConformation,reference_tmp);
 		copy(conformation_coords,conformation_coords+coordinatesPerConformation,conformation_coords_tmp);
 
-		RMSDTools::superpose(atomsPerConformation, conformation_coords_tmp, reference_tmp);
+		RMSDTools::superpose(atomsPerConformation, conformation_coords_tmp, reference);
 
-		double rmsd_val = RMSDTools::calcRMS(reference_tmp, conformation_coords_tmp, atomsPerConformation);
+		rmsd[i-(conformation+1)] = RMSDTools::calcRMS(reference, conformation_coords_tmp, atomsPerConformation);
 
-		delete [] reference_tmp;
 		delete [] conformation_coords_tmp;
-
-		rmsd[rmsd_index] = rmsd_val;
 	}
 	delete [] centers;
 }
