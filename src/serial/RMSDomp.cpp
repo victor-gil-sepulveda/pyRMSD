@@ -115,21 +115,25 @@ void RMSDomp::_one_vs_following_fit_differs_calc_coords(int conformation, double
 
 // reference coords is already a copy, in a different memory space than allCoordinates
 void RMSDomp::superpositionChangingCoordinates(double* reference, double* rmsds){
-	// Superpose all conformations with the reference conformation
+
+	double* centers = new double[numberOfConformations*3];
+	RMSDTools::centerAllToOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
+
+	// Superpose all conformations with the reference conformation without making a copy
 	#pragma omp parallel for shared(rmsds)
 	for (int i = 0; i < numberOfConformations; ++i){
 		double* working_conformation = &(allCoordinates[i*coordinatesPerConformation]);
 
-		double* reference_tmp = new double[coordinatesPerConformation];
-		copy(reference, reference+coordinatesPerConformation, reference_tmp);
+		/*double* reference_tmp = new double[coordinatesPerConformation];
+		copy(reference, reference+coordinatesPerConformation, reference_tmp);*/
 
-		RMSDTools::superpose(atomsPerConformation, reference_tmp, working_conformation);
+		RMSDTools::superpose(atomsPerConformation, working_conformation, reference);
 
 		if (rmsds != NULL){
-			rmsds[i] = RMSDTools::calcRMS(reference_tmp, working_conformation, atomsPerConformation);
+			rmsds[i] = RMSDTools::calcRMS(reference, working_conformation, atomsPerConformation);
 		}
 
-		delete [] reference_tmp;
+		//delete [] reference_tmp;
 	}
 }
 
