@@ -76,7 +76,7 @@ void test_superposition_with_coordinates_change(){
 	compareVectors("\tTesting reference: ", expected_reference, reference_coordinates, number_of_atoms*3, 1e-10);
 }
 
-void test_vector_len(vector<double>& v, int expected_len, const char* name){
+void test_vector_len(vector<double>& v, unsigned int expected_len, const char* name){
 	if(v.size()!= expected_len){
 		cout<<name<<" size is "<<v.size()<<" instead of "<<expected_len<<endl;
 	}

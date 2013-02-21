@@ -20,22 +20,6 @@ def flattenCoords(coordsets):
     @author: vgil
     @date: 30/11/2012
     """
-#    ca_coords_list = []
-#    for coords in coordsets:
-#        for coord_triplet in coords:
-#            ca_coords_list.append(coord_triplet[0]) 
-#            ca_coords_list.append(coord_triplet[1]) 
-#            ca_coords_list.append(coord_triplet[2])
-#             
-#    return numpy.array(ca_coords_list)
-#     flattened = numpy.zeros(len(coordsets)*len(coordsets[0])*3, dtype=numpy.float64)
-#     i = 0
-#     for coords in coordsets:
-#         for coord_triplet in coords:
-#             flattened[i] = coord_triplet[0]; i = i+1
-#             flattened[i] = coord_triplet[1]; i = i+1 
-#             flattened[i] = coord_triplet[2]; i = i+1
-#     return flattened
     return numpy.reshape(coordsets,coordsets.shape[0]*coordsets.shape[1]*coordsets.shape[2])
     
 class Reader(object):
