@@ -2,6 +2,7 @@ import numpy.linalg
 import pyRMSD.calculators
 from pyRMSD.utils.proteinReading import flattenCoords
 from pyRMSD.availableCalculators import availableCalculators
+import numpy
 
 
 class RMSDCalculator(object):
@@ -88,7 +89,7 @@ class RMSDCalculator(object):
         """     
         if "PYTHON" in self.calculatorType:
             target = self.coordsets[conformation_number]
-            return p_oneVsFollowing(target, self.coordsets[conformation_number+1:])
+            return numpy.array(p_oneVsFollowing(target, self.coordsets[conformation_number+1:]))
         else:
             np_coords = flattenCoords(self.coordsets)
             return pyRMSD.calculators.oneVsFollowing(availableCalculators()[self.calculatorType], np_coords, 
@@ -106,7 +107,7 @@ class RMSDCalculator(object):
         @date: 26/11/2012
         """
         if "PYTHON" in self.calculatorType :
-            return p_calculateRMSDCondensedMatrix(self.coordsets)
+            return numpy.array(p_calculateRMSDCondensedMatrix(self.coordsets))
         else:
             np_coords = flattenCoords(self.coordsets)
             return pyRMSD.calculators.calculateRMSDCondensedMatrix(availableCalculators()[self.calculatorType], np_coords, 

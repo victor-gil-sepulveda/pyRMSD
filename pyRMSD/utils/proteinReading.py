@@ -1,7 +1,6 @@
 # Conditional import
 try:
     import prody
-    from prody.ensemble import PDBEnsemble
     from prody.proteins import parsePDB
     prody_available = True
 
@@ -120,7 +119,11 @@ class Reader(object):
         coordinates = numpy.array([])
         
         if self.readerType == "PRODY_READER":
-            prody.setVerbosity('none')
+            try:
+                # Some prody versions doesn't accept this
+                prody.setVerbosity('none')
+            except:
+                pass
             for pdb_path in self.filesToRead:
                 if self.onlyCA:
                     pdb = parsePDB(pdb_path, subset='calpha')
