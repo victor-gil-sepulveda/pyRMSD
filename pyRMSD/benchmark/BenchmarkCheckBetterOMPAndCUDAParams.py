@@ -42,7 +42,7 @@ if __name__ == '__main__':
         t2 = time.time()
         del rmsd
         print 'OpenMP calculation took %0.3fs with number of threads %d' % (t2-t1, number_of_threads)
-        
+         
     # Generate test parameters
     max_n_threads = 512
     max_n_blocks = 512 
@@ -67,3 +67,6 @@ if __name__ == '__main__':
             t2 = time.time()
             del rmsd
             print 'Calculating took %0.3fs with CUDA and numthreads:%d and numblocks:%d' % (t2-t1, number_of_threads, number_of_blocks)
+
+        #Best in Minotauro (NVIDIA M2090): 128, 64
+        #Best with Quadro FX 580: 2, 16

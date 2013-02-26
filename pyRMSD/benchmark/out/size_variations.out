@@ -1,0 +1,89 @@
+2, 16 en NVIDIA M2090
+------------------
+Time for calculations (ms):3474.95
+With CUDA and size 198 it took: 5.174580s
+Time for calculations (ms):25043.8
+With CUDA and size 396 it took: 26.605189s
+Time for calculations (ms):40851.1
+With CUDA and size 594 it took: 43.134981s
+Time for calculations (ms):43990
+With CUDA and size 792 it took: 46.964039s
+Time for calculations (ms):67814.6
+With CUDA and size 990 it took: 71.481342s
+Time for calculations (ms):72521
+With CUDA and size 1188 it took: 76.917922s
+Time for calculations (ms):95284.2
+With CUDA and size 1386 it took: 100.400219s
+Time for calculations (ms):80780.8
+@> 66 atoms and 10001 coordinate set(s) were parsed in 20.74s.
+With CUDA and size 1584 it took: 86.581799s
+Setting omp threads to 6
+With OpenMP and size 198 it took: 8.067094s
+Setting omp threads to 6
+With OpenMP and size 396 it took: 13.891722s
+Setting omp threads to 6
+With OpenMP and size 594 it took: 20.309927s
+Setting omp threads to 6
+With OpenMP and size 792 it took: 26.679480s
+Setting omp threads to 6
+With OpenMP and size 990 it took: 33.186503s
+Setting omp threads to 6
+With OpenMP and size 1188 it took: 39.691194s
+Setting omp threads to 6
+With OpenMP and size 1386 it took: 46.062594s
+Setting omp threads to 6
+With OpenMP and size 1584 it took: 52.192316s
+-----------------------
+Time for calculations (ms):3515.27
+With CUDA and size 198 it took: 4.684729s
+Time for calculations (ms):25010.3
+With CUDA and size 396 it took: 26.551605s
+Time for calculations (ms):40838.7
+With CUDA and size 594 it took: 43.081905s
+Time for calculations (ms):43982.9
+With CUDA and size 792 it took: 46.944279s
+Time for calculations (ms):67832.4
+With CUDA and size 990 it took: 71.476132s
+Time for calculations (ms):72465.1
+With CUDA and size 1188 it took: 76.808613s
+Time for calculations (ms):95252.9
+With CUDA and size 1386 it took: 100.297969s
+Time for calculations (ms):80696.3
+@> 66 atoms and 10001 coordinate set(s) were parsed in 14.46s.
+With CUDA and size 1584 it took: 86.445198s
+Setting omp threads to 6
+With OpenMP and size 198 it took: 8.078613s
+Setting omp threads to 6
+With OpenMP and size 396 it took: 13.799582s
+Setting omp threads to 6
+With OpenMP and size 594 it took: 20.303844s
+Setting omp threads to 6
+With OpenMP and size 792 it took: 26.800981s
+Setting omp threads to 6
+With OpenMP and size 990 it took: 33.174474s
+Setting omp threads to 6
+With OpenMP and size 1188 it took: 39.674911s
+Setting omp threads to 6
+With OpenMP and size 1386 it took: 46.179189s
+Setting omp threads to 6
+With OpenMP and size 1584 it took: 53.070218s
+--------------------
+
+128, 64 en NVIDIA M2090
+Time for calculations (ms):3626.27
+With CUDA and size 198 it took: 4.949541s
+Time for calculations (ms):6073.38
+With CUDA and size 396 it took: 7.646747s
+Time for calculations (ms):9033.96
+With CUDA and size 594 it took: 11.277666s
+Time for calculations (ms):10856.5
+With CUDA and size 792 it took: 13.703375s
+Time for calculations (ms):14525.3
+With CUDA and size 990 it took: 18.043179s
+Time for calculations (ms):17059.8
+With CUDA and size 1188 it took: 21.251109s
+Time for calculations (ms):21654.5
+With CUDA and size 1386 it took: 26.523370s
+Time for calculations (ms):21371.8
+With CUDA and size 1584 it took: 26.925047s
+
