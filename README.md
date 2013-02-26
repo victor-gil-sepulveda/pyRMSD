@@ -1,10 +1,29 @@
 # pyRMSD
-pyRMSD goal is the fast (and easy!) calculation of rmsd collective operations, specially matrices of large ensembles of protein conformations. It also offers a symmetric matrix representation which fosters access speed over access security and is also very memory efficient.
+pyRMSD goal is the fast (and easy!) calculation of rmsd collective operations, specially matrices of large ensembles of protein conformations. It also offers a symmetric distance matrix implementation with improved access speed and memory efficiency.
 
-## Building and Installing
-### Dependencies
+# Index
+## Installation
 
-Before installing be sure you have Python 2.7 and [numpy](http://numpy.scipy.org/). Some soft dependencies are [scipy](http://www.scipy.org/), only necessary to execute one test (statistics), and [prody](http://pypi.python.org/pypi/ProDy/) which will add more power to pdb parsing (and also mandatory for one or two tests). All this packages are really easy to install (well... installing scipy can be a little bit tricky in some systems).
+>### [Dependencies](#dependencies)  
+>### [Linux](#ilinux)  
+>### [Windows](#iwindows)  
+>### [MacOs](#imac)
+
+## Building
+
+## Features
+
+##Installation
+### <a id="dependencies"></a> Dependencies
+**Users** only need to install Python version 2.6/2.7 (pyRMSD has only been tested with those, however it may work with another versions of the Python 2.X family). Numpy is also required. Surely you have already installed it, but in the case you didn't it can be found [here](http://sourceforge.net/projects/numpy/files/) where you will be able to find installers for almost all the combinations of platforms and Python versions you can think about.
+
+As a **Developer** you may be interested on istalling [scipy](http://www.scipy.org/) (only necessary to execute the statistics test), and [prody](http://www.csb.pitt.edu/prody/getprody.html) (to fully satisfy the RMSD calculators test). We provide our own pdb reader, but only for the sake of completeness. That's why we encourage the use of Prody to handle coordinates, as it is well-tested and powerful tool.
+
+### <a id="ilinux"></a>Linux
+WORK IN PROGRESS
+### <a id="iwindows"></a>Windows
+
+### <a id="imac"></a>MacOs
 
 ### Building
 To build the code (over Linux, no Windows support yet) you must execute *install.py*.  
@@ -114,4 +133,3 @@ If you have used this package and you feel something is missing/incorrect or wha
 - QCP superposition method code was adapted from the code [here](http://theobald.brandeis.edu/qcp/)
 
 - The statistics function code was adapted from the work of jjhaag@dreamincode.net (available [here](http://www.dreamincode.net/code/snippet1447.htm) ).
-
