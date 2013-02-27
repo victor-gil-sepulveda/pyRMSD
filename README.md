@@ -2,7 +2,7 @@
 pyRMSD goal is the fast (and easy!) calculation of rmsd collective operations, specially matrices of large ensembles of protein conformations. It also offers a symmetric distance matrix implementation with improved access speed and memory efficiency.
 
 # Index
->###[1- Features](#features)  
+>###1- [Features](#Features)  
   
 >###[2- Building & Installation](#building)  
 >>#### [Dependencies](#dependencies)  
@@ -26,7 +26,7 @@ pyRMSD goal is the fast (and easy!) calculation of rmsd collective operations, s
 
 
  
-##<a id="features"></a> 1- Features  
+##Features  
 pyRMSD is currently reaching V2.0 and adding new features with more options. Note that some options will be never available for some features. For instance the _Iterative Superposition_ feature has no sense without actual coordinates modification, as it is senseless to modify the coordinates in an RMSD matrix calculation.   
 <table>
  <thead>
