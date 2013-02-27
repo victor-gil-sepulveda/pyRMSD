@@ -53,14 +53,16 @@ or
   
 The build.py script is the most versatile way and will work in almost all situations, but as it requires the 'sysconfig' package, the script itself needs Python 2.7 to be executed. With this script one can build x86 and x64 distributions with enabled CUDA calculators if the --cuda flag is used. There is more information about the build.py script [here](#build_linux). 
 
-### <a id="iwindows"></a>Windows
+### <a id="iwindows"></a>Windows  
 Windows users have the following choices:  
+  
 **1)** Using a precompiled windows installer. There are two available ([x86](https://github.com/victor-gil-sepulveda/pyRMSD/tree/master/prebuilt_packages/v1/Win/32) and [x64]()). Those are used as any other regular Windows Installer (double click the executable and follow instructions).  
+  
 **2)** Using the custom build.py script in pyRMSD main folder with:  
   
     > python build_windows.py
   
-Please look [here](#build_win) if you need further iformation about the windows version of the custom build script.
+Please look [here](#build_win) if you need further iformation about the windows version of the custom build script.  
 
 ### <a id="imac"></a>MacOs
 MacOs users have the same choices that Linux users:
@@ -94,22 +96,30 @@ or
 Please see this same section in the Linux instalation guide. It has only been tested without CUDA support, but it may need only [minor changes](#build_linux) to add it.  
 
 ##<a id="buildscript"></a>3- The custom building script  
-pyRMSD includes a small build script that is indeed a recipe to compile the C extensions of pyRMSD. This script only works with Python 2.7+ as it uses the module *sysconfig* to get the search path for python headers and libs. 
+pyRMSD includes a small build script that is indeed a recipe to compile the C extensions of pyRMSD. This script only works with Python 2.7+ as it uses the module *sysconfig* to get the search path for python headers and libs.  
 The building script will try to guess the location of the needed files for compilation, however it can be modified to be able to handle all kind of scenarios. In order to do this you may want to modify the upper case constants in the top part of the file. 
 
 ###<a id="build_linux"></a>Unix-based systems  
-The script was used in a Ubuntu x86 and Ubuntu x64 Os, as well as a MacOs (Snow Leopard) for the non CUDA build. PYTHON_X constants were left unchanged.
-It was also used under Ubuntu x64 with CUDA 4.2 to build the CUDA enabled version. 
-If you are going to use it to build a CUDA enabled version you may have to change the *CUDA_BASE* constant, which needs to point to the base directory of your CUDA installation (in our case  */usr/local/cuda-4.2*). Required headers and libs are usually stored inside the */include* and */lib64* folders (*/lib* in x86 systems) subfolders, but you can also change it by modifying *CUDA_INCLUDE_FOLDER* and *CUDA_LIBRARIES_FOLDER*. Change *CUDA_ARCHITECHTURE* to match the architecture of your GPU. 
+The script was used in a Ubuntu x86 and Ubuntu x64 Os, as well as a MacOs (Snow Leopard) for the non CUDA build. PYTHON_X constants were left unchanged.  
+It was also used under Ubuntu x64 with CUDA 4.2 to build the CUDA enabled version.  
+If you are going to use it to build a CUDA enabled version you may have to change the *CUDA_BASE* constant, which needs to point to the base directory of your CUDA installation (in our case  */usr/local/cuda-4.2*). Required headers and libs are usually stored inside the */include* and */lib64* folders (*/lib* in x86 systems) subfolders, but you can also change it by modifying *CUDA_INCLUDE_FOLDER* and *CUDA_LIBRARIES_FOLDER*. Change *CUDA_ARCHITECHTURE* to match the architecture of your GPU.  
 Finally you will need to change your PYTHONPATH in order to point to the parent folder of the package (or copy it in a folder already inside your PYTHONPATH). See [this](http://superuser.com/questions/247620/how-to-globally-modify-the-default-pythonpath-sys-path) if you have any problem modifying it.  
 
 ###<a id="build_win"></a>Windows systems  
-The build script has also been tested in Win32 and 64 systems susing the MinGW compiler library. Here are the steps followed to succesfully compile the extensions:
-\- [Download](http://www.mingw.org/) and install MinGW
+The build script has also been tested in Windows 7 32 and 64 systems susing the MinGW compiler library. Here are the steps followed to succesfully compile the extensions:  
+\- [Download](http://www.mingw.org/) and install MinGW. Then add its /bin folder to Windows PATH
 \- [Download](http://www.python.org/download/releases/2.7.3/) and install Python 2.7.3
 \- [Download](http://www.scipy.org/Download) and install Numpy (tested with v. 1.7.0 for python 2.7)
 \- [Download](http://www.scipy.org/Download) and install Scipy (tested with v. 0.11.0 for python 2.7)
 \- [Download](http://www.csb.pitt.edu/prody/getprody.html) and install Prody (tested with v. 1.4.1 for python 2.7)
+Inside the build_windows.py, *PYTHON_INCLUDE_FOLDER* and *PYTHON_LIBRARY_FOLDER* constants were changed to match our Python installation paths.  
+*PYTHON_EXTENSION_LINKING_OPTIONS* and *PYTHON_EXTENSION_OPTIONS* were also changed to fit Windows extension creation options.  
+Finally pyRMSD.cpp, readerLite.cpp and Matrix.cpp includes <python2.7/Python.h> and <python2.7/structmember.h> were changed to <Python.h> and <structmember.h> as the PYTHON_INCLUDE_FOLDER constant was already pointing to the python27 directory.  
+Once everything is built create (or modify) the PYTHONPATH system variable and make it point the pyRMSD folder.  
+
+#### Modifying system variables  
+
+In order to create or modify a system variable you will need to browse to Control Panel -> System and Security -> System -> Advanced System Settings.
 
 ##<a id="testing"></a>Testing (Developers)  
 Once installed you can run the tests in *pyRMSD/test* using:  
