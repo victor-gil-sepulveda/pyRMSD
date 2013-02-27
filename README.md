@@ -2,53 +2,84 @@
 pyRMSD goal is the fast (and easy!) calculation of rmsd collective operations, specially matrices of large ensembles of protein conformations. It also offers a symmetric distance matrix implementation with improved access speed and memory efficiency.
 
 # Index
->##1-Features
->##2-Building & Installation
+>##[1- Features](#features)
+>##[2- Building & Installation](#building)  
 >>### [Dependencies](#dependencies)  
 >>### [Linux](#ilinux)  
 >>### [Windows](#iwindows)  
 >>### [MacOs](#imac)
->##3-[The custom building script](#buildscript)
->##4-Testing (Developers)
->##5-Benchmarcks (Developers)  
-  
-  
-##Installation
+>##[3- The custom building script](#buildscript)
+>>### [Unix-Based](#build_linux)  
+>>### [Windows](#build_win)  
+>##[4- Testing (Developers)](#testing)
+>##[5- Benchmarcks (Developers)](#benchmarks) 
+ 
+##<a id="features"></a> 1- Features
+##<a id="building"></a> 2- Building & Installation
 ### <a id="dependencies"></a> Dependencies
 **Users** only need to install Python version 2.6/2.7 (pyRMSD has only been tested with those, however it may work with another versions of the Python 2.X family). Numpy is also required. Surely you have already installed it, but in the case you didn't it can be found [here](http://sourceforge.net/projects/numpy/files/) where you will be able to find installers for almost all the combinations of platforms and Python versions you can think about.
 
 As a **Developer** you may be interested on istalling [scipy](http://www.scipy.org/) (only necessary to execute the statistics test), and [prody](http://www.csb.pitt.edu/prody/getprody.html) (to fully satisfy the RMSD calculators test). We provide our own pdb reader, but only for the sake of completeness. That's why we encourage the use of Prody to handle coordinates, as it is well-tested and powerful tool. Also, remember that header files of Python and Numpy may be accessible, and your Python installation must contain the python shared library This usually means to use ./configure --enable-shared before building Python (usually 2.7 distributions already come with this library).
 
 ### <a id="ilinux"></a>Linux 
-Linux **Users** have the following options:  
+Linux users have the following choices:  
   
 **1)** Using the 'setup.py' file inside the root folder by typing:  
-    > python setup.py install
+    \> python setup.py install
   
 (or 'build') to only build it), which is the usual way python packages are deployed. AS 'distutils' do not support CUDA compiling directly, your package will not be able to use CUDA calculators.
 
 **2)** Using [pyRMSD-1.0.tar.gz](https://github.com/victor-gil-sepulveda/pyRMSD/tree/master/prebuilt_packages/v1/Linux/64-CUDA) precompiled distribution: 
+
 - Unzip the file with:
-    > tar -zxvf
+    \> tar -zxvf
   
 - Open pyRMSD folder and use setup.py:
-    > python setup.py install
+    \> python setup.py install
 
 This distribution will only work in x64 systems, and will make the CUDA calculator available.
 
-**3)** Using the custom build.py script in pyRMSD main folder with:
-    > python build.py
-or
-    > python build.py --cuda
+**3)** Using the custom build.py script in pyRMSD main folder with:  
+    \> python build.py  
 
-The build.py script is the most versatile way and will work in almost all situations, but as it requires the 'sysconfig' package, the script itself needs Python 2.7 to be executed. With this script one can build x86 and x64 distributions with enabled CUDA calculators if the --cuda flag is used. There is more information about the build.py script [here](#buildscript). 
+or  
+    \> python build.py --cuda  
+
+The build.py script is the most versatile way and will work in almost all situations, but as it requires the 'sysconfig' package, the script itself needs Python 2.7 to be executed. With this script one can build x86 and x64 distributions with enabled CUDA calculators if the --cuda flag is used. There is more information about the build.py script [here](#build_linux). 
 
 ### <a id="iwindows"></a>Windows
+Windows users have the following choices:  
+**1)** Using a precompiled windows installer. There are two available (x86 and x64). Those are used as any other regular Windows Installer (double click the executable and follow instructions).  
+**2)** Using the custom build.py script in pyRMSD main folder with:  
+    \> python build_windows.py
+Please look [here](#build_win) if you need further iformation about the windows version of the custom build script.
 
 ### <a id="imac"></a>MacOs
+MacOs users have the same choices that Linux users:
 
+**1)** Use the 'setup.py' file inside the root folder by typing:  
+    \> python setup.py install
+  
+(or 'build') to only build it), which is the usual way python packages are deployed. AS 'distutils' do not support CUDA compiling directly, your package will not be able to use CUDA calculators. 
 
-##<a id="buildscript"></a>The custom building script
+**2)** Using [pyRMSD-1.0.tar.gz](https://github.com/victor-gil-sepulveda/pyRMSD/tree/master/prebuilt_packages/v1/MacOs) precompiled distribution: 
+
+- Unzip the file with:
+    \> tar -zxvf
+  
+- Open pyRMSD folder and use setup.py:
+    \> python setup.py install
+
+This is a precompiled distribution without CUDA calculators.
+
+**3)** Using the custom build.py script in pyRMSD main folder with:  
+    \> python build.py  
+
+or  
+    \> python build.py --cuda  
+
+Please see this same section in the Linux instalation guide. It has only been tested without CUDA support, but it may need only [minor changes](#build_win) to add it.  
+
 ##Testing (Developers)
 ##Benchmarcks (Developers)
 
