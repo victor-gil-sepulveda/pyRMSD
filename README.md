@@ -13,6 +13,7 @@ pyRMSD goal is the fast (and easy!) calculation of rmsd collective operations, s
 >>### [Windows](#build_win)  
 >##[4- Testing (Developers)](#testing)
 >##[5- Benchmarcks (Developers)](#benchmarks) 
+>##[6- Using it](#usage)
  
 ##<a id="features"></a> 1- Features
 ##<a id="building"></a> 2- Building & Installation
@@ -49,9 +50,9 @@ The build.py script is the most versatile way and will work in almost all situat
 
 ### <a id="iwindows"></a>Windows
 Windows users have the following choices:  
-**1)** Using a precompiled windows installer. There are two available (x86 and x64). Those are used as any other regular Windows Installer (double click the executable and follow instructions).  
+**1)** Using a precompiled windows installer. There are two available ([x86](https://github.com/victor-gil-sepulveda/pyRMSD/tree/master/prebuilt_packages/v1/Win/32) and [x64]()). Those are used as any other regular Windows Installer (double click the executable and follow instructions).  
 **2)** Using the custom build.py script in pyRMSD main folder with:  
-    \> python build_windows.py
+    \> python build_windows.py  
 Please look [here](#build_win) if you need further iformation about the windows version of the custom build script.
 
 ### <a id="imac"></a>MacOs
@@ -78,9 +79,27 @@ This is a precompiled distribution without CUDA calculators.
 or  
     \> python build.py --cuda  
 
-Please see this same section in the Linux instalation guide. It has only been tested without CUDA support, but it may need only [minor changes](#build_win) to add it.  
+Please see this same section in the Linux instalation guide. It has only been tested without CUDA support, but it may need only [minor changes](#build_linux) to add it.  
 
-##Testing (Developers)
+##<a id="buildscript"></a>3- The custom building script  
+pyRMSD includes a small build script that is indeed a recipe to compile the C extensions of pyRMSD. This script only works with Python 2.7+ as it uses the module *sysconfig* to get the search path for python headers and libs. 
+The building script will try to guess the location of the needed files for compilation, however it can be modified to be able to handle all kind of scenarios. In order to do this you may want to modify the upper case constants in the top part of the file. 
+
+###<a id="build_linux"></a>Unix-based systems  
+The script was used in a Ubuntu x86 and Ubuntu x64 Os, as well as a MacOs (Snow Leopard) for the non CUDA build. PYTHON_X constants were left unchanged.
+It was also used under Ubuntu x64 with CUDA 4.2 to build the CUDA enabled version. 
+If you are going to use it to build a CUDA enabled version you may have to change the *CUDA_BASE* constant, which needs to point to the base directory of your CUDA installation (in our case  */usr/local/cuda-4.2*). Required headers and libs are usually stored inside the */include* and */lib64* folders (*/lib* in x86 systems) subfolders, but you can also change it by modifying *CUDA_INCLUDE_FOLDER* and *CUDA_LIBRARIES_FOLDER*.
+Finally you can change *CUDA_ARCHITECHTURE* to match the architecture of your GPU. 
+###<a id="build_win"></a>Windows systems  
+
+##<a id="testing"></a>Testing (Developers)  
+Once installed you can run the tests in *pyRMSD/test* using:  
+  
+    \> python -m unittest testCondensedMatrix testMatrixHandler testMatrixNeighbours testMatrixStatistics testRMSDCalculators testPdbReader
+
+Currently only the *test_create_with_reader* test will fail if all the dependencies are fullfilled (it's unwritten yet). 
+If you didn't build pyRMSD with CUDA support, 3 tests will be skipped.
+
 ##Benchmarcks (Developers)
 
 ### Building
@@ -99,12 +118,12 @@ Once *install.py* has built all the needed files, you can copy the whole package
 ### Testing
 Once installed you can run the tests in *pyRMSD/test* using:  
   
-    > python -m unittest testCondensedMatrix testMatrixHandler testMatrixNeighbours testMatrixStatistics testRMSDCalculators testPdbReader
+    \> python -m unittest testCondensedMatrix testMatrixHandler testMatrixNeighbours testMatrixStatistics testRMSDCalculators testPdbReader
   
 You can use the benchmarks in *pyRMSD/benchmark* to tune CUDA or OpenMP parameters.  
 ## USING IT
 ### Getting coordinates
-To use the module the first thing will be to extract all the coordinates from a PDB file. Coordinates must be stored the same layout that  prody uses:  
+To use the module the first thing will be to extract all the coordinates from a PDB file. Coordinates must be stored in numpy arrays, using the same layout that  Prody uses:  
 
     Coordset: [Conformation 1, Conformation 2, ..., Conformation N]  
     Conformation: [Atom 1, Atom 2,..., Atom M]  
