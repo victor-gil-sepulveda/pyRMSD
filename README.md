@@ -2,31 +2,28 @@
 pyRMSD goal is the fast (and easy!) calculation of rmsd collective operations, specially matrices of large ensembles of protein conformations. It also offers a symmetric distance matrix implementation with improved access speed and memory efficiency.
 
 # Index
->###1- [Features](#Features)  
-  
->###[2- Building & Installation](#building)  
->>#### [Dependencies](#dependencies)  
->>#### [Linux](#ilinux)  
->>#### [Windows](#iwindows)  
->>#### [MacOs](#imac)  
-  
->###[3- The custom building script](#buildscript)  
->>#### [Unix-Based](#build_linux)  
->>#### [Windows](#build_win)  
-  
->###[4- Testing (Developers)](#testing)  
-  
->###[5- Benchmarcks (Developers)](#benchmarks)  
-  
->###[6- Using it](#usage)  
-
->###[7- Future Improvements](#future)  
-
->###[8- Credits](#credits)  
-
-
+- [1 - Features](#1---features)
+- [2 - Building & Installation](#2---building--installation)
+	- [Dependencies](#dependencies)
+	- [Linux](#linux)
+	- [Windows](#windows)
+	- [MacOs](#macos)
+- [3 - The custom building script](#3---the-custom-building-script-1)
+	- [Unix-based systems](#unix-based-systems)
+	- [Windows systems](#windows-systems)
+		- [Modifying system variables](#modifying-system-variables)
+- [4 - Testing (Developers)](#4---testing-developers)
+- [5 - Benchmarcks (Developers)](#5---benchmarcks-developers)
+- [6 - Using it](#6---using-it)
+	- [Getting coordinates](#getting-coordinates)
+	- [Calculating the RMSD matrix](#calculating-the-rmsd-matrix)
+	- [Matrix handlers](#matrix-handlers)
+	- [Accessing the RMSD matrix](#accessing-the-rmsd-matrix)
+	- [Matrix statistics](#matrix-statistics)
+- [7 - Future improvements](#7---future-improvements)
+- [8 - Credits](#8---credits)
  
-##Features  
+##1 - Features  
 pyRMSD is currently reaching V2.0 and adding new features with more options. Note that some options will be never available for some features. For instance the _Iterative Superposition_ feature has no sense without actual coordinates modification, as it is senseless to modify the coordinates in an RMSD matrix calculation.   
 <table>
  <thead>
@@ -80,13 +77,14 @@ _OMP_ - OpenMP parallel implementation
 _CUDA_ - CUDA parallel implementation  
 
 
-##<a id="building"></a> 2- Building & Installation
-### <a id="dependencies"></a> Dependencies
+##2 - Building & Installation
+###Dependencies
 **Users** only need to install Python version 2.6/2.7 (pyRMSD has only been tested with those, however it may work with another versions of the Python 2.X family). Numpy is also required. Surely you have already installed it, but in the case you didn't it can be found [here](http://sourceforge.net/projects/numpy/files/) where you will be able to find installers for almost all the combinations of platforms and Python versions you can think about.
 
 As a **Developer** you may be interested on istalling [scipy](http://www.scipy.org/) (only necessary to execute the statistics test), and [prody](http://www.csb.pitt.edu/prody/getprody.html) (to fully satisfy the RMSD calculators test). We provide our own pdb reader, but only for the sake of completeness. That's why we encourage the use of Prody to handle coordinates, as it is well-tested and powerful tool. Also, remember that header files of Python and Numpy may be accessible, and your Python installation must contain the python shared library This usually means to use ./configure --enable-shared before building Python (usually 2.7 distributions already come with this library).
 
-### <a id="ilinux"></a>Linux 
+###Linux  
+  
 Linux users have the following choices:  
   
 **1)** Using the 'setup.py' file inside the root folder by typing:  
@@ -117,7 +115,8 @@ or
   
 The build.py script is the most versatile way and will work in almost all situations, but as it requires the 'sysconfig' package, the script itself needs Python 2.7 to be executed. With this script one can build x86 and x64 distributions with enabled CUDA calculators if the --cuda flag is used. There is more information about the build.py script [here](#build_linux). 
 
-### <a id="iwindows"></a>Windows  
+###Windows  
+  
 Windows users have the following choices:  
   
 **1)** Using a precompiled windows installer. There are two available ([x86](https://github.com/victor-gil-sepulveda/pyRMSD/tree/master/prebuilt_packages/v1/Win/32) and [x64]()). Those are used as any other regular Windows Installer (double click the executable and follow instructions).  
@@ -128,7 +127,8 @@ Windows users have the following choices:
   
 Please look [here](#build_win) if you need further iformation about the windows version of the custom build script.  
 
-### <a id="imac"></a>MacOs
+###MacOs  
+  
 MacOs users have the same choices that Linux users:
 
 **1)** Use the 'setup.py' file inside the root folder by typing:  
@@ -159,11 +159,11 @@ or
   
 Please see this same section in the Linux instalation guide. It has only been tested without CUDA support, but it may need only [minor changes](#build_linux) to add it.  
 
-##<a id="buildscript"></a>3- The custom building script  
+##3 - The custom building script  
 pyRMSD includes a small build script that is indeed a recipe to compile the C extensions of pyRMSD. This script only works with Python 2.7+ as it uses the module *sysconfig* to get the search path for python headers and libs.  
 The building script will try to guess the location of the needed files for compilation, but it can be easily modified to be able to handle all kind of scenarios.  
 
-###<a id="build_linux"></a>Unix-based systems  
+###Unix-based systems  
 The script was used in a Ubuntu x86 and Ubuntu x64 Os, as well as a MacOs (Snow Leopard) for the non CUDA build. PYTHON_X constants were left unchanged.  
 It was also used under Ubuntu x64 with CUDA 4.2 to build the CUDA enabled version.  
 If you are going to use it to build a CUDA enabled version you may have to change the *CUDA_BASE* constant, which needs to point to the base directory of your CUDA installation (in our case  */usr/local/cuda-4.2*). Required headers and libs are usually stored inside the */include* and */lib64* folders (*/lib* in x86 systems) subfolders, but you can also change it by modifying *CUDA_INCLUDE_FOLDER* and *CUDA_LIBRARIES_FOLDER*. Change *CUDA_ARCHITECHTURE* to match the architecture of your GPU.  
@@ -185,7 +185,7 @@ Once everything is built create (or modify) the PYTHONPATH system variable and m
 
 In order to create or modify a system variable under Windows 7, you will have to go to Control Panel -> System and Security -> System -> Advanced System Settings.
 
-##<a id="testing"></a>Testing (Developers)  
+##4 - Testing (Developers)  
 Once installed you can run the tests in *pyRMSD/test* using:  
   
     > python -m unittest testCondensedMatrix testMatrixHandler testMatrixNeighbours testMatrixStatistics testRMSDCalculators testPdbReader
@@ -193,20 +193,15 @@ Once installed you can run the tests in *pyRMSD/test* using:
 Currently only the *test_create_with_reader* test will fail if all the dependencies are fullfilled (it's unwritten yet). 
 If you didn't build pyRMSD with CUDA support, 3 tests will be skipped.
 
-##<a id="benchmarks"></a>Benchmarcks (Developers)
-
-
+##5 - Benchmarcks (Developers)
+Also available to the user, inside the */benchmark* folder, there are the benchmarks used to assest the performance of pyRMSD.  
+There one can find some small scripts to test OpenMP parametrizations, calculation time of every implementation or even a small floating point error check.
   
-  
-
-  
-
-
-##<a id="usage"></a>Using it  
+##6 - Using it  
   
 Some code snippets and explanations about them will be shown below. Note that as the code changes rapidly, this snippets can be outdated. We will put all our effort for this not to happen, but if you detect that anything is not actually working, please contact us.
   
-### Getting coordinates
+###Getting coordinates
 To use the module the first thing will be to extract all the coordinates from a PDB file. Coordinates must be stored in numpy arrays, using the same layout that  Prody uses:  
 
     Coordset: [Conformation 1, Conformation 2, ..., Conformation N]  
@@ -223,7 +218,7 @@ In order to do this there's a convenience class function in *pyRMSD/utils/protei
     
   
 See 'pyRMSD/pyRMSD/test/testPdbReader.py for a simple usage example.
-### Calculating the RMSD matrix
+###Calculating the RMSD matrix
 To calculate the RMSD matrix you can use directly the RMSD calculation function, a **MatrixHandler**or use directly one calculator object to feed a CondensedMatrix. 
 
 This is a code snippet that shows one possible use scenario in which the calculator generates the all vs all rmsd matrix (with ALL the pairwise superpositions):
@@ -249,7 +244,7 @@ Programatically, available calculators can be seen with:
     from pyRMSD.availableCalculators import availableCalculators
     print availableCalculators()
 
-### Matrix handlers
+###Matrix handlers
 A **MatrixHandler** object will help you to create the matrix and will also help you saving and loading matrix data to disk.   
 
     from pyRMSD.matrixHandler import MatrixHandler  
@@ -263,17 +258,17 @@ A **MatrixHandler** object will help you to create the matrix and will also help
     # Get the inner CondensedMatrix instance
     rmsd_matrix = m_handler.getMatrix()  
 
-### Accessing the RMSD matrix
+###Accessing the RMSD matrix
 You can access a matrix object contents like this:  
 
     rmsd_at_pos_2_3 = rmsd_matrix[2,3]
 
 The row_lenght parameter will give you the... row length. Remember that the matrix is square and symmetric, so row_length == column_length, rmsd_matrix[i,j] == rmsd_matrix[j,i] and as it is a distance matrix, rmsd_matrix[i,i] == 0.
 
-### Matrix statistics
+###Matrix statistics
 The CondensedMatrix class also offers an efficient way to ask for the most common statistical moments. Use the methods **calculateMean**, **calculateVariance**, **calculateSkewness** and **calculateKurtosis** to get mean, variance, skewness and kurtosis ( easy, isn't it :) ). You can also use **calculateMax** and **calculateMin** to get the maximum and minimum value of the matrix.
 
-##<a id="future"></a>Future improvements
+##Future improvements
 If you have used this package and you feel something is missing/incorrect or whatever, you can change it and contribute. Some examples of things that need to be improved are:  
 * Solving bug in the CondensedMatrix object (erroneous creation when using a numpy array)
 * Adding number of threads option for any OpenMP calculator.  **DONE**
@@ -283,7 +278,7 @@ If you have used this package and you feel something is missing/incorrect or wha
 * Add more comments...  
 * and improving this README!!  
 
-##<a id="credits"></a>Credits
+##Credits
 - Some Numpy helper functions were first seen in  http://www.scipy.org/Cookbook/C_Extensions/NumPy_arrays, by Lou Pecora (if I'm not wrong).
 
 - The Python implementation of superposition was extracted from Prody source code (by [Ahmet Bakan](http://www.csb.pitt.edu/People/abakan/)) and modified, with the only goal of providing a python example to compare performance and stability.
