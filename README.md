@@ -164,7 +164,7 @@ pyRMSD includes a small build script that is indeed a recipe to compile the C ex
 The building script will try to guess the location of the needed files for compilation, but it can be easily modified to be able to handle all kind of scenarios.  
 
 ###Unix-based systems  
-The script was used in a Ubuntu x86 and Ubuntu x64 Os, as well as a MacOs (Snow Leopard) for the non CUDA build. PYTHON_X constants were left unchanged.  
+The script was used in a Ubuntu x86 and Ubuntu x64 Os, as well as a MacOs (Snow Leopard) for the non CUDA build. It had the *python-dev* package installed, so python headers were available. PYTHON_X constants were left unchanged.  
 It was also used under Ubuntu x64 with CUDA 4.2 to build the CUDA enabled version.  
 If you are going to use it to build a CUDA enabled version you may have to change the *CUDA_BASE* constant, which needs to point to the base directory of your CUDA installation (in our case  */usr/local/cuda-4.2*). Required headers and libs are usually stored inside the */include* and */lib64* folders (*/lib* in x86 systems) subfolders, but you can also change it by modifying *CUDA_INCLUDE_FOLDER* and *CUDA_LIBRARIES_FOLDER*. Change *CUDA_ARCHITECHTURE* to match the architecture of your GPU.  
 Finally you will need to change your PYTHONPATH in order to point to the parent folder of the package (or copy it in a folder already inside your PYTHONPATH). See [this](http://superuser.com/questions/247620/how-to-globally-modify-the-default-pythonpath-sys-path) if you have any problem modifying it.  
