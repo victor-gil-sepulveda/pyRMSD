@@ -45,19 +45,21 @@ if __name__ == '__main__':
     ######################################
     ### Files we are going to use
     ######################################
-    files_to_compile_with_nvcc = {"src/theobald":["ThRMSDCuda.cu","kernel_functions_cuda.cu"],
-                                  "src/theobald/test":["ctest.cpp"]}
+    files_to_compile_with_nvcc = {"src/calculators/QCP":["ThRMSDCuda.cu","kernel_functions_cuda.cu"],
+                                  "src/calculators/QCP":["ctest.cpp"]}
     
     
-    files_to_compile_with_gcc = {"src/theobald":["ThRMSDSerial.cpp","kernel_functions_serial.cpp","ThRMSDSerialOmp.cpp"],
-                                 "src/serial":["RMSDSerial.cpp","RMSD.cpp"],
+    files_to_compile_with_gcc = {"src/calculators/QCP":["ThRMSDSerial.cpp","kernel_functions_serial.cpp","ThRMSDSerialOmp.cpp"],
+                                 "src/calculators":["RMSD.cpp"],
+                                 "src/calculators/QTRFIT":["RMSDSerial.cpp"],
                                  "src/matrix":["Matrix.cpp","Statistics.cpp"],
                                  "src/python":["pyRMSD.cpp","readerLite.cpp"],
                                  "src/pdbreaderlite":["PDBReader.cpp"]}
     
-    files_to_compile_with_gcc_and_openmp = {"src/theobald":["kernel_functions_omp.cpp"],
-                                            "src/serial":["RMSDomp.cpp","RMSDTools.cpp"],
-                                            "src/serial/test":["TestRMSDTools.cpp"]}
+    files_to_compile_with_gcc_and_openmp = {"src/calculators/QCP":["kernel_functions_omp.cpp"],
+                                            "src/calculators/QTRFIT":["RMSDomp.cpp"],
+                                            "src/calculators":["RMSDTools.cpp"],
+                                            "src/calculators/test":["TestRMSDTools.cpp"]}
     #########################################
     
     files_to_link = collections.defaultdict(str)
@@ -146,7 +148,7 @@ if __name__ == '__main__':
     os.system("mv calculators.so pyRMSD/")
     os.system("mv condensedMatrix.so pyRMSD/")
     os.system("mv pdbReader.so pyRMSD/")
-    os.system("mv test_rmsdtools_main src/serial/test")
+    os.system("mv test_rmsdtools_main src/calculators/test")
     
 #    if options.use_cuda:
 #        os.system("mv test_main src/theobald/test/")
