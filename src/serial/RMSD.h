@@ -14,7 +14,6 @@ class RMSD{
 		virtual void iterativeSuperposition(double);
 
 	protected:
-		RMSD(){}
 		int numberOfConformations;
 
 		int atomsPerConformation;
@@ -26,7 +25,10 @@ class RMSD{
 		double* allRMSDCoordinates; // If is different from NULL, then this are the coordinates
 									 // to calculate the RMSD.
 
+		bool modifyFittingCoordinates;
+
 	private:
+		RMSD(){}
 		RMSD(const RMSD& r){}
 };
 #endif

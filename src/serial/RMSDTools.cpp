@@ -56,9 +56,17 @@ void RMSDTools::centerAllToOrigin(unsigned int atomsPerConformation, unsigned in
 	}
 }
 
-//void RMSDTools::applyTranslationToAll(){
-//
-//}
+void RMSDTools::applyTranslationsToAll(unsigned int atomsPerConformation, unsigned int numberOfConformations, double * const all_coords, double* const translations){
+	unsigned int coordsPerConformation = atomsPerConformation * 3;
+
+	#pragma omp parallel for
+	for (unsigned int i = 0; i < numberOfConformations; ++i){
+		double* tranlation_vector = &(translations[3*i]);
+		double* coords = &(all_coords[coordsPerConformation*i]);
+		RMSDTools::shift3D(atomsPerConformation, coords, tranlation_vector, 1.);
+	}
+}
+
 
 void RMSDTools::geometricCenter(unsigned int n, const double * const x, double * const center){
 	unsigned int i;

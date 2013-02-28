@@ -11,6 +11,9 @@ namespace RMSDTools{
 	void centerAllToOrigin(unsigned int atomsPerConformation, unsigned int numberOfConformations,
 					double * const all_coords, double* const translations);
 
+	void applyTranslationsToAll(unsigned int atomsPerConformation, unsigned int numberOfConformations,
+			double * const all_coords, double* const translations);
+
 	void geometricCenter(unsigned int n, const double * const x, double * const center);
 	
 	void shift3D(unsigned int numberOfPoints, double * const x, double trans[3], double scalar);

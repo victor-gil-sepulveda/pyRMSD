@@ -46,9 +46,37 @@ void test_coordinates_mean(){
 	compareVectors("\tTesting coordinates mean: ", expected_mean_coordinates, mean_coordinates, 9, 1e-10);
 }
 
+void test_translate_all(){
+	cout <<"\nTEST test_translate_all"<<endl;
+	double coordinates[] = {
+			1,1,0,  2,2,0,  3,3,0,  // 1st conformation
+			6,6,0,  5,5,0,  4,4,0,  // 2nd conformation (upside down)
+			7,7,0,  8,8,0,  9,9,0,  // 3rd conformation
+			5,4,0,  5,5,0,  4,4,0   // 4th conformation
+	};
+
+	double translations[] = {
+			0,0,1,
+			0,1,0,
+			1,0,0,
+			1,0,1
+	};
+
+	double expected_coordinates[]={
+			1,1,1,  2,2,1,  3,3,1,
+			6,7,0,  5,6,0,  4,5,0,
+			8,7,0,  9,8,0,  10,9,0,
+			6,4,1,  6,5,1,  5,4,1
+	};
+
+	RMSDTools::applyTranslationsToAll(3,4,coordinates,translations);
+
+	compareVectors("\tTesting translated coordinates: ", expected_coordinates, coordinates, 3*3*4, 1e-12);
+}
+
 void test_superposition_with_coordinates_change(){
 	cout <<"\nTEST test_superposition_with_coordinates_change"<<endl;
-	double coordinates[] = { 1,1,0,  2,2,0,  3,3,0,  // 1st conformation
+	double coordinates[] = {  1,1,0,  2,2,0,  3,3,0,  // 1st conformation
 							  6,6,0,  5,5,0,  4,4,0,  // 2nd conformation (upside down)
 							  7,7,0,  8,8,0,  9,9,0 , // 3rd conformation
 							  5,4,0,  5,5,0,  4,4,0}; // 4th conformation (upside down + one changed point
@@ -139,6 +167,7 @@ int main(int argc, char **argv){
 	test_initialize();
 	test_copy_array();
 	test_coordinates_mean();
+	test_translate_all();
 	test_superposition_with_coordinates_change();
 	test_superposition_with_different_fit_and_calc_coordsets();
 
