@@ -1,15 +1,13 @@
 #include <python2.7/Python.h>
 #include <numpy/arrayobject.h>
-#include "../serial/RMSDSerial.h"
-#include "../serial/RMSDomp.h"
-#include "../theobald/ThRMSDCuda.cuh"
-#include "../theobald/ThRMSDSerial.h"
-#include "../theobald/ThRMSDSerialOmp.h"
+#include "../calculators/QTRFIT/RMSDSerial.h"
+#include "../calculators/QTRFIT/RMSDomp.h"
+#include "../calculators/QCP/ThRMSDCuda.cuh"
+#include "../calculators/QCP/ThRMSDSerial.h"
+#include "../calculators/QCP/ThRMSDSerialOmp.h"
 #include <vector>
 #include <iostream>
 using namespace std;
-
-
 
 enum calcType{
 	SERIAL_CALCULATOR = 0,

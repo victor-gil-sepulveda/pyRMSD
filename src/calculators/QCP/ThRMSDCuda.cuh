@@ -3,7 +3,7 @@
 #define THEO_RMSD_CUDA_H_
 
 #include <vector>
-#include "../serial/RMSD.h"
+#include "../RMSD.h"
 
 #define floating_point_type float
 

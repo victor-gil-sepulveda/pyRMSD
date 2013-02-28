@@ -5,7 +5,7 @@
 #include <cmath>
 #include <iostream>
 #include "../RMSDTools.h"
-#include "../RMSDomp.h"
+#include "../QTRFIT/RMSDomp.h"
 
 
 using namespace std;
@@ -114,12 +114,33 @@ void test_superposition_with_coordinates_change(){
 			                          4.5286,5,0,  5.2357,4.29289,0,  5.2357,5.70711,0};
 
 	RMSDomp calculator(number_of_conformations,number_of_atoms, coordinates);
-	calculator.superposition_with_external_reference(reference_coordinates,rmsds);
+	calculator.superposition_with_external_reference_and_fit_equals_calc(reference_coordinates,rmsds);
 
 	compareVectors("\tTesting RMSD: ", expected_rmsds, rmsds, number_of_conformations, 1e-5); // Only the fourth decimal, as it was obtained with cout without more precission:P
 	compareVectors("\tTesting coordinates: ", expected_coordinates, coordinates,
 				number_of_atoms*3*number_of_conformations, 1e-5);
 	compareVectors("\tTesting reference: ", expected_reference, reference_coordinates, number_of_atoms*3, 1e-10);
+}
+
+void test_iterposition(){
+	cout <<"\nTEST test_iterposition"<<endl;
+	int number_of_coordsets = 5;
+	int number_of_atoms = 3239;
+
+	vector<double> not_aligned_coordinates;
+	vector<double> iterposed_coordinates;
+
+	load_vector(not_aligned_coordinates, "data/ligand_mini_all");
+	load_vector(iterposed_coordinates, "data/ligand_mini_iterposed_all");
+
+	test_vector_len(not_aligned_coordinates, number_of_atoms*number_of_coordsets*3, "all not aligned atoms");
+	test_vector_len(iterposed_coordinates, number_of_atoms*number_of_coordsets*3, "all iterposed atoms");
+
+	// Iterposition
+	RMSDomp calculator(number_of_coordsets, number_of_atoms, &(not_aligned_coordinates[0]));
+	calculator.iterativeSuperposition();
+
+	compareVectors("\tTesting iterposed coordinates: ", &(iterposed_coordinates[0]),&(not_aligned_coordinates[0]), not_aligned_coordinates.size(), 1e-6);
 }
 
 void test_superposition_with_different_fit_and_calc_coordsets(){
@@ -166,26 +187,6 @@ void test_superposition_with_different_fit_and_calc_coordsets(){
 
 }
 
-void test_iterposition(){
-	cout <<"\nTEST test_iterposition"<<endl;
-	int number_of_coordsets = 5;
-	int number_of_atoms = 3239;
-
-	vector<double> not_aligned_coordinates;
-	vector<double> iterposed_coordinates;
-
-	load_vector(not_aligned_coordinates, "data/ligand_mini_all");
-	load_vector(iterposed_coordinates, "data/ligand_mini_iterposed_all");
-
-	test_vector_len(not_aligned_coordinates, number_of_atoms*number_of_coordsets*3, "all not aligned atoms");
-	test_vector_len(iterposed_coordinates, number_of_atoms*number_of_coordsets*3, "all iterposed atoms");
-
-	// Iterposition
-	RMSDomp calculator(number_of_coordsets, number_of_atoms, &(not_aligned_coordinates[0]));
-	calculator.iterativeSuperposition();
-
-	compareVectors("\tTesting iterposed coordinates: ", &(iterposed_coordinates[0]),&(not_aligned_coordinates[0]), not_aligned_coordinates.size(), 1e-6);
-}
 
 int main(int argc, char **argv){
 

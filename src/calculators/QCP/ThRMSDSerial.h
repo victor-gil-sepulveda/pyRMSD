@@ -3,7 +3,7 @@
 #define RMSD_CUDA_SERIAL_H_
 
 #include <vector>
-#include "../serial/RMSD.h"
+#include "../RMSD.h"
 
 #define floating_point_type double
 
