@@ -21,10 +21,10 @@ class RMSDomp: public RMSD{
 		void iterativeSuperposition(double);
 
 	private:
-		void _one_vs_following_fit_equals_calc_coords(int conformation, double *rmsd, bool preserve_coords);
-		void _one_vs_following_fit_differs_calc_coords(int conformation, double *rmsd, bool preserve_coords);
-		void _one_vs_following_fit_equals_calc_coords_changing_coordinates(int conformation, double *rmsd, bool preserve_coords);
-		void _one_vs_following_fit_differs_calc_coords_changing_coordinates(int conformation, double *rmsd, bool preserve_coords);
+		void _one_vs_following_fit_equals_calc_coords(int conformation, double *rmsd);
+		void _one_vs_following_fit_differs_calc_coords(int conformation, double *rmsd);
+		void _one_vs_following_fit_equals_calc_coords_changing_coordinates(int conformation, double *rmsd);
+		void _one_vs_following_fit_differs_calc_coords_changing_coordinates(int conformation, double *rmsd);
 };
 
 #endif /* RMSDOMP_H_ */

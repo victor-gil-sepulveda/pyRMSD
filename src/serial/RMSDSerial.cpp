@@ -19,6 +19,10 @@ void RMSDSerial::oneVsFollowing(int conformation, double* rmsd){
 		int coordsOffset = conformation*coordinatesPerConformation;
 		double* reference = &(allCoordinates[coordsOffset]);
 		
+		double* centers = new double[numberOfConformations*3];
+		RMSDTools::centerAllToOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
+		delete [] centers;
+
 		int rmsd_index = 0;
 		for (int i = conformation+1; i < numberOfConformations; ++i){
 			coordsOffset += coordinatesPerConformation;
@@ -28,6 +32,7 @@ void RMSDSerial::oneVsFollowing(int conformation, double* rmsd){
 			rmsd[rmsd_index] = rmsd_val;
 			rmsd_index++;
 		}
+
 	}
 }
 

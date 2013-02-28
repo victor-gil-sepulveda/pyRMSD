@@ -47,24 +47,24 @@ void RMSDomp::oneVsFollowing(int conformation, double *rmsd){
 
 		if(this->allRMSDCoordinates == NULL){
 			if(!this->modifyFittingCoordinates){
-				this->_one_vs_following_fit_equals_calc_coords(conformation, rmsd, this->modifyFittingCoordinates);
+				this->_one_vs_following_fit_equals_calc_coords(conformation, rmsd);
 			}
 			else{
-				//this->_one_vs_following_fit_equals_calc_coords_changing_coordinates(conformation, rmsd, this->modifyFittingCoordinates);
+				this->_one_vs_following_fit_equals_calc_coords_changing_coordinates(conformation, rmsd);
 			}
 		}
 		else{
 			if(!this->modifyFittingCoordinates){
-				this->_one_vs_following_fit_differs_calc_coords(conformation, rmsd, this->modifyFittingCoordinates);
+				this->_one_vs_following_fit_differs_calc_coords(conformation, rmsd);
 			}
 			else{
-				//this->_one_vs_following_fit_differs_calc_coords_changing_coordinates(conformation, rmsd, this->modifyFittingCoordinates);
+				this->_one_vs_following_fit_differs_calc_coords_changing_coordinates(conformation, rmsd);
 			}
 		}
 	}
 }
 
-void RMSDomp::_one_vs_following_fit_equals_calc_coords(int conformation, double *rmsd, bool preserve_coords = true){
+void RMSDomp::_one_vs_following_fit_equals_calc_coords(int conformation, double *rmsd){
 	double* reference = &(allCoordinates[conformation*coordinatesPerConformation]);
 
 	// Center all
@@ -91,7 +91,27 @@ void RMSDomp::_one_vs_following_fit_equals_calc_coords(int conformation, double 
 	delete [] centers;
 }
 
-void RMSDomp::_one_vs_following_fit_differs_calc_coords(int conformation, double *rmsd, bool preserve_coords = true){
+void RMSDomp::_one_vs_following_fit_equals_calc_coords_changing_coordinates(int conformation, double *rmsd){
+	double* reference = &(allCoordinates[conformation*coordinatesPerConformation]);
+
+	// Center all
+	double* centers = new double[numberOfConformations*3];
+	RMSDTools::centerAllToOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
+	delete [] centers;
+
+	#pragma omp parallel for shared(rmsd)
+	for (int i = conformation+1; i < numberOfConformations; ++i){
+		// Real conformation coordinates are used, so they are modified
+		double* conformation_coords = &(allCoordinates[i*coordinatesPerConformation]);
+
+		RMSDTools::superpose(atomsPerConformation, conformation_coords, reference);
+
+		rmsd[i-(conformation+1)] = RMSDTools::calcRMS(reference, conformation_coords, atomsPerConformation);
+	}
+	// Coordinates are left centered
+}
+
+void RMSDomp::_one_vs_following_fit_differs_calc_coords(int conformation, double *rmsd){
 	double* fitReference = &(allCoordinates[conformation*coordinatesPerConformation]);
 	double* calcReference = &(allRMSDCoordinates[conformation*coordinatesPerRMSDConformation]);
 
@@ -129,7 +149,37 @@ void RMSDomp::_one_vs_following_fit_differs_calc_coords(int conformation, double
 	delete [] calcCenters;
 }
 
+void RMSDomp::_one_vs_following_fit_differs_calc_coords_changing_coordinates(int conformation, double *rmsd){
+	double* fitReference = &(allCoordinates[conformation*coordinatesPerConformation]);
+	double* calcReference = &(allRMSDCoordinates[conformation*coordinatesPerRMSDConformation]);
+	double* fitCenters = new double[numberOfConformations*3];
+	double* calcCenters = new double[numberOfConformations*3];
+	RMSDTools::centerAllToOrigin(atomsPerConformation, numberOfConformations, allCoordinates, fitCenters);
+	RMSDTools::centerAllToOrigin(atomsPerRMSDConformation, numberOfConformations, allRMSDCoordinates, calcCenters);
+	delete [] fitCenters;
+	delete [] calcCenters;
 
+	#pragma omp parallel for shared(rmsd)
+	for (int i = conformation+1; i < numberOfConformations; ++i){
+		int fitCoordsOffset = i*coordinatesPerConformation;
+		double* fit_conformation_coords = &(allCoordinates[fitCoordsOffset]);
+
+		int calcCoordsOffset = i*coordinatesPerRMSDConformation;
+		double* calc_conformation_coords = &(allRMSDCoordinates[calcCoordsOffset]);
+
+		RMSDTools::superpose(atomsPerConformation, 	   fit_conformation_coords,  fitReference,
+							 atomsPerRMSDConformation, calc_conformation_coords, calcReference);
+
+		rmsd[i-(conformation+1)] = RMSDTools::calcRMS(calcReference, calc_conformation_coords, atomsPerRMSDConformation);
+
+		delete [] fit_conformation_coords;
+		delete [] calc_conformation_coords;
+	}
+
+	// Move then again to their places to avoid coordinate modification
+	RMSDTools::applyTranslationsToAll(this->atomsPerConformation, this->numberOfConformations, this->allCoordinates, fitCenters);
+	RMSDTools::applyTranslationsToAll(this->atomsPerRMSDConformation, this->numberOfConformations, this->allRMSDCoordinates, calcCenters);
+}
 
 // reference coords is already a copy, in a different memory space than allCoordinates
 void RMSDomp::superpositionChangingCoordinates(double* reference, double* rmsds){
@@ -153,6 +203,8 @@ void RMSDomp::superpositionChangingCoordinates(double* reference, double* rmsds)
 
 		//delete [] reference_tmp;
 	}
+
+
 }
 
 void RMSDomp::iterativeSuperposition(double rmsd_diff_to_stop = 1e-4){
