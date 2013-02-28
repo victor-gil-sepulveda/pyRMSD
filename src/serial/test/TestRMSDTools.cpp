@@ -14,6 +14,7 @@ void load_vector(vector<double> & , const char * );
 void print_vector(const char*,double*, int);
 bool expectedVectorEqualsCalculatedWithinPrecision(const double * const , const double * const , int , double );
 void compareVectors(const char*, const double * const , const double * const , int , double );
+void checkDistances(double* vector1, double* vector2, int totalatoms);
 
 void test_initialize(){
 	cout <<"\nTEST test_initialize"<<endl;
@@ -46,7 +47,7 @@ void test_coordinates_mean(){
 	compareVectors("\tTesting coordinates mean: ", expected_mean_coordinates, mean_coordinates, 9, 1e-10);
 }
 
-void test_translate_all(){
+void test_translations(){
 	cout <<"\nTEST test_translate_all"<<endl;
 	double coordinates[] = {
 			1,1,0,  2,2,0,  3,3,0,  // 1st conformation
@@ -69,9 +70,28 @@ void test_translate_all(){
 			6,4,1,  6,5,1,  5,4,1
 	};
 
+	double translation_vector [] = {1, 2, 4};
+
+	double expected_retranslated_coordinates[]={
+				2,3,5,  3,4,5,    4,5,5,
+				7,9,4,  6,8,4,    5,7,4,
+				9,9,4,  10,10,4,  11,11,4,
+				7,6,5,  7,7,5,    6,6,5
+	};
+
 	RMSDTools::applyTranslationsToAll(3,4,coordinates,translations);
 
 	compareVectors("\tTesting translated coordinates: ", expected_coordinates, coordinates, 3*3*4, 1e-12);
+
+	RMSDTools::applyTranslationToAll(3,4,coordinates,translation_vector);
+
+	compareVectors("\tTesting translated coordinates: ", expected_retranslated_coordinates, coordinates, 3*3*4, 1e-12);
+}
+
+void test_vector_len(vector<double>& v, unsigned int expected_len, const char* name){
+	if(v.size()!= expected_len){
+		cout<<name<<" size is "<<v.size()<<" instead of "<<expected_len<<endl;
+	}
 }
 
 void test_superposition_with_coordinates_change(){
@@ -82,7 +102,7 @@ void test_superposition_with_coordinates_change(){
 							  5,4,0,  5,5,0,  4,4,0}; // 4th conformation (upside down + one changed point
 													  // with dist d((6,6),(5,4))
 	double reference_coordinates[] = {4,4,0,  5,5,0,  6,6,0};
-	double rmsds[3];
+	double rmsds[] = {0,0,0};
 	int number_of_atoms = 3;
 	int number_of_conformations = 4;
 
@@ -94,20 +114,12 @@ void test_superposition_with_coordinates_change(){
 			                          4.5286,5,0,  5.2357,4.29289,0,  5.2357,5.70711,0};
 
 	RMSDomp calculator(number_of_conformations,number_of_atoms, coordinates);
-	calculator.superpositionChangingCoordinates(reference_coordinates,rmsds);
+	calculator.superposition_with_external_reference(reference_coordinates,rmsds);
 
-	//print_vector("references:",reference_coordinates, number_of_atoms*3);
-
-	compareVectors("\tTesting RMSD: ", expected_rmsds, rmsds, number_of_conformations, 1e-4); // Only the fourth decimal, as it was obtained with cout without more precission:P
+	compareVectors("\tTesting RMSD: ", expected_rmsds, rmsds, number_of_conformations, 1e-5); // Only the fourth decimal, as it was obtained with cout without more precission:P
 	compareVectors("\tTesting coordinates: ", expected_coordinates, coordinates,
-				number_of_atoms*3*number_of_conformations, 1e-4);
+				number_of_atoms*3*number_of_conformations, 1e-5);
 	compareVectors("\tTesting reference: ", expected_reference, reference_coordinates, number_of_atoms*3, 1e-10);
-}
-
-void test_vector_len(vector<double>& v, unsigned int expected_len, const char* name){
-	if(v.size()!= expected_len){
-		cout<<name<<" size is "<<v.size()<<" instead of "<<expected_len<<endl;
-	}
 }
 
 void test_superposition_with_different_fit_and_calc_coordsets(){
@@ -154,12 +166,25 @@ void test_superposition_with_different_fit_and_calc_coordsets(){
 
 }
 
-/*void test_translations(){
-
-}*/
-
 void test_iterposition(){
+	cout <<"\nTEST test_iterposition"<<endl;
+	int number_of_coordsets = 5;
+	int number_of_atoms = 3239;
 
+	vector<double> not_aligned_coordinates;
+	vector<double> iterposed_coordinates;
+
+	load_vector(not_aligned_coordinates, "data/ligand_mini_all");
+	load_vector(iterposed_coordinates, "data/ligand_mini_iterposed_all");
+
+	test_vector_len(not_aligned_coordinates, number_of_atoms*number_of_coordsets*3, "all not aligned atoms");
+	test_vector_len(iterposed_coordinates, number_of_atoms*number_of_coordsets*3, "all iterposed atoms");
+
+	// Iterposition
+	RMSDomp calculator(number_of_coordsets, number_of_atoms, &(not_aligned_coordinates[0]));
+	calculator.iterativeSuperposition();
+
+	compareVectors("\tTesting iterposed coordinates: ", &(iterposed_coordinates[0]),&(not_aligned_coordinates[0]), not_aligned_coordinates.size(), 1e-6);
 }
 
 int main(int argc, char **argv){
@@ -167,14 +192,24 @@ int main(int argc, char **argv){
 	test_initialize();
 	test_copy_array();
 	test_coordinates_mean();
-	test_translate_all();
+	test_translations();
 	test_superposition_with_coordinates_change();
+	test_iterposition();
 	test_superposition_with_different_fit_and_calc_coordsets();
 
 	return 0;
 }
 
-
+void checkDistances(double* vector1, double* vector2, int totalatoms){
+	for(int i=0 ; i< totalatoms;i++){
+		double* point1 = &(vector1[i*3]);
+		double* point2 = &(vector2[i*3]);
+		double tmp = 	(point1[0]-point2[0])*(point1[0]-point2[0]) +
+						(point1[1]-point2[1])*(point1[1]-point2[1]) +
+						(point1[2]-point2[2])*(point1[2]-point2[2]);
+		cout<<sqrt(tmp)<<endl;
+	}
+}
 
 void compareVectors(const char* message, const double * const expectedVector, const double * const calculatedVector, int dimension, double precision){
 	cout<<message;

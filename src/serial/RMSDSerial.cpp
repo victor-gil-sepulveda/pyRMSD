@@ -20,7 +20,7 @@ void RMSDSerial::oneVsFollowing(int conformation, double* rmsd){
 		double* reference = &(allCoordinates[coordsOffset]);
 		
 		double* centers = new double[numberOfConformations*3];
-		RMSDTools::centerAllToOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
+		RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
 		delete [] centers;
 
 		int rmsd_index = 0;
