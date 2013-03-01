@@ -8,8 +8,6 @@ using namespace std;
 
 // After the function both coordinate sets are modified
 void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* const coord_ref){
-	//double center_fit[3] = {0.,0.,0.};
-	//double center_ref[3] = {0.,0.,0.};
 	double u[3][3];
 	double q[4];
 
@@ -19,24 +17,20 @@ void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* cons
 	// Rotate the reference molecule by the rotation matrix u
 	RMSDTools::rotate3D(n, coord_fit, u);
 
-	/*// Shift the reference molecule to the geometric center of the fit
-	RMSDTools::shift3D(n, coord_ref, center_ref, +1.);
-
-	// Shift to the origin
-	RMSDTools::shift3D(n, coord_fit, center_ref, +1.);*/
 }
 
 // superposes calc_coords over ref_coords and leaves them @ origin
 // Once finished,
 void RMSDTools::superpose(unsigned int fit_n, double * const fit_coords, double* const fit_ref_coords,
-							unsigned int calc_n, double* const calc_coords, double* const calc_reference){
+							unsigned int calc_n, double* const calc_coords){
 	double u[3][3];
 	double q[4];
 
 	// Get rotation matrix
 	RMSDTools::superpositionQuatFit(fit_n,  fit_coords, fit_ref_coords,q, u);
 
-	// Rotate the calculation coordinate set using rotation matrix u
+	// Rotate the calculation and fit coordinate sets by using rotation matrix u
+	RMSDTools::rotate3D(fit_n, fit_coords, u);
 	RMSDTools::rotate3D(calc_n, calc_coords, u);
 }
 /*
@@ -236,19 +230,11 @@ double RMSDTools::calcRMS(const double * const x, const double * const y, unsign
 }
 
 void RMSDTools::initializeTo(double* array, double value, int array_len){
-//	#pragma omp parallel for
-//	for(int i = 0; i < array_len; ++i){
-//		array[i] = value;
-//	}
 	fill(array, array+array_len, value);
 }
 
 //array1 = array2
 void RMSDTools::copyArrays(double* array1, double* array2, int array_len){
-//	#pragma omp parallel for
-//	for(int i = 0; i < array_len; ++i){
-//		array1[i] = array2[i];
-//	}
 	copy(array2,array2+array_len,array1);
 }
 

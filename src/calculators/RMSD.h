@@ -14,7 +14,7 @@ class RMSD{
 
 		void iterativeSuperposition(double rmsd_diff_to_stop = 1e-4);
 		void superposition_with_external_reference_and_fit_equals_calc(double*, double*);
-		void superposition_with_external_reference_and_fit_differs_calc(double*, double*);
+		void superposition_with_external_reference_and_fit_differs_calc(double*);
 
 	protected:
 		virtual void _one_vs_following_fit_equals_calc_coords(double* reference,

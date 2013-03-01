@@ -61,7 +61,10 @@ void RMSD::calculateRMSDCondensedMatrix(std::vector<double>& rmsd){
 
 	for(int conformation_number = 0;conformation_number<numberOfConformations;++conformation_number){
 		int offset = conformation_number*(numberOfConformations-1)- (((conformation_number-1)*conformation_number)/2) ;
-		oneVsFollowing(conformation_number,&(rmsd_tmp[offset]));
+		//oneVsFollowing(conformation_number,&(rmsd_tmp[offset]));
+
+		double* reference_conformation = &(allCoordinates[conformation_number*coordinatesPerConformation]);
+		this->_one_vs_following_fit_equals_calc_coords(reference_conformation, conformation_number, &(rmsd_tmp[offset]));
 	}
 
 	for (int i = 0; i < num_of_rmsds; ++i){
@@ -105,7 +108,14 @@ void RMSD::iterativeSuperposition(double rmsd_diff_to_stop){
 	RMSDTools::copyArrays(reference_coords, allCoordinates, coordinatesPerConformation);
 	do{
 		// Superpose all conformations with the reference conformation
-		superposition_with_external_reference_and_fit_equals_calc(reference_coords, NULL);
+		if(this->allRMSDCoordinates == NULL){
+			superposition_with_external_reference_and_fit_equals_calc(reference_coords, NULL);
+		}
+		else{
+			// As we are only interested in coordinates change, we can set the calc_reference to NULL
+			// (we won't calculate the RMSD)
+			superposition_with_external_reference_and_fit_differs_calc(reference_coords);
+		}
 
 		// Calculate new mean coords, which will be the next reference
 		RMSDTools::calculateMeanCoordinates(mean_coords, allCoordinates,
@@ -123,9 +133,12 @@ void RMSD::iterativeSuperposition(double rmsd_diff_to_stop){
 	}
 	while(rmsd_difference > rmsd_diff_to_stop and
 			current_iteration < MAX_ITERATIONS);
+
+	delete [] reference_coords;
+	delete [] mean_coords;
 }
 
-// Reference coords is already a copy, in a different memory space than allCoordinates
+// Reference coordinates is already a copy, in a different memory space than allCoordinates
 // In this case (used for iterative superposition) conformations are recentered over the reference conformation.
 void RMSD::superposition_with_external_reference_and_fit_equals_calc(double* reference, double* rmsds){
 	double reference_center[3];
@@ -137,5 +150,12 @@ void RMSD::superposition_with_external_reference_and_fit_equals_calc(double* ref
 	RMSDTools::applyTranslationsToAll(this->atomsPerConformation, 1, reference, reference_center);
 }
 
-void RMSD::superposition_with_external_reference_and_fit_differs_calc(double* reference, double* rmsds){
+void RMSD::superposition_with_external_reference_and_fit_differs_calc(double* fit_reference){
+	double fit_reference_center[3];
+	RMSDTools::centerAllAtOrigin(atomsPerConformation, 1, fit_reference, fit_reference_center);
+
+	_one_vs_following_fit_differs_calc_coords_changing_coordinates(fit_reference, NULL, -1, NULL);
+
+	RMSDTools::applyTranslationToAll(this->atomsPerConformation, this->numberOfConformations, this->allCoordinates, fit_reference_center);
+	RMSDTools::applyTranslationsToAll(this->atomsPerConformation, 1, fit_reference, fit_reference_center);
 }

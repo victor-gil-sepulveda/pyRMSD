@@ -6,7 +6,7 @@ namespace RMSDTools{
 	void superpose(unsigned int n, double * const coord_fit, double* const coord_ref);
 
 	void superpose(unsigned int fit_n, double * const fit_coords, double* const fit_ref_coords,
-			unsigned int rmsd_n, double* const calc_coords, double* const calc_reference);
+			unsigned int rmsd_n, double* const calc_coords);
 	
 	void centerAllAtOrigin(unsigned int atomsPerConformation, unsigned int numberOfConformations,
 					double * const all_coords, double* const translations);

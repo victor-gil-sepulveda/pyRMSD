@@ -33,7 +33,7 @@ Installing Numpy (mandatory):
 	python setup.py install --prefix=~/Python
 
 Installing Prody (optional):
-	tar -zxvf ProDy-1.4.tar.gz ç
+	tar -zxvf ProDy-1.4.tar.gz
 	cd ProDy-1.4
 	python setup.py install
 	

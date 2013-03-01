@@ -75,8 +75,8 @@ void RMSDSerial::_one_vs_following_fit_differs_calc_coords(double* fitReference,
 		double* calc_conformation_coords_tmp = new double[coordinatesPerRMSDConformation];
 		copy(calc_conformation_coords, calc_conformation_coords+coordinatesPerRMSDConformation, calc_conformation_coords_tmp);
 
-		RMSDTools::superpose(atomsPerConformation, 	   fit_conformation_coords_tmp,  fitReference,
-							 atomsPerRMSDConformation, calc_conformation_coords_tmp, calcReference);
+		RMSDTools::superpose(atomsPerConformation,    fit_conformation_coords_tmp,  fitReference,
+							 atomsPerRMSDConformation, calc_conformation_coords_tmp);
 
 		rmsd[i-(reference_conformation_number+1)] = RMSDTools::calcRMS(calcReference, calc_conformation_coords_tmp, atomsPerRMSDConformation);
 
@@ -105,8 +105,8 @@ void RMSDSerial::_one_vs_following_fit_differs_calc_coords_changing_coordinates(
 		double* fit_conformation_coords = &(allCoordinates[i*coordinatesPerConformation]);
 		double* calc_conformation_coords = &(allRMSDCoordinates[i*coordinatesPerRMSDConformation]);
 
-		RMSDTools::superpose(atomsPerConformation, 	   fit_conformation_coords,  fitReference,
-							 atomsPerRMSDConformation, calc_conformation_coords, calcReference);
+		RMSDTools::superpose(atomsPerConformation, fit_conformation_coords,  fitReference,
+							 atomsPerRMSDConformation, calc_conformation_coords);
 
 		// rmsd vector can be null if we are only interested in conformation superposition
 		if (rmsd != NULL){
