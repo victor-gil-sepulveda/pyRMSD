@@ -8,7 +8,7 @@ pyRMSD goal is the fast (and easy!) calculation of rmsd collective operations, s
 	- [Linux](#linux)
 	- [Windows](#windows)
 	- [MacOs](#macos)
-- [3 - The custom building script](#3---the-custom-building-script-1)
+- [3 - The custom building script](#3---the-custom-building-script)
 	- [Unix-based systems](#unix-based-systems)
 	- [Windows systems](#windows-systems)
 		- [Modifying system variables](#modifying-system-variables)
