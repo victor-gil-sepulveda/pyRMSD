@@ -189,7 +189,11 @@ In order to create or modify a system variable under Windows 7, you will have to
 Once installed you can run the tests in *pyRMSD/test* using:  
   
     > python -m unittest testCondensedMatrix testMatrixHandler testMatrixNeighbours testMatrixStatistics testRMSDCalculators testPdbReader
-
+  
+or with the easier  
+  
+    > python -m unittest  
+  
 Currently only the *test_create_with_reader* test will fail if all the dependencies are fullfilled (it's unwritten yet). 
 If you didn't build pyRMSD with CUDA support, 3 tests will be skipped.
 
