@@ -4,24 +4,26 @@
 
 #include <vector>
 #include "../RMSD.h"
-
-#define floating_point_type double
+class KernelFunctions;
 
 class ThRMSDSerial: public RMSD{
 
 	public:
 		ThRMSDSerial(int numberOfConformations, int atomsPerConformation, double* coords);
 		virtual ~ThRMSDSerial();
-		virtual void oneVsFollowing(int conformation, double* rmsd_result);
-		virtual void calculateRMSDCondensedMatrix(std::vector<double>& rmsd);
 		
-		// For debug purposes
-		double* getCoordinates();
-
 	protected:
-		// Pointers to data storage
-		floating_point_type* convertedCoords;
-		floating_point_type* tmpRMSDs;
+		virtual void _one_vs_following_fit_equals_calc_coords(double* reference,
+				int reference_conformation_number, double *rmsd);
+		/*virtual void _one_vs_following_fit_differs_calc_coords(double* fitReference,
+				double* calcReference, int reference_conformation_number, double *rmsd);
+		virtual void _one_vs_following_fit_equals_calc_coords_changing_coordinates(double* reference,
+				int reference_conformation_number, double *rmsd);
+		virtual void _one_vs_following_fit_differs_calc_coords_changing_coordinates(double* fitReference,
+				double* calcReference, int reference_conformation_number, double *rmsd);
+*/
+		double* tmpRMSDs;
+		KernelFunctions* kernelFunctions;
 };
 
 #endif

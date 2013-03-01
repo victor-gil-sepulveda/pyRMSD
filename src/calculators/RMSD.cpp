@@ -62,9 +62,15 @@ void RMSD::calculateRMSDCondensedMatrix(std::vector<double>& rmsd){
 	for(int conformation_number = 0;conformation_number<numberOfConformations;++conformation_number){
 		int offset = conformation_number*(numberOfConformations-1)- (((conformation_number-1)*conformation_number)/2) ;
 		//oneVsFollowing(conformation_number,&(rmsd_tmp[offset]));
-
-		double* reference_conformation = &(allCoordinates[conformation_number*coordinatesPerConformation]);
-		this->_one_vs_following_fit_equals_calc_coords(reference_conformation, conformation_number, &(rmsd_tmp[offset]));
+		if(this->allRMSDCoordinates == NULL){
+			double* reference_conformation = &(allCoordinates[conformation_number*coordinatesPerConformation]);
+			this->_one_vs_following_fit_equals_calc_coords(reference_conformation, conformation_number, &(rmsd_tmp[offset]));
+		}
+		else{
+			double* fit_reference_conformation = &(allCoordinates[conformation_number*coordinatesPerConformation]);
+			double* calc_reference_conformation = &(allRMSDCoordinates[conformation_number*coordinatesPerRMSDConformation]);
+			this->_one_vs_following_fit_differs_calc_coords(fit_reference_conformation, calc_reference_conformation, conformation_number, &(rmsd_tmp[offset]));
+		}
 	}
 
 	for (int i = 0; i < num_of_rmsds; ++i){

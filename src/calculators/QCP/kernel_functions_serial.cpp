@@ -4,7 +4,6 @@
 
 using namespace std;
 
-#define floating_point_type double
 
 ///////////////////////////////////////////////////////////////
 /// \remarks
@@ -23,10 +22,10 @@ using namespace std;
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-void ThRMSDSerialKernel::centerCoordsOfAllConformations(int number_of_conformations, int number_of_atoms, floating_point_type* all_coordinates){
+void ThRMSDSerialKernel::centerCoordsOfAllConformations(int number_of_conformations, int number_of_atoms, double* all_coordinates){
 	for(int conformation_id = 0; conformation_id < number_of_conformations; ++conformation_id){
 		int coordinates_per_conformation = number_of_atoms * 3;
-		floating_point_type* conformation_coordinates = &(all_coordinates[conformation_id*coordinates_per_conformation]);
+		double* conformation_coordinates = &(all_coordinates[conformation_id*coordinates_per_conformation]);
 		centerCoords(conformation_coordinates, number_of_atoms);
 	}
 }
@@ -43,10 +42,10 @@ void ThRMSDSerialKernel::centerCoordsOfAllConformations(int number_of_conformati
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-void ThRMSDSerialKernel::centerCoords( floating_point_type* conformation_coordinates, int number_of_atoms){
-    floating_point_type xsum = 0;
-    floating_point_type ysum = 0;
-    floating_point_type zsum = 0;
+void ThRMSDSerialKernel::centerCoords( double* conformation_coordinates, int number_of_atoms){
+    double xsum = 0;
+    double ysum = 0;
+    double zsum = 0;
 
 	int total_number_of_coordinates = 3 * number_of_atoms;
     for (int i = 0; i < total_number_of_coordinates; i+=3){
@@ -81,11 +80,11 @@ void ThRMSDSerialKernel::centerCoords( floating_point_type* conformation_coordin
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-floating_point_type ThRMSDSerialKernel::innerProduct(floating_point_type* A, floating_point_type* first_conformation_coords,
-														floating_point_type* second_conformation_coords, int number_of_atoms){
-    floating_point_type x1, x2, y1, y2, z1, z2;
+double ThRMSDSerialKernel::innerProduct(double* A, double* first_conformation_coords,
+														double* second_conformation_coords, int number_of_atoms){
+    double x1, x2, y1, y2, z1, z2;
     int i;
-    floating_point_type G1 = 0.0, G2 = 0.0;
+    double G1 = 0.0, G2 = 0.0;
 
     A[0] = A[1] = A[2] = A[3] = A[4] = A[5] = A[6] = A[7] = A[8] = 0.0;
 
@@ -135,17 +134,17 @@ floating_point_type ThRMSDSerialKernel::innerProduct(floating_point_type* A, flo
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-floating_point_type ThRMSDSerialKernel::calcRMSDForTwoConformationsWithTheobaldMethod(floating_point_type *A, floating_point_type E0, int number_of_atoms){
-    floating_point_type Sxx, Sxy, Sxz, Syx, Syy, Syz, Szx, Szy, Szz;
-    floating_point_type Szz2, Syy2, Sxx2, Sxy2, Syz2, Sxz2, Syx2, Szy2, Szx2,
+double ThRMSDSerialKernel::calcRMSDForTwoConformationsWithTheobaldMethod(double *A, double E0, int number_of_atoms){
+    double Sxx, Sxy, Sxz, Syx, Syy, Syz, Szx, Szy, Szz;
+    double Szz2, Syy2, Sxx2, Sxy2, Syz2, Sxz2, Syx2, Szy2, Szx2,
            SyzSzymSyySzz2, Sxx2Syy2Szz2Syz2Szy2, Sxy2Sxz2Syx2Szx2,
            SxzpSzx, SyzpSzy, SxypSyx, SyzmSzy,
            SxzmSzx, SxymSyx, SxxpSyy, SxxmSyy;
-    floating_point_type C[4];
-    floating_point_type mxEigenV;
-    floating_point_type b, a, delta, x2;
-    floating_point_type oldg = 0.0;
-    floating_point_type evalprec = 1e-11;
+    double C[4];
+    double mxEigenV;
+    double b, a, delta, x2;
+    double oldg = 0.0;
+    double evalprec = 1e-11;
 
     Sxx = A[0]; Sxy = A[1]; Sxz = A[2];
     Syx = A[3]; Syy = A[4]; Syz = A[5];
@@ -216,12 +215,12 @@ floating_point_type ThRMSDSerialKernel::calcRMSDForTwoConformationsWithTheobaldM
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-floating_point_type ThRMSDSerialKernel::calcRMSDOfTwoConformations(	floating_point_type* first_conformation_coords,
-									 									floating_point_type* second_conformation_coords,
+double ThRMSDSerialKernel::calcRMSDOfTwoConformations(	double* first_conformation_coords,
+									 									double* second_conformation_coords,
 									 									int number_of_atoms){
 
-	floating_point_type A[9];
-	floating_point_type E0 = innerProduct(A, first_conformation_coords, second_conformation_coords, number_of_atoms);
+	double A[9];
+	double E0 = innerProduct(A, first_conformation_coords, second_conformation_coords, number_of_atoms);
 	return calcRMSDForTwoConformationsWithTheobaldMethod(A, E0, number_of_atoms);
 }
 
@@ -247,19 +246,19 @@ floating_point_type ThRMSDSerialKernel::calcRMSDOfTwoConformations(	floating_poi
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-void ThRMSDSerialKernel::calcRMSDOfOneVsFollowing(floating_point_type* all_coordinates,
+void ThRMSDSerialKernel::calcRMSDOfOneVsFollowing(double* all_coordinates,
 									 int base_conformation_id,
 									 int other_conformations_starting_id,
 									 int number_of_conformations,
 									 int number_of_atoms,
-									 floating_point_type* rmsd){
+									 double* rmsd){
 
 	int coordinates_per_conformation = number_of_atoms * 3;
-	floating_point_type* first_conformation_coords = &(all_coordinates[base_conformation_id*coordinates_per_conformation]);
+	double* first_conformation_coords = &(all_coordinates[base_conformation_id*coordinates_per_conformation]);
 
 	for (int second_conformation_id = other_conformations_starting_id;
 			second_conformation_id < number_of_conformations; ++second_conformation_id){
-		floating_point_type* second_conformation_coords = &(all_coordinates[second_conformation_id*coordinates_per_conformation]);
+		double* second_conformation_coords = &(all_coordinates[second_conformation_id*coordinates_per_conformation]);
 		rmsd[second_conformation_id] = calcRMSDOfTwoConformations(first_conformation_coords, second_conformation_coords, number_of_atoms);
 	}
 }

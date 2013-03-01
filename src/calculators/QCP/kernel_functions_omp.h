@@ -1,12 +1,16 @@
 #ifndef _KERNEL_SERIAL_OMP_H_
 #define _KERNEL_SERIAL_OMP_H_
 
-#define floating_point_type double
+#include "kernel_functions_serial.h"
 
-namespace ThRMSDSerialOmpKernel{
-	void calcRMSDOfOneVsFollowing( floating_point_type* all_coordinates, int base_conformation_id,
-			int other_conformations_starting_id, int number_of_conformations, int number_of_atoms,
-			floating_point_type* rmsd, int omp_threads);
+class ThRMSDSerialOmpKernel: public ThRMSDSerialKernel{
+	public:
+		ThRMSDSerialOmpKernel(){}
+		virtual ~ThRMSDSerialOmpKernel(){}
 
-}
+		void calcRMSDOfOneVsFollowing(double* all_coordinates, int base_conformation_id,
+				int other_conformations_starting_id, int number_of_conformations, int number_of_atoms,
+				double* rmsd, int omp_threads);
+
+};
 #endif

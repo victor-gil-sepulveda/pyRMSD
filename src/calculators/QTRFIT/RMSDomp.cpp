@@ -44,7 +44,7 @@ void RMSDomp::_one_vs_following_fit_equals_calc_coords(double* reference, int re
 		delete [] conformation_coords_tmp;
 	}
 
-	// Move then again to their places to avoid coordinate modification
+	// Move conformations again to their original places to avoid coordinate modification
 	RMSDTools::applyTranslationsToAll(this->atomsPerConformation, this->numberOfConformations, this->allCoordinates, centers);
 	delete [] centers;
 }
