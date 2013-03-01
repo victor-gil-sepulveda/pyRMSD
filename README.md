@@ -8,7 +8,7 @@ pyRMSD goal is the fast (and easy!) calculation of rmsd collective operations, s
 	- [Linux](#linux)
 	- [Windows](#windows)
 	- [MacOs](#macos)
-- [3 - The custom building script](#3---the-custom-building-script-1)
+- [3 - The custom building script](#3---the-custom-building-script)
 	- [Unix-based systems](#unix-based-systems)
 	- [Windows systems](#windows-systems)
 		- [Modifying system variables](#modifying-system-variables)
@@ -189,7 +189,11 @@ In order to create or modify a system variable under Windows 7, you will have to
 Once installed you can run the tests in *pyRMSD/test* using:  
   
     > python -m unittest testCondensedMatrix testMatrixHandler testMatrixNeighbours testMatrixStatistics testRMSDCalculators testPdbReader
-
+  
+or with the easier  
+  
+    > python -m unittest  
+  
 Currently only the *test_create_with_reader* test will fail if all the dependencies are fullfilled (it's unwritten yet). 
 If you didn't build pyRMSD with CUDA support, 3 tests will be skipped.
 
