@@ -45,8 +45,7 @@ if __name__ == '__main__':
     ######################################
     ### Files we are going to use
     ######################################
-    files_to_compile_with_nvcc = {"src/calculators/QCP":["ThRMSDCuda.cu","kernel_functions_cuda.cu"],
-                                  "src/calculators/QCP":["ctest.cpp"]}
+    files_to_compile_with_nvcc = {"src/calculators/QCP":["ThRMSDCuda.cu","kernel_functions_cuda.cu"]}
     
     
     files_to_compile_with_gcc = {"src/calculators/QCP":["ThRMSDSerial.cpp","kernel_functions_serial.cpp","ThRMSDSerialOmp.cpp"],
@@ -120,19 +119,6 @@ if __name__ == '__main__':
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
     os.system(linkDSL.getLinkingCommand())
     
-#    if options.use_cuda:
-#        linkDSL = Link().\
-#                        using("g++").\
-#                        with_options([]).\
-#                        using_libs([CUDA_LIBRARY]).\
-#                        using_lib_locations([CUDA_LIBRARIES_FOLDER]).\
-#                        this_object_files([files_to_link["ctest"],files_to_link["ThRMSDSerial"],files_to_link["kernel_functions_serial"],files_to_link["ThRMSDCuda"],\
-#                                           files_to_link["kernel_functions_cuda"],files_to_link["RMSD"]]).\
-#                        to_produce("test_main")
-#                        
-#        os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
-#        os.system(linkDSL.getLinkingCommand())
-
     linkDSL = Link().\
                     using("g++").\
                     with_options([OPENMP_OPTION]).\
@@ -149,9 +135,6 @@ if __name__ == '__main__':
     os.system("mv condensedMatrix.so pyRMSD/")
     os.system("mv pdbReader.so pyRMSD/")
     os.system("mv test_rmsdtools_main src/calculators/test")
-    
-#    if options.use_cuda:
-#        os.system("mv test_main src/theobald/test/")
     
     ##Calculators
     if options.use_cuda:
