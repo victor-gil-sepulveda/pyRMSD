@@ -125,7 +125,7 @@ if __name__ == '__main__':
                     using_libs([]).\
                     using_lib_locations([]).\
                     this_object_files([files_to_link["TestRMSDTools"],files_to_link["RMSDTools"],files_to_link["RMSDomp"],
-                                       files_to_link["RMSD"]]).\
+                                       files_to_link["ThRMSDSerial"], files_to_link["kernel_functions_serial"], files_to_link["RMSD"] ]).\
                     to_produce("test_rmsdtools_main")
                     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')

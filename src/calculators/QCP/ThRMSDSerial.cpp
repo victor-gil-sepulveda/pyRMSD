@@ -22,7 +22,6 @@ using namespace std;
 ThRMSDSerial::ThRMSDSerial(int numberOfConformations, int atomsPerConformation, double* coords):
 				RMSD(numberOfConformations, atomsPerConformation, coords){
     
-	this->tmpRMSDs = new double[numberOfConformations];
 	this->kernelFunctions = new ThRMSDSerialKernel;
 }
 
@@ -34,7 +33,6 @@ ThRMSDSerial::ThRMSDSerial(int numberOfConformations, int atomsPerConformation, 
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
 ThRMSDSerial::~ThRMSDSerial(){
-	delete [] tmpRMSDs;
 	delete kernelFunctions;
 }
 
@@ -43,17 +41,30 @@ void ThRMSDSerial::_one_vs_following_fit_equals_calc_coords(double* reference, i
 	double* centers = new double[numberOfConformations*3];
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
 
-	// TODO: evitar copiar el vector de rmsd cambiando la kernel function
-	this->kernelFunctions->calcRMSDOfOneVsFollowing(this->allCoordinates, reference_conformation_number, reference_conformation_number + 1,
-								numberOfConformations, atomsPerConformation, this->tmpRMSDs);
-
-	// Copy it to the output vector (needs to have the correct size)
-	int j = 0;
-	for (int i = reference_conformation_number + 1; i < numberOfConformations;++i,++j){
-		rmsd[j] = (double) this->tmpRMSDs[i];
-	}
+	// This kernel function does not modify coordinates.
+	this->kernelFunctions->calcRMSDOfOneVsFollowing(this->allCoordinates,
+													reference,
+													reference_conformation_number,
+													numberOfConformations,
+													atomsPerConformation,
+													rmsd);
 
 	// Move conformations again to their places to avoid coordinate modification
 	RMSDTools::applyTranslationsToAll(this->atomsPerConformation, this->numberOfConformations, this->allCoordinates, centers);
 	delete [] centers;
+}
+
+void ThRMSDSerial::_one_vs_following_fit_equals_calc_coords_changing_coordinates(double* reference, int reference_conformation_number, double *rmsd){
+	// Center all
+	double* centers = new double[numberOfConformations*3];
+	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
+	delete [] centers;
+	this->kernelFunctions->calcRMSDOfOneVsFollowingModifyingCoordinates(this->allCoordinates,
+																		reference,
+																		reference_conformation_number,
+																		numberOfConformations,
+																		atomsPerConformation,
+																		rmsd);
+
+
 }

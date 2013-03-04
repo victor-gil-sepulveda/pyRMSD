@@ -1,65 +1,9 @@
 #include "kernel_functions_serial.h"
 #include <cmath>
 #include <iostream>
+#include "../RMSDTools.h"
 
 using namespace std;
-
-
-///////////////////////////////////////////////////////////////
-/// \remarks
-/// Centers the coordinates of all conformations as a previous phase for the
-/// application of Theobald's algorithm.
-///
-/// \param 	number_of_conformations [In] The number of conformations stored in all_coordinates.
-///
-/// \param 	number_of_atoms [In] The number of atoms PER CONFORMATION.
-///
-/// \param 	all_coordinates [In/Out] An array containing all the coordinates of all the conformations of the
-///	trajectory, where the first conformation first atom coordinates are x = all_coordinates[0],
-/// y = all_coordinates[1], z = all_coordinates[2]; Second conformation's first atom's coordinates would be
-/// x = all_coordinates[number_of_atoms*3 + 0], y = all_coordinates[number_of_atoms*3 + 1] ... and so on.
-///
-/// \author victor_gil
-/// \date 05/10/2012
-///////////////////////////////////////////////////////////////
-void ThRMSDSerialKernel::centerCoordsOfAllConformations(int number_of_conformations, int number_of_atoms, double* all_coordinates){
-	for(int conformation_id = 0; conformation_id < number_of_conformations; ++conformation_id){
-		int coordinates_per_conformation = number_of_atoms * 3;
-		double* conformation_coordinates = &(all_coordinates[conformation_id*coordinates_per_conformation]);
-		centerCoords(conformation_coordinates, number_of_atoms);
-	}
-}
-
-///////////////////////////////////////////////////////////////
-/// \remarks
-/// Centers the coordinates of only one conformation.
-///
-/// \param conformation_coordinates [In] Array containing the coordinates of the conformation to be centered.
-///
-/// \param number_of_atoms [In] Number of atoms of this conformation (so the length of 'conformation_coordinates'
-/// would be 'number_of_atoms'*3)
-///
-/// \author victor_gil
-/// \date 05/10/2012
-///////////////////////////////////////////////////////////////
-void ThRMSDSerialKernel::centerCoords( double* conformation_coordinates, int number_of_atoms){
-    double xsum = 0;
-    double ysum = 0;
-    double zsum = 0;
-
-	int total_number_of_coordinates = 3 * number_of_atoms;
-    for (int i = 0; i < total_number_of_coordinates; i+=3){
-        xsum += conformation_coordinates[i];
-        ysum += conformation_coordinates[i+1];
-        zsum += conformation_coordinates[i+2];
-    }
-
-    for (int i = 0; i < total_number_of_coordinates; i+=3){
-        conformation_coordinates[i] -= xsum / number_of_atoms;
-        conformation_coordinates[i+1] -= ysum / number_of_atoms;
-        conformation_coordinates[i+2] -= zsum / number_of_atoms;
-    }
-}
 
 ///////////////////////////////////////////////////////////////
 /// \remarks
@@ -134,7 +78,7 @@ double ThRMSDSerialKernel::innerProduct(double* A, double* first_conformation_co
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-double ThRMSDSerialKernel::calcRMSDForTwoConformationsWithTheobaldMethod(double *A, double E0, int number_of_atoms){
+double ThRMSDSerialKernel::calcRMSDForTwoConformationsWithTheobaldMethod(double *A, double E0, int number_of_atoms, double* rot_matrix){
     double Sxx, Sxy, Sxz, Syx, Syy, Syz, Szx, Szy, Szz;
     double Szz2, Syy2, Sxx2, Sxy2, Syz2, Sxz2, Syx2, Szy2, Szx2,
            SyzSzymSyySzz2, Sxx2Syy2Szz2Syz2Szy2, Sxy2Sxz2Syx2Szx2,
@@ -197,7 +141,112 @@ double ThRMSDSerialKernel::calcRMSDForTwoConformationsWithTheobaldMethod(double 
             break;
     }
 
-    return sqrt(fabs(2.0 * (E0 - mxEigenV)/number_of_atoms));
+    if (rot_matrix != NULL ){
+		double a11, a12, a13, a14, a21, a22, a23, a24,
+				a31, a32, a33, a34, a41, a42, a43, a44;
+
+		double a3344_4334, a3244_4234, a3243_4233,
+				a3143_4133, a3144_4134, a3142_4132;
+
+		double q1, q2, q3, q4, normq;
+
+		double evecprec = 1e-6;
+
+		double a2, x2, y2, z2;
+
+		double xy, az, zx, ay, yz, ax;
+
+		a11 = SxxpSyy + Szz - mxEigenV;
+		a12 = SyzmSzy;
+		a13 = -SxzmSzx;
+		a14 = SxymSyx;
+		a21 = SyzmSzy; a22 = SxxmSyy - Szz-mxEigenV; a23 = SxypSyx; a24= SxzpSzx;
+		a31 = a13; a32 = a23; a33 = Syy-Sxx-Szz - mxEigenV; a34 = SyzpSzy;
+		a41 = a14; a42 = a24; a43 = a34; a44 = Szz - SxxpSyy - mxEigenV;
+		a3344_4334 = a33 * a44 - a43 * a34; a3244_4234 = a32 * a44-a42*a34;
+		a3243_4233 = a32 * a43 - a42 * a33; a3143_4133 = a31 * a43-a41*a33;
+		a3144_4134 = a31 * a44 - a41 * a34; a3142_4132 = a31 * a42-a41*a32;
+		q1 =  a22*a3344_4334-a23*a3244_4234+a24*a3243_4233;
+		q2 = -a21*a3344_4334+a23*a3144_4134-a24*a3143_4133;
+		q3 =  a21*a3244_4234-a22*a3144_4134+a24*a3142_4132;
+		q4 = -a21*a3243_4233+a22*a3143_4133-a23*a3142_4132;
+
+		double qsqr = q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4;
+
+		if (qsqr < evecprec)
+		{
+			q1 =  a12*a3344_4334 - a13*a3244_4234 + a14*a3243_4233;
+			q2 = -a11*a3344_4334 + a13*a3144_4134 - a14*a3143_4133;
+			q3 =  a11*a3244_4234 - a12*a3144_4134 + a14*a3142_4132;
+			q4 = -a11*a3243_4233 + a12*a3143_4133 - a13*a3142_4132;
+			qsqr = q1*q1 + q2 *q2 + q3*q3+q4*q4;
+
+			if (qsqr < evecprec)
+			{
+				double a1324_1423 = a13 * a24 - a14 * a23, a1224_1422 = a12 * a24 - a14 * a22;
+				double a1223_1322 = a12 * a23 - a13 * a22, a1124_1421 = a11 * a24 - a14 * a21;
+				double a1123_1321 = a11 * a23 - a13 * a21, a1122_1221 = a11 * a22 - a12 * a21;
+
+				q1 =  a42 * a1324_1423 - a43 * a1224_1422 + a44 * a1223_1322;
+				q2 = -a41 * a1324_1423 + a43 * a1124_1421 - a44 * a1123_1321;
+				q3 =  a41 * a1224_1422 - a42 * a1124_1421 + a44 * a1122_1221;
+				q4 = -a41 * a1223_1322 + a42 * a1123_1321 - a43 * a1122_1221;
+				qsqr = q1*q1 + q2 *q2 + q3*q3+q4*q4;
+
+				if (qsqr < evecprec)
+				{
+					q1 =  a32 * a1324_1423 - a33 * a1224_1422 + a34 * a1223_1322;
+					q2 = -a31 * a1324_1423 + a33 * a1124_1421 - a34 * a1123_1321;
+					q3 =  a31 * a1224_1422 - a32 * a1124_1421 + a34 * a1122_1221;
+					q4 = -a31 * a1223_1322 + a32 * a1123_1321 - a33 * a1122_1221;
+					qsqr = q1*q1 + q2 *q2 + q3*q3 + q4*q4;
+
+					/*if (qsqr < evecprec)
+					{
+						// if qsqr is still too small, return the identity matrix.
+						rot_matrix[0] = rot_matrix[4] = rot_matrix[8] = 1.0;
+						rot_matrix[1] = rot_matrix[2] = rot_matrix[3] = rot_matrix[5] = rot_matrix[6] = rot_matrix[7] = 0.0;
+						//cout<<"Qsqr is too small!"<<endl;
+					}*/
+				}
+			}
+		}
+
+		normq = sqrt(qsqr);
+		q1 /= normq;
+		q2 /= normq;
+		q3 /= normq;
+		q4 /= normq;
+
+		a2 = q1 * q1;
+		x2 = q2 * q2;
+		y2 = q3 * q3;
+		z2 = q4 * q4;
+
+		xy = q2 * q3;
+		az = q1 * q4;
+		zx = q4 * q2;
+		ay = q1 * q3;
+		yz = q3 * q4;
+		ax = q1 * q2;
+
+		rot_matrix[0] = a2 + x2 - y2 - z2;
+		rot_matrix[1] = 2 * (xy + az);
+		rot_matrix[2] = 2 * (zx - ay);
+		rot_matrix[3] = 2 * (xy - az);
+		rot_matrix[4] = a2 - x2 + y2 - z2;
+		rot_matrix[5] = 2 * (yz + ax);
+		rot_matrix[6] = 2 * (zx + ay);
+		rot_matrix[7] = 2 * (yz - ax);
+		rot_matrix[8] = a2 - x2 - y2 + z2;
+    }
+
+    if (isnan(mxEigenV)){
+    	return 0.0;
+    }
+    else{
+    	return sqrt(fabs(2.0 * (E0 - mxEigenV)/number_of_atoms));
+    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -215,13 +264,13 @@ double ThRMSDSerialKernel::calcRMSDForTwoConformationsWithTheobaldMethod(double 
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-double ThRMSDSerialKernel::calcRMSDOfTwoConformations(	double* first_conformation_coords,
-									 									double* second_conformation_coords,
-									 									int number_of_atoms){
+double ThRMSDSerialKernel::calcRMSDOfTwoConformations(double* first_conformation_coords,
+									 						  double* second_conformation_coords,
+									 						  int number_of_atoms, double* rot_matrix){
 
 	double A[9];
 	double E0 = innerProduct(A, first_conformation_coords, second_conformation_coords, number_of_atoms);
-	return calcRMSDForTwoConformationsWithTheobaldMethod(A, E0, number_of_atoms);
+	return calcRMSDForTwoConformationsWithTheobaldMethod(A, E0, number_of_atoms, rot_matrix);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -247,18 +296,51 @@ double ThRMSDSerialKernel::calcRMSDOfTwoConformations(	double* first_conformatio
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
 void ThRMSDSerialKernel::calcRMSDOfOneVsFollowing(double* all_coordinates,
-									 int base_conformation_id,
-									 int other_conformations_starting_id,
-									 int number_of_conformations,
-									 int number_of_atoms,
-									 double* rmsd){
+														 double* reference_conformation,
+														 int reference_conformation_id,
+														 int number_of_conformations,
+														 int number_of_atoms,
+														 double* rmsd){
 
 	int coordinates_per_conformation = number_of_atoms * 3;
-	double* first_conformation_coords = &(all_coordinates[base_conformation_id*coordinates_per_conformation]);
 
-	for (int second_conformation_id = other_conformations_starting_id;
-			second_conformation_id < number_of_conformations; ++second_conformation_id){
+	for (int second_conformation_id = reference_conformation_id + 1;
+					second_conformation_id < number_of_conformations; ++second_conformation_id){
 		double* second_conformation_coords = &(all_coordinates[second_conformation_id*coordinates_per_conformation]);
-		rmsd[second_conformation_id] = calcRMSDOfTwoConformations(first_conformation_coords, second_conformation_coords, number_of_atoms);
+		double rmsd_val = calcRMSDOfTwoConformations(	reference_conformation,
+															  	second_conformation_coords,
+																number_of_atoms);
+		if(rmsd!= NULL){
+			rmsd[second_conformation_id-(reference_conformation_id+1)] = rmsd_val;
+		}
 	}
 }
+
+void ThRMSDSerialKernel::calcRMSDOfOneVsFollowingModifyingCoordinates(double* all_coordinates,
+																				double* reference_conformation,
+																				int reference_conformation_id,
+																				int number_of_conformations,
+																				int number_of_atoms,
+																				double* rmsd ){
+	int coordinates_per_conformation = number_of_atoms * 3;
+	double rot_matrix[9];
+
+	for (int second_conformation_id = reference_conformation_id + 1;
+			second_conformation_id < number_of_conformations; ++second_conformation_id){
+
+		double* second_conformation_coords = &(all_coordinates[second_conformation_id*coordinates_per_conformation]);
+
+		RMSDTools::initializeTo(rot_matrix, 0.0, 9);
+
+		double rmsd_val = calcRMSDOfTwoConformations(	reference_conformation,
+													  	second_conformation_coords,
+														number_of_atoms,
+														rot_matrix);
+		if(rmsd!=NULL){
+			rmsd[second_conformation_id-(reference_conformation_id+1)] = rmsd_val;
+		}
+
+		RMSDTools::rotate3D(number_of_atoms, second_conformation_coords, rot_matrix);
+	}
+}
+

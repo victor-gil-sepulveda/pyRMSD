@@ -122,7 +122,6 @@ void RMSD::iterativeSuperposition(double rmsd_diff_to_stop){
 			// (we won't calculate the RMSD)
 			superposition_with_external_reference_and_fit_differs_calc(reference_coords);
 		}
-
 		// Calculate new mean coords, which will be the next reference
 		RMSDTools::calculateMeanCoordinates(mean_coords, allCoordinates,
 											numberOfConformations, atomsPerConformation);

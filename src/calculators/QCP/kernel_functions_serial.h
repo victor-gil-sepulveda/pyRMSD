@@ -8,17 +8,25 @@ class ThRMSDSerialKernel: public KernelFunctions{
 		ThRMSDSerialKernel(){}
 		virtual ~ThRMSDSerialKernel(){}
 
-		void centerCoordsOfAllConformations(int number_of_conformations, int number_of_atoms, double* all_coordinates);
-
-		void centerCoords( double* all_cooordinates, int number_of_atoms);
-
 		double innerProduct(double* A, double* first_conformation_coords, double* second_conformation_coords, int number_of_atoms);
 
-		double calcRMSDForTwoConformationsWithTheobaldMethod(double *A, double E0, int number_of_atoms);
+		double calcRMSDForTwoConformationsWithTheobaldMethod(double *A, double E0, int number_of_atoms, double* rot_matrix = NULL);
 
-		double calcRMSDOfTwoConformations( double* first_conformation_coords, double* second_conformation_coords, int number_of_atoms);
+		double calcRMSDOfTwoConformations( double* first_conformation_coords, double* second_conformation_coords,
+				int number_of_atoms, double* rot_matrix = NULL);
 
-		virtual void calcRMSDOfOneVsFollowing( double* all_coordinates, int base_conformation_id, int other_conformations_starting_id,
-											int number_of_conformations, int number_of_atoms, double* rmsd);
+		virtual void calcRMSDOfOneVsFollowing(double* all_coordinates,
+												   double* reference_conformation,
+												   int reference_conformation_id,
+												   int number_of_conformations,
+												   int number_of_atoms,
+												   double* rmsd );
+
+		virtual void calcRMSDOfOneVsFollowingModifyingCoordinates( double* all_coordinates,
+																		   double* reference_conformation,
+																		   int reference_conformation_id,
+																		   int number_of_conformations,
+																		   int number_of_atoms,
+																		   double* rmsd );
 };
 #endif

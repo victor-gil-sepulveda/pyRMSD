@@ -202,20 +202,32 @@ void RMSDTools::generateLeftRotationMatrixFromNormalizedQuaternion(double q[4], 
 	u[2][2] = q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3];
 }
 
-
-void RMSDTools::rotate3D(unsigned int n, double * const x, double u[3][3]){
+void RMSDTools::rotate3D(unsigned int n, double * const x, double* rot_matrix){
+	double u[3][3];
+	u[0][0] = rot_matrix[0];
+	u[0][1] = rot_matrix[1];
+	u[0][2] = rot_matrix[2];
+	u[1][0] = rot_matrix[3];
+	u[1][1] = rot_matrix[4];
+	u[1][2] = rot_matrix[5];
+	u[2][0] = rot_matrix[6];
+	u[2][1] = rot_matrix[7];
+	u[2][2] = rot_matrix[8];
+	rotate3D(n, x, u);
+}
+void RMSDTools::rotate3D(unsigned int number_of_atoms, double * const coords, double u[3][3]){
 	// We go through all selected atoms
-	for(unsigned int i=0; i<n; ++i){
+	for(unsigned int i=0; i<number_of_atoms; ++i){
 		int offset = i*3;
 		double x_tmp_0,x_tmp_1,x_tmp_2;
-		x_tmp_0 = x[offset];
-		x_tmp_1 = x[offset+1];
-		x_tmp_2 = x[offset+2];
+		x_tmp_0 = coords[offset];
+		x_tmp_1 = coords[offset+1];
+		x_tmp_2 = coords[offset+2];
 
 		// An rotate each of them
-		x[offset] 	= u[0][0] * x_tmp_0 + u[0][1] * x_tmp_1 + u[0][2] * x_tmp_2;
-		x[offset+1] = u[1][0] * x_tmp_0 + u[1][1] * x_tmp_1 + u[1][2] * x_tmp_2;
-		x[offset+2] = u[2][0] * x_tmp_0 + u[2][1] * x_tmp_1 + u[2][2] * x_tmp_2;
+		coords[offset] 	= u[0][0] * x_tmp_0 + u[0][1] * x_tmp_1 + u[0][2] * x_tmp_2;
+		coords[offset+1] = u[1][0] * x_tmp_0 + u[1][1] * x_tmp_1 + u[1][2] * x_tmp_2;
+		coords[offset+2] = u[2][0] * x_tmp_0 + u[2][1] * x_tmp_1 + u[2][2] * x_tmp_2;
 	}
 }
 

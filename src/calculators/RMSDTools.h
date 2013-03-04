@@ -29,6 +29,8 @@ namespace RMSDTools{
 	
 	void generateLeftRotationMatrixFromNormalizedQuaternion(double q[4], double u[3][3]);
 	
+	void rotate3D(unsigned int n, double * const x, double*);
+
 	void rotate3D(unsigned int n, double * const x, double u[3][3]);
 	
 	double calcRMS(const double * const x, const double * const y, unsigned int num_atoms);
