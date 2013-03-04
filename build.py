@@ -57,7 +57,8 @@ if __name__ == '__main__':
                                  "src/calculators/QCP/kernel":["kernel_functions_serial.cpp"],
                                  "src/matrix":["Matrix.cpp","Statistics.cpp"],
                                  "src/python":["pyRMSD.cpp","readerLite.cpp"],
-                                 "src/pdbreaderlite":["PDBReader.cpp"]
+                                 "src/pdbreaderlite":["PDBReader.cpp"],
+                                 "src/calculators/test":["main.cpp","test_tools.cpp","tests.cpp"],
     }
     
     files_to_compile_with_gcc_and_openmp = {
@@ -65,7 +66,6 @@ if __name__ == '__main__':
                                             "src/calculators/QTRFIT":["RMSDomp.cpp"],
                                             "src/calculators/QCP":["ThRMSDSerialOmp.cpp"],
                                             "src/calculators/QCP/kernel":["kernel_functions_omp.cpp"],
-                                            "src/calculators/test":["test.cpp"],
     }
     #########################################
     
@@ -132,8 +132,9 @@ if __name__ == '__main__':
                     with_options([OPENMP_OPTION]).\
                     using_libs([]).\
                     using_lib_locations([]).\
-                    this_object_files([files_to_link["test"],files_to_link["RMSDTools"],files_to_link["RMSDomp"],
-                                       files_to_link["ThRMSDSerial"], files_to_link["kernel_functions_serial"], files_to_link["RMSD"] ]).\
+                    this_object_files([files_to_link["main"], files_to_link["test_tools"], files_to_link["tests"],
+                                       files_to_link["RMSDTools"], files_to_link["RMSDomp"], files_to_link["ThRMSDSerial"], 
+                                       files_to_link["kernel_functions_serial"], files_to_link["RMSD"] ]).\
                     to_produce("test_rmsdtools_main")
                     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
