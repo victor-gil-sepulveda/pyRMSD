@@ -7,9 +7,9 @@
 
 using namespace std;
 
-ThRMSDSerialOmp::ThRMSDSerialOmp(int numberOfConformations, int atomsPerConformation,
+QCPOmpCalculator::QCPOmpCalculator(int numberOfConformations, int atomsPerConformation,
 		double* coords, int omp_threads):
-				ThRMSDSerial(numberOfConformations, atomsPerConformation, coords){
+				QCPSerialCalculator(numberOfConformations, atomsPerConformation, coords){
 
 	this->omp_threads = omp_threads;
 	omp_set_num_threads(this->omp_threads);
@@ -17,4 +17,4 @@ ThRMSDSerialOmp::ThRMSDSerialOmp(int numberOfConformations, int atomsPerConforma
 	this->kernelFunctions = new ThRMSDSerialOmpKernel;
 }
 
-ThRMSDSerialOmp::~ThRMSDSerialOmp(){}
+QCPOmpCalculator::~QCPOmpCalculator(){}

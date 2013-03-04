@@ -96,7 +96,7 @@ def compile_a_file_collection(base_dir, file_collection, compiler, options, incl
             filewoext,extension = file_name.split(".") #@UnusedVariable
             files_to_link[filewoext] = folder+"/"+filewoext+product_extension
             comp = Compile().using(compiler).with_options(options).including_folders(includes).the_file(file_name)
-            os.system('echo "\033[31m'+ comp.getCompilingCommand()+'\033[0m"')
+            os.system('echo "\\033[31m'+ comp.getCompilingCommand()+'\\033[0m"')
             os.system( comp.getCompilingCommand())
         os.chdir(base_dir)
 

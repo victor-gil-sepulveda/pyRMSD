@@ -3,13 +3,13 @@
 #define RMSD_CUDA_SERIAL_H_
 
 #include <vector>
-#include "../RMSD.h"
+#include "../RMSDCalculator.h"
 
-class ThRMSDSerial: public RMSD{
+class QCPSerialCalculator: public RMSDCalculator{
 
 	public:
-		ThRMSDSerial(int numberOfConformations, int atomsPerConformation, double* coords);
-		virtual ~ThRMSDSerial();
+		QCPSerialCalculator(int numberOfConformations, int atomsPerConformation, double* coords);
+		virtual ~QCPSerialCalculator();
 		
 	protected:
 		virtual void _one_vs_following_fit_equals_calc_coords(double* reference,

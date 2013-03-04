@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "../RMSDTools.h"
-#include "../QTRFIT/RMSDomp.h"
+#include "../QTRFIT/QTRFITOmpCalculator.h"
 #include "../QCP/ThRMSDSerial.h"
 #include "../QCP/kernel/kernel_functions_serial.h"
 
@@ -105,7 +105,7 @@ void test_superposition_with_coordinates_change(){
 	// With QTRFIT
 	cout<<"- QTRFIT:"<<endl;
 	RMSDTools::copyArrays(coordinates_copy,coordinates,number_of_atoms*number_of_conformations*3);
-	RMSDomp QTRFITcalculator(number_of_conformations, number_of_atoms, coordinates_copy);
+	QTRFITOmpCalculator QTRFITcalculator(number_of_conformations, number_of_atoms, coordinates_copy);
 	QTRFITcalculator.superposition_with_external_reference_and_fit_equals_calc(reference_coordinates, rmsds);
 	//print_vector("rmsd:",rmsds, 4);
 	compareVectors("\tTesting RMSD: ", expected_rmsds, rmsds, number_of_conformations, 1e-8);
@@ -116,7 +116,7 @@ void test_superposition_with_coordinates_change(){
 	// With QCP
 	cout<<"- QCP:"<<endl;
 	RMSDTools::copyArrays(coordinates_copy,coordinates,number_of_atoms*number_of_conformations*3);
-	ThRMSDSerial QCPcalculator(number_of_conformations, number_of_atoms, coordinates_copy);
+	QCPSerialCalculator QCPcalculator(number_of_conformations, number_of_atoms, coordinates_copy);
 	QCPcalculator.superposition_with_external_reference_and_fit_equals_calc(reference_coordinates, rmsds);
 	//print_vector("rmsd:",rmsds, 4);
 	compareVectors("\tTesting RMSD: ", expected_rmsds, rmsds, number_of_conformations, 1e-8);
@@ -140,7 +140,7 @@ void test_iterative_superposition_with_equal_calc_and_fit_sets(){
 	test_vector_len(iterposed_coordinates, number_of_atoms*number_of_coordsets*3, "all iterposed atoms");
 
 	// Iterposition with QTRFIT
-	RMSDomp QTRFITcalculator(number_of_coordsets, number_of_atoms, &(not_aligned_coordinates[0]));
+	QTRFITOmpCalculator QTRFITcalculator(number_of_coordsets, number_of_atoms, &(not_aligned_coordinates[0]));
 	QTRFITcalculator.iterativeSuperposition();
 	compareVectors("\tTesting iterposed coordinates (QTRFIT): ", &(iterposed_coordinates[0]),&(not_aligned_coordinates[0]), not_aligned_coordinates.size(), 1e-6);
 
@@ -148,7 +148,7 @@ void test_iterative_superposition_with_equal_calc_and_fit_sets(){
 	not_aligned_coordinates.clear();
 	load_vector(not_aligned_coordinates, "data/ligand_mini_all");
 	test_vector_len(not_aligned_coordinates, number_of_atoms*number_of_coordsets*3, "all not aligned atoms");
-	ThRMSDSerial QCPcalculator(number_of_coordsets, number_of_atoms, &(not_aligned_coordinates[0]));
+	QCPSerialCalculator QCPcalculator(number_of_coordsets, number_of_atoms, &(not_aligned_coordinates[0]));
 	QCPcalculator.iterativeSuperposition();
 	compareVectors("\tTesting iterposed coordinates (QCP): ", &(iterposed_coordinates[0]),&(not_aligned_coordinates[0]), not_aligned_coordinates.size(), 1e-6);
 }
@@ -172,7 +172,7 @@ void test_iterative_superposition_with_different_calc_and_fit_sets(){
 	test_vector_len(iterposed_coordinates, number_of_atoms*number_of_coordsets*3, "all iterposed atoms");
 
 	// Iterposition with QTRFIT
-	RMSDomp QTRFITcalculator(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
+	QTRFITOmpCalculator QTRFITcalculator(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
 	QTRFITcalculator.setCalculationCoordinates(number_of_atoms, &(not_iterposed_coordinates[0]));
 	QTRFITcalculator.iterativeSuperposition();
 	compareVectors("\tTesting iterposed coordinates (QTRFIT): ", &(iterposed_coordinates[0]),&(not_iterposed_coordinates[0]), not_iterposed_coordinates.size(), 1e-6);
@@ -185,7 +185,7 @@ void test_iterative_superposition_with_different_calc_and_fit_sets(){
 	not_aligned_CA.clear();
 	load_vector(not_aligned_CA, "data/ligand_mini_CAs");
 	test_vector_len(not_aligned_CA, number_of_CAs*number_of_coordsets*3, "not aligned CAs");
-	ThRMSDSerial QCPcalculator(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
+	QCPSerialCalculator QCPcalculator(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
 	QCPcalculator.setCalculationCoordinates(number_of_atoms, &(not_iterposed_coordinates[0]));
 	QCPcalculator.iterativeSuperposition();
 	compareVectors("\tTesting iterposed coordinates (QCP): ", &(iterposed_coordinates[0]),&(not_iterposed_coordinates[0]), not_iterposed_coordinates.size(), 1e-6);
@@ -213,7 +213,7 @@ void test_superposition_with_different_fit_and_calc_coordsets(){
 	test_vector_len(aligned_coordinates, number_of_atoms*number_of_coordsets*3, "all aligned atoms");
 
 	// RMSD of all atoms using CA for superposition
-	RMSDomp calculator1(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
+	QTRFITOmpCalculator calculator1(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
 	calculator1.setCalculationCoordinates(number_of_atoms, &(not_aligned_coordinates[0]));
 	calculator1.oneVsFollowing(0, rmsds);
 	//print_vector("rmsd:",rmsds, 5);
@@ -221,14 +221,14 @@ void test_superposition_with_different_fit_and_calc_coordsets(){
 	compareVectors("\tTesting RMSD 1 (QTRFIT): ", expected_rmsds, rmsds, number_of_coordsets, 1e-12); // Only the fourth decimal, as it was obtained with cout without more precission:P
 
 	// RMSD of CA using CA for superposition (default behaviour)
-	RMSDomp calculator2(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
+	QTRFITOmpCalculator calculator2(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
 	calculator2.oneVsFollowing(0, rmsds);
 //	print_vector("rmsd:",rmsds, 5);
 	double expected_rmsds_2 []= {0.767947519172927, 0.8838644164683896, 0.4177715823462121, 0.3383320758562839, 0};
 	compareVectors("\tTesting RMSD 2 (QTRFIT): ", expected_rmsds_2, rmsds, number_of_coordsets, 1e-12);
 
 	// RMSD  of CA using CA for superposition (using the same selection and RMSD subsets)
-	RMSDomp calculator3(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
+	QTRFITOmpCalculator calculator3(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
 	calculator3.setCalculationCoordinates(number_of_CAs, &(not_aligned_CA[0]));
 	calculator3.oneVsFollowing(0, rmsds);
 //	print_vector("rmsd:",rmsds, 5);
@@ -236,20 +236,20 @@ void test_superposition_with_different_fit_and_calc_coordsets(){
 
 	// With QCP
 	// RMSD of all atoms using CA for superposition
-	ThRMSDSerial calculator4(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
+	QCPSerialCalculator calculator4(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
 	calculator4.setCalculationCoordinates(number_of_atoms, &(not_aligned_coordinates[0]));
 	calculator4.oneVsFollowing(0, rmsds);
 	//print_vector("rmsd:",rmsds, 5);
 	compareVectors("\tTesting RMSD 4 (QCP): ", expected_rmsds, rmsds, number_of_coordsets, 1e-10); // Only the fourth decimal, as it was obtained with cout without more precission:P
 
 	// RMSD of CA using CA for superposition (default behaviour)
-	ThRMSDSerial calculator5(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
+	QCPSerialCalculator calculator5(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
 	calculator5.oneVsFollowing(0, rmsds);
 //	print_vector("rmsd:",rmsds, 5);
 	compareVectors("\tTesting RMSD 5 (QCP): ", expected_rmsds_2, rmsds, number_of_coordsets, 1e-12);
 
 	// RMSD  of CA using CA for superposition (using the same selection and RMSD subsets)
-	ThRMSDSerial calculator6(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
+	QCPSerialCalculator calculator6(number_of_coordsets, number_of_CAs, &(not_aligned_CA[0]));
 	calculator6.setCalculationCoordinates(number_of_CAs, &(not_aligned_CA[0]));
 	calculator6.oneVsFollowing(0, rmsds);
 //	print_vector("rmsd:",rmsds, 5);

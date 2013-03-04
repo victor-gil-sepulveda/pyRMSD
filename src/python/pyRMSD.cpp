@@ -1,7 +1,7 @@
 #include <python2.7/Python.h>
 #include <numpy/arrayobject.h>
-#include "../calculators/QTRFIT/RMSDSerial.h"
-#include "../calculators/QTRFIT/RMSDomp.h"
+#include "../calculators/QTRFIT/QTRFITSerialCalculator.h"
+#include "../calculators/QTRFIT/QTRFITOmpCalculator.h"
 #include "../calculators/QCP/ThRMSDCuda.cuh"
 #include "../calculators/QCP/ThRMSDSerial.h"
 #include "../calculators/QCP/ThRMSDSerialOmp.h"
@@ -87,18 +87,18 @@ PyArrayObject* embed_rmsd_data(vector<double>& rmsd){
 	return rmsds_list_obj;
 }
 
-RMSD* getCalculator(calcType cType, int numberOfConformations, int atomsPerConformation,
+RMSDCalculator* getCalculator(calcType cType, int numberOfConformations, int atomsPerConformation,
 		int number_of_threads, int threads_per_block, int blocks_per_grid,
 		double* Coordinates){
 
 	switch(cType){
 
 		case SERIAL_CALCULATOR:
-			return new RMSDSerial(numberOfConformations,atomsPerConformation,Coordinates);
+			return new QTRFITSerialCalculator(numberOfConformations,atomsPerConformation,Coordinates);
 			break;
 
 		case OPENMP_CALCULATOR:
-			return new RMSDomp(numberOfConformations,atomsPerConformation,Coordinates);
+			return new QTRFITOmpCalculator(numberOfConformations,atomsPerConformation,Coordinates);
 			break;
 
 #ifdef USE_CUDA
@@ -108,11 +108,11 @@ RMSD* getCalculator(calcType cType, int numberOfConformations, int atomsPerConfo
 #endif
 
 		case THEOBALD_SERIAL_CALCULATOR:
-			return new ThRMSDSerial(numberOfConformations,atomsPerConformation,Coordinates);
+			return new QCPSerialCalculator(numberOfConformations,atomsPerConformation,Coordinates);
 			break;
 
 		case THEOBALD_SERIAL_OMP_CALCULATOR:
-			return new ThRMSDSerialOmp(numberOfConformations,atomsPerConformation,Coordinates,number_of_threads);
+			return new QCPOmpCalculator(numberOfConformations,atomsPerConformation,Coordinates,number_of_threads);
 			break;
 
 		default:
@@ -138,7 +138,7 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 
 	rmsd.resize(number_of_conformations-conformation_number-1);
 
-    RMSD* rmsdCalculator = getCalculator(cType, number_of_conformations, atoms_per_conformation,
+    RMSDCalculator* rmsdCalculator = getCalculator(cType, number_of_conformations, atoms_per_conformation,
     		number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
 
     rmsdCalculator->oneVsFollowing(conformation_number,&(rmsd[0]));
@@ -163,7 +163,7 @@ static PyObject* iterativeSuperposition(PyObject *self, PyObject *args){
 	parse_params_for_condensed_matrix(args, cType, atoms_per_conformation, number_of_conformations,
 			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
 
-	RMSD* rmsdCalculator = getCalculator(cType, number_of_conformations, atoms_per_conformation,
+	RMSDCalculator* rmsdCalculator = getCalculator(cType, number_of_conformations, atoms_per_conformation,
 			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
 
 	rmsdCalculator->iterativeSuperposition(1e-4);
@@ -187,7 +187,7 @@ static PyObject* calculateRMSDCondensedMatrix(PyObject *self, PyObject *args){
 	parse_params_for_condensed_matrix(args, cType, atoms_per_conformation, number_of_conformations,
 			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
 
-	RMSD* rmsdCalculator = getCalculator(cType, number_of_conformations, atoms_per_conformation,
+	RMSDCalculator* rmsdCalculator = getCalculator(cType, number_of_conformations, atoms_per_conformation,
 			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
 
 	rmsdCalculator->calculateRMSDCondensedMatrix(rmsd);

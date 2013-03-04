@@ -19,8 +19,8 @@ using namespace std;
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-ThRMSDSerial::ThRMSDSerial(int numberOfConformations, int atomsPerConformation, double* coords):
-				RMSD(numberOfConformations, atomsPerConformation, coords){
+QCPSerialCalculator::QCPSerialCalculator(int numberOfConformations, int atomsPerConformation, double* coords):
+				RMSDCalculator(numberOfConformations, atomsPerConformation, coords){
     
 	this->kernelFunctions = new ThRMSDSerialKernel;
 }
@@ -32,11 +32,11 @@ ThRMSDSerial::ThRMSDSerial(int numberOfConformations, int atomsPerConformation, 
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-ThRMSDSerial::~ThRMSDSerial(){
+QCPSerialCalculator::~QCPSerialCalculator(){
 	delete kernelFunctions;
 }
 
-void ThRMSDSerial::_one_vs_following_fit_equals_calc_coords(double* reference, int reference_conformation_number, double* rmsd){
+void QCPSerialCalculator::_one_vs_following_fit_equals_calc_coords(double* reference, int reference_conformation_number, double* rmsd){
 	// center coords
 	double* centers = new double[numberOfConformations*3];
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
@@ -54,7 +54,7 @@ void ThRMSDSerial::_one_vs_following_fit_equals_calc_coords(double* reference, i
 	delete [] centers;
 }
 
-void ThRMSDSerial::_one_vs_following_fit_differs_calc_coords(double* fitReference,
+void QCPSerialCalculator::_one_vs_following_fit_differs_calc_coords(double* fitReference,
 				double* calcReference, int reference_conformation_number, double *rmsd){
 	// Center coordinates
 	double* fitCenters = new double[numberOfConformations*3];
@@ -81,7 +81,7 @@ void ThRMSDSerial::_one_vs_following_fit_differs_calc_coords(double* fitReferenc
 }
 
 
-void ThRMSDSerial::_one_vs_following_fit_equals_calc_coords_changing_coordinates(double* reference, int reference_conformation_number, double *rmsd){
+void QCPSerialCalculator::_one_vs_following_fit_equals_calc_coords_changing_coordinates(double* reference, int reference_conformation_number, double *rmsd){
 	// Center all
 	double* centers = new double[numberOfConformations*3];
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
@@ -94,7 +94,7 @@ void ThRMSDSerial::_one_vs_following_fit_equals_calc_coords_changing_coordinates
 																		rmsd);
 }
 
-void ThRMSDSerial::_one_vs_following_fit_differs_calc_coords_changing_coordinates(double* fitReference,
+void QCPSerialCalculator::_one_vs_following_fit_differs_calc_coords_changing_coordinates(double* fitReference,
 		double* calcReference, int reference_conformation_number, double *rmsd){
 		double* fitCenters = new double[numberOfConformations*3];
 		double* calcCenters = new double[numberOfConformations*3];

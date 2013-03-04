@@ -3,12 +3,12 @@
 #define THEO_RMSD_CUDA_H_
 
 #include <vector>
-#include "../RMSD.h"
+#include "../RMSDCalculator.h"
 
 #define floating_point_type float
 
 
-class ThRMSDCuda: public RMSD{ 
+class ThRMSDCuda: public RMSDCalculator{ 
 
 	public:
 		ThRMSDCuda(int numberOfConformations, int atomsPerConformation, double* coords, int threads_per_block = 32, int number_of_blocks = 512);

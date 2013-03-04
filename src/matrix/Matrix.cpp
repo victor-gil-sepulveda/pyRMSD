@@ -97,9 +97,13 @@ static int condensedMatrix_init(CondensedMatrix *self, PyObject *args, PyObject 
 	return 0;
 }
 
+char row_length_text[] = "row_length";
+char data_size_text[] = "data_size";
+char bogus_description_text[] = "TODO";
+
 static PyMemberDef condensedMatrix_members[] = {
-    {"row_length", T_INT, offsetof(CondensedMatrix, row_length), READONLY,	PyDoc_STR("description")},
-    {"data_size", T_INT, offsetof(CondensedMatrix, data_size), READONLY, PyDoc_STR("description")},
+    {row_length_text, T_INT, offsetof(CondensedMatrix, row_length), READONLY,	PyDoc_STR(bogus_description_text)},
+    {data_size_text, T_INT, offsetof(CondensedMatrix, data_size), READONLY, PyDoc_STR(bogus_description_text)},
     {NULL}  /* Sentinel */
 };
 

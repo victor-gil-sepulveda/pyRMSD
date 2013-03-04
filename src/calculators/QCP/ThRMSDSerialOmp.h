@@ -5,11 +5,11 @@
 #include <vector>
 #include "ThRMSDSerial.h"
 
-class ThRMSDSerialOmp: public ThRMSDSerial{
+class QCPOmpCalculator: public QCPSerialCalculator{
 
 	public:
-		ThRMSDSerialOmp(int numberOfConformations, int atomsPerConformation, double* coords, int omp_threads);
-		~ThRMSDSerialOmp();
+		QCPOmpCalculator(int numberOfConformations, int atomsPerConformation, double* coords, int omp_threads);
+		~QCPOmpCalculator();
 
 	private:
 		int omp_threads;
