@@ -42,7 +42,7 @@ void ThRMSDSerial::_one_vs_following_fit_equals_calc_coords(double* reference, i
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
 
 	// This kernel function does not modify coordinates.
-	this->kernelFunctions->calcRMSDOfOneVsFollowing(this->allCoordinates,
+	dynamic_cast<QCPKernelFunctions*>(this->kernelFunctions)->calcRMSDOfOneVsFollowing(this->allCoordinates,
 													reference,
 													reference_conformation_number,
 													numberOfConformations,
@@ -62,7 +62,7 @@ void ThRMSDSerial::_one_vs_following_fit_differs_calc_coords(double* fitReferenc
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, fitCenters);
 	RMSDTools::centerAllAtOrigin(atomsPerRMSDConformation, numberOfConformations, allRMSDCoordinates, calcCenters);
 
-	this->kernelFunctions->calcRMSDOfOneVsFollowingWithDifferentFitAndCalcCoords(
+	dynamic_cast<QCPKernelFunctions*>(this->kernelFunctions)->calcRMSDOfOneVsFollowingWithDifferentFitAndCalcCoords(
 			allCoordinates,
 			allRMSDCoordinates,
 			fitReference,
@@ -86,7 +86,7 @@ void ThRMSDSerial::_one_vs_following_fit_equals_calc_coords_changing_coordinates
 	double* centers = new double[numberOfConformations*3];
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
 	delete [] centers;
-	this->kernelFunctions->calcRMSDOfOneVsFollowingModifyingCoordinates(this->allCoordinates,
+	dynamic_cast<QCPKernelFunctions*>(this->kernelFunctions)->calcRMSDOfOneVsFollowingModifyingCoordinates(this->allCoordinates,
 																		reference,
 																		reference_conformation_number,
 																		numberOfConformations,
@@ -103,7 +103,7 @@ void ThRMSDSerial::_one_vs_following_fit_differs_calc_coords_changing_coordinate
 		delete [] fitCenters;
 		delete [] calcCenters;
 
-		this->kernelFunctions->calcRMSDOfOneVsFollowingWithDifferentFitAndCalcCoordsModifyingCoordinates(
+		dynamic_cast<QCPKernelFunctions*>(this->kernelFunctions)->calcRMSDOfOneVsFollowingWithDifferentFitAndCalcCoordsModifyingCoordinates(
 				allCoordinates,
 				allRMSDCoordinates,
 				fitReference,

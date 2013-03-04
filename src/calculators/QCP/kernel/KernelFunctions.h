@@ -5,14 +5,16 @@
  *      Author: victor
  */
 
-#ifndef KERNELFUNCTIONS_H_
-#define KERNELFUNCTIONS_H_
-#include <cstddef>
+#ifndef QCP_KERNELFUNCTIONS_H_
+#define QCP_KERNELFUNCTIONS_H_
 
-class KernelFunctions {
+#include <cstddef>
+#include "../../KernelFunctions.h"
+
+class QCPKernelFunctions:public KernelFunctions {
 	public:
-		KernelFunctions(){}
-		virtual ~KernelFunctions(){};
+		QCPKernelFunctions(){}
+		virtual ~QCPKernelFunctions(){};
 		
 		virtual double innerProduct(
 				double* A,
@@ -68,4 +70,4 @@ class KernelFunctions {
 
 };
 
-#endif /* KERNELFUNCTIONS_H_ */
+#endif /* QCP_KERNELFUNCTIONS_H_ */

@@ -2,6 +2,7 @@
 #define RMSD_H_
 
 #include <vector>
+#include "KernelFunctions.h"
 
 class RMSD{
 
@@ -40,6 +41,8 @@ class RMSD{
 
 		bool modifyFittingCoordinates;
 
+
+		KernelFunctions* kernelFunctions;
 	private:
 		RMSD(){}
 		RMSD(const RMSD& r){}

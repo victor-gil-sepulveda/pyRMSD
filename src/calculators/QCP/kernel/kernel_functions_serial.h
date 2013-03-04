@@ -3,7 +3,7 @@
 
 #include "KernelFunctions.h"
 
-class ThRMSDSerialKernel: public KernelFunctions{
+class ThRMSDSerialKernel: public QCPKernelFunctions{
 	public:
 		ThRMSDSerialKernel(){}
 		virtual ~ThRMSDSerialKernel(){}
