@@ -45,20 +45,28 @@ if __name__ == '__main__':
     ######################################
     ### Files we are going to use
     ######################################
-    files_to_compile_with_nvcc = {"src/calculators/QCP":["ThRMSDCuda.cu","kernel_functions_cuda.cu"]}
+    files_to_compile_with_nvcc = {
+                                  "src/calculators/QCP":["ThRMSDCuda.cu"],
+                                  "src/calculators/QCP/kernel":["kernel_functions_cuda.cu"]
+    }
     
-    
-    files_to_compile_with_gcc = {"src/calculators/QCP":["ThRMSDSerial.cpp","kernel_functions_serial.cpp","ThRMSDSerialOmp.cpp"],
+    files_to_compile_with_gcc = {
                                  "src/calculators":["RMSD.cpp"],
                                  "src/calculators/QTRFIT":["RMSDSerial.cpp"],
+                                 "src/calculators/QCP":["ThRMSDSerial.cpp"],
+                                 "src/calculators/QCP/kernel":["kernel_functions_serial.cpp"],
                                  "src/matrix":["Matrix.cpp","Statistics.cpp"],
                                  "src/python":["pyRMSD.cpp","readerLite.cpp"],
-                                 "src/pdbreaderlite":["PDBReader.cpp"]}
+                                 "src/pdbreaderlite":["PDBReader.cpp"]
+    }
     
-    files_to_compile_with_gcc_and_openmp = {"src/calculators/QCP":["kernel_functions_omp.cpp"],
-                                            "src/calculators/QTRFIT":["RMSDomp.cpp"],
+    files_to_compile_with_gcc_and_openmp = {
                                             "src/calculators":["RMSDTools.cpp"],
-                                            "src/calculators/test":["TestRMSDTools.cpp"]}
+                                            "src/calculators/QTRFIT":["RMSDomp.cpp"],
+                                            "src/calculators/QCP":["ThRMSDSerialOmp.cpp"],
+                                            "src/calculators/QCP/kernel":["kernel_functions_omp.cpp"],
+                                            "src/calculators/test":["test.cpp"],
+    }
     #########################################
     
     files_to_link = collections.defaultdict(str)
@@ -124,7 +132,7 @@ if __name__ == '__main__':
                     with_options([OPENMP_OPTION]).\
                     using_libs([]).\
                     using_lib_locations([]).\
-                    this_object_files([files_to_link["TestRMSDTools"],files_to_link["RMSDTools"],files_to_link["RMSDomp"],
+                    this_object_files([files_to_link["test"],files_to_link["RMSDTools"],files_to_link["RMSDomp"],
                                        files_to_link["ThRMSDSerial"], files_to_link["kernel_functions_serial"], files_to_link["RMSD"] ]).\
                     to_produce("test_rmsdtools_main")
                     

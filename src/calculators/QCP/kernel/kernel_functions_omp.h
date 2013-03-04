@@ -15,5 +15,12 @@ class ThRMSDSerialOmpKernel: public ThRMSDSerialKernel{
 										   int number_of_atoms,
 										   double* rmsd);
 
+		void calcRMSDOfOneVsFollowingModifyingCoordinates(  double* all_coordinates,
+																   double* reference_conformation,
+																   int reference_conformation_id,
+																   int number_of_conformations,
+																   int number_of_atoms,
+																   double* rmsd);
+
 };
 #endif

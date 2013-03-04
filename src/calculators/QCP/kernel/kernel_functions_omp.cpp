@@ -1,7 +1,7 @@
-#include "kernel_functions_serial.h"
-#include "kernel_functions_omp.h"
 #include <cmath>
 #include <iostream>
+#include "kernel_functions_omp.h"
+#include "../../RMSDTools.h"
 
 using namespace std;
 

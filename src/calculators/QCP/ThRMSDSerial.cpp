@@ -1,5 +1,5 @@
 #include "ThRMSDSerial.h"
-#include "kernel_functions_serial.h"
+#include "kernel/kernel_functions_serial.h"
 #include "../RMSDTools.h"
 #include <assert.h>
 #include <iostream>

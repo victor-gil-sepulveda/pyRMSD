@@ -1,6 +1,6 @@
 #include "ThRMSDSerialOmp.h"
 #include "ThRMSDSerial.h"
-#include "kernel_functions_omp.h"
+#include "kernel/kernel_functions_omp.h"
 #include <assert.h>
 #include <iostream>
 #include <omp.h>
