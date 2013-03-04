@@ -8,14 +8,14 @@ using namespace std;
 
 // After the function both coordinate sets are modified
 void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* const coord_ref){
-	double u[3][3];
-	double q[4];
+	double rot_matrix[3][3];
+	double quaternion[4];
 
 	// Get rotation matrix
-	RMSDTools::superpositionQuatFit(n, coord_fit, coord_ref, q, u);
+	RMSDTools::superpositionQuatFit(n, coord_fit, coord_ref, quaternion, rot_matrix);
 
 	// Rotate the reference molecule by the rotation matrix u
-	RMSDTools::rotate3D(n, coord_fit, u);
+	RMSDTools::rotate3D(n, coord_fit, rot_matrix);
 
 }
 
@@ -23,15 +23,15 @@ void RMSDTools::superpose(unsigned int n, double * const coord_fit, double* cons
 // Once finished,
 void RMSDTools::superpose(unsigned int fit_n, double * const fit_coords, double* const fit_ref_coords,
 							unsigned int calc_n, double* const calc_coords){
-	double u[3][3];
-	double q[4];
+	double rot_matrix[3][3];
+	double quaternion[4];
 
 	// Get rotation matrix
-	RMSDTools::superpositionQuatFit(fit_n,  fit_coords, fit_ref_coords,q, u);
+	RMSDTools::superpositionQuatFit(fit_n,  fit_coords, fit_ref_coords,quaternion, rot_matrix);
 
 	// Rotate the calculation and fit coordinate sets by using rotation matrix u
-	RMSDTools::rotate3D(fit_n, fit_coords, u);
-	RMSDTools::rotate3D(calc_n, calc_coords, u);
+	RMSDTools::rotate3D(fit_n, fit_coords, rot_matrix);
+	RMSDTools::rotate3D(calc_n, calc_coords, rot_matrix);
 }
 /*
  * Centers all the conformations to origin and stores the movement vectors.

@@ -16,7 +16,7 @@ bool expectedVectorEqualsCalculatedWithinPrecision(const double * const , const 
 void compareVectors(const char*, const double * const , const double * const , int , double );
 void checkDistances(double* vector1, double* vector2, int totalatoms);
 void writeVector(std::vector<double> & vector, const char* path);
-
+void test_vector_len(std::vector<double>& v, unsigned int expected_len, const char* name);
 
 
 #endif /* TEST_TOOLS_H_ */

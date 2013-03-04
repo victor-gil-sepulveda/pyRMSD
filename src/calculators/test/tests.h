@@ -11,7 +11,7 @@
 	void test_copy_array();
 	void test_coordinates_mean();
 	void test_translations();
-	void test_iterative_superposition();
+	void test_iterative_superposition_with_equal_calc_and_fit_sets();
 	void test_iterative_superposition_with_different_calc_and_fit_sets();
 	void test_superposition_with_coordinates_change();
 	void test_superposition_with_different_fit_and_calc_coordsets();

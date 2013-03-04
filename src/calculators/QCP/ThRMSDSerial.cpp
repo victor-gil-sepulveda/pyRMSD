@@ -54,6 +54,33 @@ void ThRMSDSerial::_one_vs_following_fit_equals_calc_coords(double* reference, i
 	delete [] centers;
 }
 
+void ThRMSDSerial::_one_vs_following_fit_differs_calc_coords(double* fitReference,
+				double* calcReference, int reference_conformation_number, double *rmsd){
+	// Center coordinates
+	double* fitCenters = new double[numberOfConformations*3];
+	double* calcCenters = new double[numberOfConformations*3];
+	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, fitCenters);
+	RMSDTools::centerAllAtOrigin(atomsPerRMSDConformation, numberOfConformations, allRMSDCoordinates, calcCenters);
+
+	this->kernelFunctions->calcRMSDOfOneVsFollowingWithDifferentFitAndCalcCoords(
+			allCoordinates,
+			allRMSDCoordinates,
+			fitReference,
+			calcReference,
+			reference_conformation_number,
+			this->numberOfConformations,
+			this->atomsPerConformation,
+			this->atomsPerRMSDConformation,
+			rmsd);
+
+	// Move then again to their places to avoid coordinate modification
+	RMSDTools::applyTranslationsToAll(this->atomsPerConformation, this->numberOfConformations, this->allCoordinates, fitCenters);
+	RMSDTools::applyTranslationsToAll(this->atomsPerRMSDConformation, this->numberOfConformations, this->allRMSDCoordinates, calcCenters);
+	delete [] fitCenters;
+	delete [] calcCenters;
+}
+
+
 void ThRMSDSerial::_one_vs_following_fit_equals_calc_coords_changing_coordinates(double* reference, int reference_conformation_number, double *rmsd){
 	// Center all
 	double* centers = new double[numberOfConformations*3];
@@ -65,6 +92,26 @@ void ThRMSDSerial::_one_vs_following_fit_equals_calc_coords_changing_coordinates
 																		numberOfConformations,
 																		atomsPerConformation,
 																		rmsd);
+}
 
+void ThRMSDSerial::_one_vs_following_fit_differs_calc_coords_changing_coordinates(double* fitReference,
+		double* calcReference, int reference_conformation_number, double *rmsd){
+		double* fitCenters = new double[numberOfConformations*3];
+		double* calcCenters = new double[numberOfConformations*3];
+		RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, fitCenters);
+		RMSDTools::centerAllAtOrigin(atomsPerRMSDConformation, numberOfConformations, allRMSDCoordinates, calcCenters);
+		delete [] fitCenters;
+		delete [] calcCenters;
+
+		this->kernelFunctions->calcRMSDOfOneVsFollowingWithDifferentFitAndCalcCoordsModifyingCoordinates(
+				allCoordinates,
+				allRMSDCoordinates,
+				fitReference,
+				calcReference,
+				reference_conformation_number,
+				this->numberOfConformations,
+				this->atomsPerConformation,
+				this->atomsPerRMSDConformation,
+				rmsd);
 
 }

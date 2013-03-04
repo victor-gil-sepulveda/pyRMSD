@@ -96,9 +96,13 @@ void load_vector(vector<double> & vector, const char * dataPath){
 		myfile.close();
 	}
 	else{
-		cout << "Unable to open file: "<< string(dataPath) << endl;
+		cout << "\033[1;31mUnable to open file: "<< string(dataPath) <<"\033[0m"<< endl;
 	}
 }
 
-
+void test_vector_len(vector<double>& v, unsigned int expected_len, const char* name){
+	if(v.size()!= expected_len){
+		cout<<"\033[1;31m"<<name<<" vector size is "<<v.size()<<" instead of "<<expected_len<<"\033[0m"<<endl;
+	}
+}
 

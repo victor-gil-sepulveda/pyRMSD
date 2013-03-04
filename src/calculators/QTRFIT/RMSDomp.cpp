@@ -120,7 +120,7 @@ void RMSDomp::_one_vs_following_fit_differs_calc_coords_changing_coordinates(dou
 		double* fit_conformation_coords = &(allCoordinates[i*coordinatesPerConformation]);
 		double* calc_conformation_coords = &(allRMSDCoordinates[i*coordinatesPerRMSDConformation]);
 
-		RMSDTools::superpose(atomsPerConformation, 	   fit_conformation_coords,  fitReference,
+		RMSDTools::superpose(atomsPerConformation,    fit_conformation_coords,  fitReference,
 							 atomsPerRMSDConformation, calc_conformation_coords);
 
 		// rmsd vector can be null if we are only interested in conformation superposition
