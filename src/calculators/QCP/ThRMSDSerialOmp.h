@@ -11,8 +11,12 @@ class QCPOmpCalculator: public QCPSerialCalculator{
 		QCPOmpCalculator(int numberOfConformations, int atomsPerConformation, double* coords, int omp_threads);
 		~QCPOmpCalculator();
 
+	protected:
+		KernelFunctions* getKernelFunctions();
+
 	private:
 		int omp_threads;
+
 };
 
 #endif

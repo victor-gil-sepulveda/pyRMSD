@@ -13,8 +13,14 @@ QCPOmpCalculator::QCPOmpCalculator(int numberOfConformations, int atomsPerConfor
 
 	this->omp_threads = omp_threads;
 	omp_set_num_threads(this->omp_threads);
-
-	this->kernelFunctions = new ThRMSDSerialOmpKernel;
 }
 
 QCPOmpCalculator::~QCPOmpCalculator(){}
+
+KernelFunctions* QCPOmpCalculator::getKernelFunctions(){
+	if (this->kernelFunctions == NULL){
+		this->kernelFunctions =  new ThRMSDSerialKernel;
+	}
+
+	return this->kernelFunctions;
+}
