@@ -10,8 +10,7 @@ QTRFITSerialCalculator::QTRFITSerialCalculator(int numberOfConformations, int at
 		RMSDCalculator(numberOfConformations, atomsPerConformation,allCoordinates){
 }
 
-QTRFITSerialCalculator::~QTRFITSerialCalculator(){
-}
+QTRFITSerialCalculator::~QTRFITSerialCalculator(){}
 
 
 void QTRFITSerialCalculator::_one_vs_following_fit_equals_calc_coords(double* reference, int reference_conformation_number, double *rmsd){
@@ -21,7 +20,7 @@ void QTRFITSerialCalculator::_one_vs_following_fit_equals_calc_coords(double* re
 	// TODO: change this to gain performance
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
 
-	dynamic_cast<QTRFITSerialKernel*>(this->getKernelFunctions())->oneVsFollowingFitEqualCalcWithoutConfRotation(
+	this->getKernelFunctions()->oneVsFollowingFitEqualCalcWithoutConfRotation(
 			reference,
 			reference_conformation_number,
 			rmsd,
@@ -42,7 +41,7 @@ void QTRFITSerialCalculator::_one_vs_following_fit_equals_calc_coords_changing_c
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
 	delete [] centers;
 
-	dynamic_cast<QTRFITSerialKernel*>(this->getKernelFunctions())->oneVsFollowingFitEqualCalcWithConfRotation(
+	this->getKernelFunctions()->oneVsFollowingFitEqualCalcWithConfRotation(
 			reference,
 			reference_conformation_number,
 			rmsd,
@@ -63,7 +62,7 @@ void QTRFITSerialCalculator::_one_vs_following_fit_differs_calc_coords(double* f
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, fitCenters);
 	RMSDTools::centerAllAtOrigin(atomsPerRMSDConformation, numberOfConformations, allRMSDCoordinates, calcCenters);
 
-	dynamic_cast<QTRFITSerialKernel*>(this->getKernelFunctions())->oneVsFollowingFitDiffersCalcWithoutConfRotation(
+	this->getKernelFunctions()->oneVsFollowingFitDiffersCalcWithoutConfRotation(
 			fitReference,
 			calcReference,
 			reference_conformation_number,
@@ -94,7 +93,7 @@ void QTRFITSerialCalculator::_one_vs_following_fit_differs_calc_coords_changing_
 	delete [] fitCenters;
 	delete [] calcCenters;
 
-	dynamic_cast<QTRFITSerialKernel*>(this->getKernelFunctions())->oneVsAllFitDiffersCalcWithConfRotation(
+	this->getKernelFunctions()->oneVsAllFitDiffersCalcWithConfRotation(
 			fitReference,
 			calcReference,
 			reference_conformation_number,

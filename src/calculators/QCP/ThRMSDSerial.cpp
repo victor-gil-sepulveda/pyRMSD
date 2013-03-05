@@ -38,7 +38,7 @@ void QCPSerialCalculator::_one_vs_following_fit_equals_calc_coords(double* refer
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
 
 	// This kernel function does not modify coordinates.
-	dynamic_cast<ThRMSDSerialKernel*>(this->getKernelFunctions())->oneVsFollowingFitEqualCalcWithoutConfRotation(
+	this->getKernelFunctions()->oneVsFollowingFitEqualCalcWithoutConfRotation(
 			reference,
 			reference_conformation_number,
 			rmsd,
@@ -60,7 +60,7 @@ void QCPSerialCalculator::_one_vs_following_fit_differs_calc_coords(double* fitR
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, fitCenters);
 	RMSDTools::centerAllAtOrigin(atomsPerRMSDConformation, numberOfConformations, allRMSDCoordinates, calcCenters);
 
-	dynamic_cast<ThRMSDSerialKernel*>(this->getKernelFunctions())->oneVsFollowingFitDiffersCalcWithoutConfRotation(
+	this->getKernelFunctions()->oneVsFollowingFitDiffersCalcWithoutConfRotation(
 			fitReference,
 			calcReference,
 			reference_conformation_number,
@@ -86,7 +86,7 @@ void QCPSerialCalculator::_one_vs_following_fit_equals_calc_coords_changing_coor
 	double* centers = new double[numberOfConformations*3];
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
 	delete [] centers;
-	dynamic_cast<ThRMSDSerialKernel*>(this->getKernelFunctions())->oneVsFollowingFitEqualCalcWithConfRotation(
+	this->getKernelFunctions()->oneVsFollowingFitEqualCalcWithConfRotation(
 			reference,
 			reference_conformation_number,
 			rmsd,
@@ -105,7 +105,7 @@ void QCPSerialCalculator::_one_vs_following_fit_differs_calc_coords_changing_coo
 		delete [] fitCenters;
 		delete [] calcCenters;
 
-		dynamic_cast<ThRMSDSerialKernel*>(this->getKernelFunctions())->oneVsAllFitDiffersCalcWithConfRotation(
+		this->getKernelFunctions()->oneVsAllFitDiffersCalcWithConfRotation(
 				fitReference,
 				calcReference,
 				reference_conformation_number,
