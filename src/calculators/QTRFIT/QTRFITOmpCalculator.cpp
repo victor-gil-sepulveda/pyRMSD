@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <sstream>
 #include <fstream>
+#include "kernel/QTRFITSerialKernel.h"
 using namespace std;
 
 
@@ -132,6 +133,9 @@ void QTRFITOmpCalculator::_one_vs_following_fit_differs_calc_coords_changing_coo
 }
 
 KernelFunctions* QTRFITOmpCalculator::getKernelFunctions(){
-	return NULL;
+	if(this->kernelFunctions == NULL){
+			this->kernelFunctions =  new QTRFITSerialKernel;
+	}
+	return this->kernelFunctions;
 }
 

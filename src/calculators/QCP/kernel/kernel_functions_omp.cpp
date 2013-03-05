@@ -7,7 +7,7 @@ using namespace std;
 
 #define floating_point_type double
 
-void ThRMSDSerialOmpKernel::calcRMSDOfOneVsFollowing(double* all_coordinates,
+void ThRMSDSerialOmpKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(double* all_coordinates,
 														   double* reference_conformation,
 														   int reference_conformation_id,
 														   int number_of_conformations,
@@ -29,7 +29,7 @@ void ThRMSDSerialOmpKernel::calcRMSDOfOneVsFollowing(double* all_coordinates,
 	}
 }
 
-void ThRMSDSerialOmpKernel::calcRMSDOfOneVsFollowingModifyingCoordinates( double* all_coordinates,
+void ThRMSDSerialOmpKernel::oneVsFollowingFitEqualCalcWithConfRotation( double* all_coordinates,
 																					double* reference_conformation,
 																					int reference_conformation_id,
 																					int number_of_conformations,

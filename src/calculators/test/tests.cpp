@@ -302,6 +302,13 @@ void test_QCP_Kernel(){
 	// Using the function modifying coords
 	RMSDTools::copyArrays(frag_b_copy,frag_b,atoms_len*3);
 	RMSDTools::centerAllAtOrigin(atoms_len,1,frag_b_copy,translations);
-	kernel.calcRMSDOfOneVsFollowingModifyingCoordinates(frag_b_copy,frag_a,-1,1,atoms_len,&rmsd);
+	kernel.oneVsFollowingFitEqualCalcWithConfRotation(
+			frag_a,
+			-1,
+			&rmsd,
+			1,
+			atoms_len*3,
+			atoms_len,
+			frag_b_copy);
 	compareVectors("\tTesting rotated coordinates: ", expected_rotated_coordinates, frag_b_copy, atoms_len*3, 1e-14);
 }

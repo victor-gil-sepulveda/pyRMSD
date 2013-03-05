@@ -8,14 +8,14 @@ class ThRMSDSerialOmpKernel: public ThRMSDSerialKernel{
 		ThRMSDSerialOmpKernel(){}
 		virtual ~ThRMSDSerialOmpKernel(){}
 
-		void calcRMSDOfOneVsFollowing( double* all_coordinates,
+		void oneVsFollowingFitEqualCalcWithoutConfRotation( double* all_coordinates,
 										   double* reference_conformation,
 										   int reference_conformation_id,
 										   int number_of_conformations,
 										   int number_of_atoms,
 										   double* rmsd);
 
-		void calcRMSDOfOneVsFollowingModifyingCoordinates(  double* all_coordinates,
+		void oneVsFollowingFitEqualCalcWithConfRotation(  double* all_coordinates,
 																   double* reference_conformation,
 																   int reference_conformation_id,
 																   int number_of_conformations,

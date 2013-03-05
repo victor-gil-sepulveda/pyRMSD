@@ -10,7 +10,7 @@
 
 class KernelFunctions{
 	public:
-		KernelFunctions();
+		KernelFunctions(){};
 		virtual ~KernelFunctions(){}
 
 		virtual void oneVsFollowingFitEqualCalcWithoutConfRotation(
@@ -56,8 +56,6 @@ class KernelFunctions{
 				int coordinatesPerRMSDConformation,
 				int atomsPerRMSDConformation,
 				double *allRMSDCoordinates) = 0;
-
-
 };
 
 

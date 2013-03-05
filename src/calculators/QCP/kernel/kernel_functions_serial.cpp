@@ -295,128 +295,141 @@ double ThRMSDSerialKernel::calcRMSDOfTwoConformations(double* first_conformation
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-void ThRMSDSerialKernel::calcRMSDOfOneVsFollowing(double* all_coordinates,
-														 double* reference_conformation,
-														 int reference_conformation_id,
-														 int number_of_conformations,
-														 int number_of_atoms,
-														 double* rmsd){
 
-	int coordinates_per_conformation = number_of_atoms * 3;
+void ThRMSDSerialKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
+		double* reference,
+		int reference_conformation_number,
+		double* rmsd,
+		int numberOfConformations,
+		int coordinatesPerConformation,
+		int atomsPerConformation,
+		double *allCoordinates){
 
-	for (int second_conformation_id = reference_conformation_id + 1;
-					second_conformation_id < number_of_conformations; ++second_conformation_id){
-		double* second_conformation_coords = &(all_coordinates[second_conformation_id*coordinates_per_conformation]);
-		double rmsd_val = calcRMSDOfTwoConformations(reference_conformation,
+	int coordinates_per_conformation = atomsPerConformation * 3;
+
+	for (int second_conformation_id = reference_conformation_number + 1;
+					second_conformation_id < numberOfConformations; ++second_conformation_id){
+		double* second_conformation_coords = &(allCoordinates[second_conformation_id*coordinates_per_conformation]);
+		double rmsd_val = calcRMSDOfTwoConformations(reference,
 													  second_conformation_coords,
-													  number_of_atoms);
+													  atomsPerConformation);
 		if(rmsd!= NULL){
-			rmsd[second_conformation_id-(reference_conformation_id+1)] = rmsd_val;
+			rmsd[second_conformation_id-(reference_conformation_number+1)] = rmsd_val;
 		}
 	}
 }
 
 
-void ThRMSDSerialKernel::calcRMSDOfOneVsFollowingModifyingCoordinates(double* all_coordinates,
-																				double* reference_conformation,
-																				int reference_conformation_id,
-																				int number_of_conformations,
-																				int number_of_atoms,
-																				double* rmsd ){
-	int coordinates_per_conformation = number_of_atoms * 3;
+void ThRMSDSerialKernel::oneVsFollowingFitEqualCalcWithConfRotation(
+		double* reference,
+		int reference_conformation_number,
+		double* rmsd,
+		int numberOfConformations,
+		int coordinatesPerConformation,
+		int atomsPerConformation,
+		double *allCoordinates){
+
+	int coordinates_per_conformation = atomsPerConformation * 3;
 	double rot_matrix[9];
 
-	for (int second_conformation_id = reference_conformation_id + 1;
-			second_conformation_id < number_of_conformations; ++second_conformation_id){
+	for (int second_conformation_id = reference_conformation_number + 1;
+			second_conformation_id < numberOfConformations; ++second_conformation_id){
 
-		double* second_conformation_coords = &(all_coordinates[second_conformation_id*coordinates_per_conformation]);
+		double* second_conformation_coords = &(allCoordinates[second_conformation_id*coordinates_per_conformation]);
 
 		RMSDTools::initializeTo(rot_matrix, 0.0, 9);
 
-		double rmsd_val = calcRMSDOfTwoConformations(	reference_conformation,
+		double rmsd_val = calcRMSDOfTwoConformations(	reference,
 													  	second_conformation_coords,
-														number_of_atoms,
+														atomsPerConformation,
 														rot_matrix);
 		if(rmsd!=NULL){
-			rmsd[second_conformation_id-(reference_conformation_id+1)] = rmsd_val;
+			rmsd[second_conformation_id-(reference_conformation_number+1)] = rmsd_val;
 		}
 
-		RMSDTools::rotate3D(number_of_atoms, second_conformation_coords, rot_matrix);
+		RMSDTools::rotate3D(atomsPerConformation, second_conformation_coords, rot_matrix);
 	}
 }
 
-void ThRMSDSerialKernel::calcRMSDOfOneVsFollowingWithDifferentFitAndCalcCoords(double* all_fit_coordinates,
-																					   double* all_calc_coordinates,
-																					   double*fit_reference,
-																					   double*calc_reference,
-																					   int reference_conformation_id,
-																					   int number_of_conformations,
-																					   int number_of_fit_atoms,
-																					   int number_of_calc_atoms,
-																					   double* rmsd ){
-	int coordinates_per_fit_conformation = number_of_fit_atoms * 3;
-	int coordinates_per_calc_conformation = number_of_calc_atoms * 3;
+
+void ThRMSDSerialKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
+		double* fitReference,
+		double* calcReference,
+		int reference_conformation_number,
+		double* rmsd,
+		int numberOfConformations,
+		int coordinatesPerConformation,
+		int atomsPerConformation,
+		double *allCoordinates,
+		int coordinatesPerRMSDConformation,
+		int atomsPerRMSDConformation,
+		double *allRMSDCoordinates){
+
+	int coordinates_per_fit_conformation = atomsPerConformation * 3;
+	int coordinates_per_calc_conformation = atomsPerRMSDConformation * 3;
 	double rot_matrix[9];
 
-	for (int second_conformation_id = reference_conformation_id + 1;
-			second_conformation_id < number_of_conformations; ++second_conformation_id){
+	for (int second_conformation_id = reference_conformation_number + 1;
+			second_conformation_id < numberOfConformations; ++second_conformation_id){
 
-		double* fit_conformation_coords = &(all_fit_coordinates[second_conformation_id*coordinates_per_fit_conformation]);
+		double* fit_conformation_coords = &(allCoordinates[second_conformation_id*coordinates_per_fit_conformation]);
 		RMSDTools::initializeTo(rot_matrix, 0.0, 9);
 
-		calcRMSDOfTwoConformations(	fit_reference,
+		calcRMSDOfTwoConformations(	fitReference,
 									fit_conformation_coords,
-									number_of_fit_atoms,
+									atomsPerConformation,
 									rot_matrix);
 
-		double* calc_conformation_coords =  &(all_calc_coordinates[second_conformation_id*coordinates_per_calc_conformation]);
+		double* calc_conformation_coords =  &(allRMSDCoordinates[second_conformation_id*coordinates_per_calc_conformation]);
 		double* calc_conformation_coords_copy = new double[coordinates_per_calc_conformation];
 		RMSDTools::copyArrays(calc_conformation_coords_copy,calc_conformation_coords,coordinates_per_calc_conformation);
-		RMSDTools::rotate3D(number_of_calc_atoms, calc_conformation_coords_copy, rot_matrix);
+		RMSDTools::rotate3D(atomsPerRMSDConformation, calc_conformation_coords_copy, rot_matrix);
 
 		// The check has no sense indeed, as in this case we are only interested in RMSD
 		if(rmsd!=NULL){
-			rmsd[second_conformation_id-(reference_conformation_id+1)] = RMSDTools::calcRMS(calc_reference,
-					calc_conformation_coords_copy, number_of_calc_atoms);
+			rmsd[second_conformation_id-(reference_conformation_number+1)] = RMSDTools::calcRMS(calcReference,
+					calc_conformation_coords_copy, atomsPerRMSDConformation);
 		}
 
 		delete [] calc_conformation_coords_copy;
 	}
 }
+void ThRMSDSerialKernel::oneVsAllFitDiffersCalcWithConfRotation(
+		double* fitReference,
+		double* calcReference,
+		int reference_conformation_number,
+		double* rmsd,
+		int numberOfConformations,
+		int coordinatesPerConformation,
+		int atomsPerConformation,
+		double *allCoordinates,
+		int coordinatesPerRMSDConformation,
+		int atomsPerRMSDConformation,
+		double *allRMSDCoordinates){
 
-void ThRMSDSerialKernel::calcRMSDOfOneVsFollowingWithDifferentFitAndCalcCoordsModifyingCoordinates(
-																				double* all_fit_coordinates,
-																				double* all_calc_coordinates,
-																				double*fit_reference,
-																				double*calc_reference,
-																				int reference_conformation_id,
-																				int number_of_conformations,
-																				int number_of_fit_atoms,
-																				int number_of_calc_atoms,
-																				double* rmsd  ){
-	int coordinates_per_fit_conformation = number_of_fit_atoms * 3;
-	int coordinates_per_calc_conformation = number_of_calc_atoms * 3;
+	int coordinates_per_fit_conformation = atomsPerConformation * 3;
+	int coordinates_per_calc_conformation = atomsPerRMSDConformation * 3;
 	double rot_matrix[9];
 
-	for (int second_conformation_id = reference_conformation_id + 1;
-			second_conformation_id < number_of_conformations; ++second_conformation_id){
+	for (int second_conformation_id = reference_conformation_number + 1;
+			second_conformation_id < numberOfConformations; ++second_conformation_id){
 
-		double* fit_conformation_coords = &(all_fit_coordinates[second_conformation_id*coordinates_per_fit_conformation]);
+		double* fit_conformation_coords = &(allCoordinates[second_conformation_id*coordinates_per_fit_conformation]);
 		RMSDTools::initializeTo(rot_matrix, 0.0, 9);
 
-		calcRMSDOfTwoConformations(	fit_reference,
+		calcRMSDOfTwoConformations(	fitReference,
 									fit_conformation_coords,
-									number_of_fit_atoms,
+									atomsPerConformation,
 									rot_matrix);
 
-		double* calc_conformation_coords =  &(all_calc_coordinates[second_conformation_id*coordinates_per_calc_conformation]);
+		double* calc_conformation_coords =  &(allRMSDCoordinates[second_conformation_id*coordinates_per_calc_conformation]);
 
-		RMSDTools::rotate3D(number_of_fit_atoms, fit_conformation_coords, rot_matrix);
-		RMSDTools::rotate3D(number_of_calc_atoms, calc_conformation_coords, rot_matrix);
+		RMSDTools::rotate3D(atomsPerConformation, fit_conformation_coords, rot_matrix);
+		RMSDTools::rotate3D(atomsPerRMSDConformation, calc_conformation_coords, rot_matrix);
 
 		if(rmsd!=NULL){
-			rmsd[second_conformation_id-(reference_conformation_id+1)] = RMSDTools::calcRMS(calc_reference,
-					calc_conformation_coords, number_of_calc_atoms);
+			rmsd[second_conformation_id-(reference_conformation_number+1)] = RMSDTools::calcRMS(calcReference,
+					calc_conformation_coords, atomsPerRMSDConformation);
 		}
 	}
 }
