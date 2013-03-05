@@ -13,7 +13,7 @@ QTRFITSerialCalculator::QTRFITSerialCalculator(int numberOfConformations, int at
 QTRFITSerialCalculator::~QTRFITSerialCalculator(){}
 
 
-void QTRFITSerialCalculator::_one_vs_following_fit_equals_calc_coords(double* reference, int reference_conformation_number, double *rmsd){
+/*void QTRFITSerialCalculator::_one_vs_following_fit_equals_calc_coords(double* reference, int reference_conformation_number, double *rmsd){
 	// Center all
 	double* centers = new double[numberOfConformations*3];
 	// Indeed only numberOfConformations-reference_conformation_number+1 conformations have to be centered...
@@ -105,7 +105,7 @@ void QTRFITSerialCalculator::_one_vs_following_fit_differs_calc_coords_changing_
 			coordinatesPerRMSDConformation,
 			atomsPerRMSDConformation,
 			allRMSDCoordinates);
-}
+}*/
 
 KernelFunctions* QTRFITSerialCalculator::getKernelFunctions(){
 	if(this->kernelFunctions == NULL){
