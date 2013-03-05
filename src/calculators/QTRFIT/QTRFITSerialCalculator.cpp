@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include "kernel/QTRFITSerialKernel.h"
 using namespace std;
 
 QTRFITSerialCalculator::QTRFITSerialCalculator(int numberOfConformations, int atomsPerConformation, double* allCoordinates):
@@ -11,6 +12,7 @@ QTRFITSerialCalculator::QTRFITSerialCalculator(int numberOfConformations, int at
 
 QTRFITSerialCalculator::~QTRFITSerialCalculator(){}
 
+
 void QTRFITSerialCalculator::_one_vs_following_fit_equals_calc_coords(double* reference, int reference_conformation_number, double *rmsd){
 	// Center all
 	double* centers = new double[numberOfConformations*3];
@@ -18,24 +20,14 @@ void QTRFITSerialCalculator::_one_vs_following_fit_equals_calc_coords(double* re
 	// TODO: change this to gain performance
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
 
-	for (int i = reference_conformation_number+1; i < numberOfConformations; ++i){
-
-		// Coordinates are copied so the working coordinates set is not modified
-		double* conformation_coords = &(allCoordinates[i*coordinatesPerConformation]);
-		double* conformation_coords_tmp = new double[coordinatesPerConformation];
-		copy(conformation_coords,conformation_coords+coordinatesPerConformation,conformation_coords_tmp);
-
-		RMSDTools::superpose(atomsPerConformation, conformation_coords_tmp, reference);
-
-		rmsd[i-(reference_conformation_number+1)] = RMSDTools::calcRMS(reference, conformation_coords_tmp, atomsPerConformation);
-
-		delete [] conformation_coords_tmp;
-	}
+	oneVsFollowingFitEqualCalcWithoutConfRotation(reference_conformation_number,
+			reference, rmsd);
 
 	// Move then again to their places to avoid coordinate modification
 	RMSDTools::applyTranslationsToAll(this->atomsPerConformation, this->numberOfConformations, this->allCoordinates, centers);
 	delete [] centers;
 }
+
 
 void QTRFITSerialCalculator::_one_vs_following_fit_equals_calc_coords_changing_coordinates(double* reference, int reference_conformation_number, double *rmsd){
 	// Center all
@@ -43,18 +35,12 @@ void QTRFITSerialCalculator::_one_vs_following_fit_equals_calc_coords_changing_c
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
 	delete [] centers;
 
-	for (int i = reference_conformation_number+1; i < numberOfConformations; ++i){
-		// Real conformation coordinates are used, so they are modified
-		double* conformation_coords = &(allCoordinates[i*coordinatesPerConformation]);
-
-		RMSDTools::superpose(atomsPerConformation, conformation_coords, reference);
-		// rmsd vector can be null if we are only interested in conformation superposition
-		if (rmsd != NULL){
-			rmsd[i-(reference_conformation_number+1)] = RMSDTools::calcRMS(reference, conformation_coords, atomsPerConformation);
-		}
-	}
+	oneVsFollowingFitEqualCalcWithConfRotation(reference_conformation_number,
+			reference, rmsd);
 	// Coordinates are left centered
 }
+
+
 
 void QTRFITSerialCalculator::_one_vs_following_fit_differs_calc_coords(double* fitReference, double* calcReference, int reference_conformation_number, double *rmsd){
 
@@ -64,25 +50,8 @@ void QTRFITSerialCalculator::_one_vs_following_fit_differs_calc_coords(double* f
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, fitCenters);
 	RMSDTools::centerAllAtOrigin(atomsPerRMSDConformation, numberOfConformations, allRMSDCoordinates, calcCenters);
 
-	for (int i = reference_conformation_number+1; i < numberOfConformations; ++i){
-		int fitCoordsOffset = i*coordinatesPerConformation;
-		double* fit_conformation_coords = &(allCoordinates[fitCoordsOffset]);
-		double* fit_conformation_coords_tmp = new double[coordinatesPerConformation];
-		copy(fit_conformation_coords,fit_conformation_coords+coordinatesPerConformation,fit_conformation_coords_tmp);
-
-		int calcCoordsOffset = i*coordinatesPerRMSDConformation;
-		double* calc_conformation_coords = &(allRMSDCoordinates[calcCoordsOffset]);
-		double* calc_conformation_coords_tmp = new double[coordinatesPerRMSDConformation];
-		copy(calc_conformation_coords, calc_conformation_coords+coordinatesPerRMSDConformation, calc_conformation_coords_tmp);
-
-		RMSDTools::superpose(atomsPerConformation,    fit_conformation_coords_tmp,  fitReference,
-							 atomsPerRMSDConformation, calc_conformation_coords_tmp);
-
-		rmsd[i-(reference_conformation_number+1)] = RMSDTools::calcRMS(calcReference, calc_conformation_coords_tmp, atomsPerRMSDConformation);
-
-		delete [] fit_conformation_coords_tmp;
-		delete [] calc_conformation_coords_tmp;
-	}
+	oneVsFollowingFitDiffersCalcWithoutConfRotation(
+			reference_conformation_number, fitReference, rmsd, calcReference);
 
 	// Move then again to their places to avoid coordinate modification
 	RMSDTools::applyTranslationsToAll(this->atomsPerConformation, this->numberOfConformations, this->allCoordinates, fitCenters);
@@ -90,6 +59,8 @@ void QTRFITSerialCalculator::_one_vs_following_fit_differs_calc_coords(double* f
 	delete [] fitCenters;
 	delete [] calcCenters;
 }
+
+
 
 void QTRFITSerialCalculator::_one_vs_following_fit_differs_calc_coords_changing_coordinates(double* fitReference, double* calcReference, int reference_conformation_number, double *rmsd){
 
@@ -100,24 +71,10 @@ void QTRFITSerialCalculator::_one_vs_following_fit_differs_calc_coords_changing_
 	delete [] fitCenters;
 	delete [] calcCenters;
 
-	for (int i = reference_conformation_number+1; i < numberOfConformations; ++i){
-
-		double* fit_conformation_coords = &(allCoordinates[i*coordinatesPerConformation]);
-		double* calc_conformation_coords = &(allRMSDCoordinates[i*coordinatesPerRMSDConformation]);
-
-		RMSDTools::superpose(atomsPerConformation, fit_conformation_coords,  fitReference,
-							 atomsPerRMSDConformation, calc_conformation_coords);
-
-		// rmsd vector can be null if we are only interested in conformation superposition
-		if (rmsd != NULL){
-			rmsd[i-(reference_conformation_number+1)] = RMSDTools::calcRMS(calcReference, calc_conformation_coords, atomsPerRMSDConformation);
-		}
-
-	}
-
+	oneVsAllFitDiffersCalcWithConfRotation(reference_conformation_number,
+			fitReference, rmsd, calcReference);
 }
 
-
 KernelFunctions* QTRFITSerialCalculator::getKernelFunctions(){
-	return NULL;
+	return new QTRFITSerialKernel;
 }

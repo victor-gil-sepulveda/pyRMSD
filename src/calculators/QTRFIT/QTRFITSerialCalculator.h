@@ -16,6 +16,7 @@ class QTRFITSerialCalculator: public RMSDCalculator{
 		void _one_vs_following_fit_differs_calc_coords_changing_coordinates(double* fitReference, double* calcReference, int reference_conformation_number, double *rmsd);
 
 		KernelFunctions* getKernelFunctions();
+
 };
 
 #endif

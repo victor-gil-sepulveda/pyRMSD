@@ -53,6 +53,7 @@ if __name__ == '__main__':
     files_to_compile_with_gcc = {
                                  "src/calculators":["RMSDCalculator.cpp"],
                                  "src/calculators/QTRFIT":["QTRFITSerialCalculator.cpp"],
+                                 "src/calculators/QTRFIT/kernel":["QTRFITSerialKernel.cpp"],
                                  "src/calculators/QCP":["ThRMSDSerial.cpp"],
                                  "src/calculators/QCP/kernel":["kernel_functions_serial.cpp"],
                                  "src/matrix":["Matrix.cpp","Statistics.cpp"],
@@ -120,7 +121,7 @@ if __name__ == '__main__':
                         using_libs([PYTHON_LIBRARY]).\
                         using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
                         this_object_files([files_to_link["ThRMSDSerial"],files_to_link["ThRMSDSerialOmp"],files_to_link["kernel_functions_serial"],\
-                                           files_to_link["kernel_functions_omp"],files_to_link["pyRMSD"],\
+                                           files_to_link["kernel_functions_omp"],files_to_link["pyRMSD"],files_to_link["QTRFITSerialKernel"],\
                                            files_to_link["QTRFITOmpCalculator"],files_to_link["RMSDCalculator"],files_to_link["QTRFITSerialCalculator"],files_to_link["RMSDTools"],]).\
                         to_produce("calculators.so")
     
@@ -132,9 +133,9 @@ if __name__ == '__main__':
                     with_options([OPENMP_OPTION]).\
                     using_libs([]).\
                     using_lib_locations([]).\
-                    this_object_files([files_to_link["main"], files_to_link["test_tools"], files_to_link["tests"],
-                                       files_to_link["RMSDTools"], files_to_link["QTRFITOmpCalculator"], files_to_link["ThRMSDSerial"], 
-                                       files_to_link["kernel_functions_serial"], files_to_link["RMSDCalculator"] ]).\
+                    this_object_files([files_to_link["main"], files_to_link["test_tools"], files_to_link["tests"],\
+                                       files_to_link["RMSDTools"], files_to_link["QTRFITOmpCalculator"], files_to_link["QTRFITSerialKernel"],\
+                                       files_to_link["ThRMSDSerial"],files_to_link["kernel_functions_serial"], files_to_link["RMSDCalculator"] ]).\
                     to_produce("test_rmsdtools_main")
                     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')

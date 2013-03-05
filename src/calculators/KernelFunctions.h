@@ -10,8 +10,54 @@
 
 class KernelFunctions{
 	public:
-		KernelFunctions(){}
+		KernelFunctions();
 		virtual ~KernelFunctions(){}
+
+		virtual void oneVsFollowingFitEqualCalcWithoutConfRotation(
+				double* reference,
+				int reference_conformation_number,
+				double* rmsd,
+				int numberOfConformations,
+				int coordinatesPerConformation,
+				int atomsPerConformation,
+				double *allCoordinates) = 0;
+
+		virtual void oneVsFollowingFitEqualCalcWithConfRotation(
+				double* reference,
+				int reference_conformation_number,
+				double* rmsd,
+				int numberOfConformations,
+				int coordinatesPerConformation,
+				int atomsPerConformation,
+				double *allCoordinates) = 0;
+
+		virtual void oneVsFollowingFitDiffersCalcWithoutConfRotation(
+				double* fitReference,
+				double* calcReference,
+				int reference_conformation_number,
+				double* rmsd,
+				int numberOfConformations,
+				int coordinatesPerConformation,
+				int atomsPerConformation,
+				double *allCoordinates,
+				int coordinatesPerRMSDConformation,
+				int atomsPerRMSDConformation,
+				double *allRMSDCoordinates) = 0;
+
+		virtual void oneVsAllFitDiffersCalcWithConfRotation(
+				double* fitReference,
+				double* calcReference,
+				int reference_conformation_number,
+				double* rmsd,
+				int numberOfConformations,
+				int coordinatesPerConformation,
+				int atomsPerConformation,
+				double *allCoordinates,
+				int coordinatesPerRMSDConformation,
+				int atomsPerRMSDConformation,
+				double *allRMSDCoordinates) = 0;
+
+
 };
 
 
