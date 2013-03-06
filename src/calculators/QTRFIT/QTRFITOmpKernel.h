@@ -8,9 +8,9 @@
 #ifndef QTRFITOMPKERNEL_H_
 #define QTRFITOMPKERNEL_H_
 
-#include "../KernelFunctions.h"
+#include "QTRFITSerialKernel.h"
 
-class QTRFITOmpKernel: public KernelFunctions {
+class QTRFITOmpKernel: public QTRFITSerialKernel {
 	public:
 		QTRFITOmpKernel();
 		virtual ~QTRFITOmpKernel();
