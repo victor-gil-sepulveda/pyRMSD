@@ -54,7 +54,7 @@ if __name__ == '__main__':
                                  "src/calculators":["RMSDCalculator.cpp"],
                                  "src/calculators/factory":["RMSDCalculatorFactory.cpp"],
                                  "src/calculators/QTRFIT":["QTRFITSerialKernel.cpp"],
-                                 "src/calculators/QCP":["kernel_functions_serial.cpp"],
+                                 "src/calculators/QCP":["QCPSerialKernel.cpp"],
                                  "src/matrix":["Matrix.cpp","Statistics.cpp"],
                                  "src/python":["pyRMSD.cpp","readerLite.cpp"],
                                  "src/pdbreaderlite":["PDBReader.cpp"],
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     files_to_compile_with_gcc_and_openmp = {
                                             "src/calculators":["RMSDTools.cpp"],
                                             "src/calculators/QTRFIT":["QTRFITOmpKernel.cpp"],
-                                            "src/calculators/QCP":["kernel_functions_omp.cpp"],
+                                            "src/calculators/QCP":["QCPOmpKernel.cpp"],
     }
     #########################################
     
@@ -107,8 +107,8 @@ if __name__ == '__main__':
                             files_to_link["RMSDTools"],
                             files_to_link["QTRFITSerialKernel"],
                             files_to_link["QTRFITOmpKernel"],
-                            files_to_link["kernel_functions_serial"],
-                            files_to_link["kernel_functions_omp"],
+                            files_to_link["QCPSerialKernel"],
+                            files_to_link["QCPOmpKernel"],
                             files_to_link["RMSDCalculatorFactory"],
                             files_to_link["RMSDCalculator"],
                             files_to_link["pyRMSD"]

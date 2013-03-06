@@ -4,7 +4,7 @@
 #include <iostream>
 #include "../RMSDTools.h"
 #include "../RMSDCalculator.h"
-#include "../QCP/kernel_functions_serial.h"
+#include "../QCP/QCPSerialKernel.h"
 #include "../QTRFIT/QTRFITOmpKernel.h"
 
 using namespace std;
