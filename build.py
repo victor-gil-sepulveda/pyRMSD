@@ -52,10 +52,9 @@ if __name__ == '__main__':
     
     files_to_compile_with_gcc = {
                                  "src/calculators":["RMSDCalculator.cpp"],
-                                 "src/calculators/QTRFIT":["QTRFITSerialCalculator.cpp"],
-                                 "src/calculators/QTRFIT/kernel":["QTRFITSerialKernel.cpp"],
-                                 "src/calculators/QCP":["ThRMSDSerial.cpp"],
-                                 "src/calculators/QCP/kernel":["kernel_functions_serial.cpp"],
+                                 "src/calculators/factory":["RMSDCalculatorFactory.cpp"],
+                                 "src/calculators/QTRFIT":["QTRFITSerialKernel.cpp"],
+                                 "src/calculators/QCP":["kernel_functions_serial.cpp"],
                                  "src/matrix":["Matrix.cpp","Statistics.cpp"],
                                  "src/python":["pyRMSD.cpp","readerLite.cpp"],
                                  "src/pdbreaderlite":["PDBReader.cpp"],
@@ -64,9 +63,8 @@ if __name__ == '__main__':
     
     files_to_compile_with_gcc_and_openmp = {
                                             "src/calculators":["RMSDTools.cpp"],
-                                            "src/calculators/QTRFIT":["QTRFITOmpCalculator.cpp"],
-                                            "src/calculators/QCP":["ThRMSDSerialOmp.cpp"],
-                                            "src/calculators/QCP/kernel":["kernel_functions_omp.cpp"],
+                                            "src/calculators/QTRFIT":["QTRFITOmpKernel.cpp"],
+                                            "src/calculators/QCP":["kernel_functions_omp.cpp"],
     }
     #########################################
     
@@ -104,15 +102,25 @@ if __name__ == '__main__':
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            
     os.system( linkDSL.getLinkingCommand())
     
+    
+    calculator_obj_files = [
+                            files_to_link["RMSDTools"],
+                            files_to_link["QTRFITSerialKernel"],
+                            files_to_link["QTRFITOmpKernel"],
+                            files_to_link["kernel_functions_serial"],
+                            files_to_link["kernel_functions_omp"],
+                            files_to_link["RMSDCalculatorFactory"],
+                            files_to_link["RMSDCalculator"],
+                            files_to_link["pyRMSD"]
+    ]
+    
     if options.use_cuda:
         linkDSL = Link().\
                         using("g++").\
                         with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
                         using_libs([PYTHON_LIBRARY,CUDA_LIBRARY]).\
                         using_lib_locations([CUDA_LIBRARIES_FOLDER,PYTHON_LIBRARY_FOLDER]).\
-                        this_object_files([files_to_link["ThRMSDSerial"],files_to_link["ThRMSDSerialOmp"],files_to_link["ThRMSDCuda"],files_to_link["kernel_functions_serial"],\
-                                           files_to_link["kernel_functions_omp"],files_to_link["kernel_functions_cuda"],files_to_link["pyRMSD"],\
-                                           files_to_link["QTRFITOmpCalculator"],files_to_link["RMSDCalculator"],files_to_link["QTRFITSerialCalculator"],files_to_link["RMSDTools"],]).\
+                        this_object_files(calculator_obj_files).\
                         to_produce("calculators.so")
     else:
         linkDSL = Link().\
@@ -120,22 +128,21 @@ if __name__ == '__main__':
                         with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
                         using_libs([PYTHON_LIBRARY]).\
                         using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
-                        this_object_files([files_to_link["ThRMSDSerial"],files_to_link["ThRMSDSerialOmp"],files_to_link["kernel_functions_serial"],\
-                                           files_to_link["kernel_functions_omp"],files_to_link["pyRMSD"],files_to_link["QTRFITSerialKernel"],\
-                                           files_to_link["QTRFITOmpCalculator"],files_to_link["RMSDCalculator"],files_to_link["QTRFITSerialCalculator"],files_to_link["RMSDTools"],]).\
+                        this_object_files(calculator_obj_files).\
                         to_produce("calculators.so")
     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
     os.system(linkDSL.getLinkingCommand())
     
+    test_obj_files = list(calculator_obj_files)
+    test_obj_files.remove(files_to_link["pyRMSD"])
+    test_obj_files.extend([files_to_link["main"], files_to_link["test_tools"], files_to_link["tests"]])
     linkDSL = Link().\
                     using("g++").\
                     with_options([OPENMP_OPTION]).\
                     using_libs([]).\
                     using_lib_locations([]).\
-                    this_object_files([files_to_link["main"], files_to_link["test_tools"], files_to_link["tests"],\
-                                       files_to_link["RMSDTools"], files_to_link["QTRFITOmpCalculator"], files_to_link["QTRFITSerialKernel"],\
-                                       files_to_link["ThRMSDSerial"],files_to_link["kernel_functions_serial"], files_to_link["RMSDCalculator"] ]).\
+                    this_object_files(test_obj_files).\
                     to_produce("test_rmsdtools_main")
                     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
@@ -150,12 +157,12 @@ if __name__ == '__main__':
     if options.use_cuda:
         calcs_str = """
 def availableCalculators():
-    return {"KABSCH_PYTHON_CALCULATOR":-1,"QTRFIT_SERIAL_CALCULATOR":0,"QTRFIT_OMP_CALCULATOR":1,"QCP_CUDA_CALCULATOR":2,"QCP_SERIAL_CALCULATOR":3,"QCP_OMP_CALCULATOR":4}
+    return {"KABSCH_PYTHON_CALCULATOR":-1,"QTRFIT_SERIAL_CALCULATOR":2,"QTRFIT_OMP_CALCULATOR":3,"QCP_SERIAL_CALCULATOR":4,"QCP_OMP_CALCULATOR":5,"QCP_CUDA_CALCULATOR":6}
 """
     else:
         calcs_str = """
 def availableCalculators():
-    return {"KABSCH_PYTHON_CALCULATOR":-1,"QTRFIT_SERIAL_CALCULATOR":0,"QTRFIT_OMP_CALCULATOR":1,"QCP_SERIAL_CALCULATOR":3,"QCP_OMP_CALCULATOR":4}
+    return {"KABSCH_PYTHON_CALCULATOR":-1,"QTRFIT_SERIAL_CALCULATOR":2,"QTRFIT_OMP_CALCULATOR":3,"QCP_SERIAL_CALCULATOR":4,"QCP_OMP_CALCULATOR":5}
 """
     os.system('echo "\033[33mWriting available calculators...\033[0m"')
     open("pyRMSD/availableCalculators.py","w").write(calcs_str)

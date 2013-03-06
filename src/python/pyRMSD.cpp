@@ -1,30 +1,20 @@
 #include <python2.7/Python.h>
 #include <numpy/arrayobject.h>
-#include "../calculators/QTRFIT/QTRFITSerialCalculator.h"
-#include "../calculators/QTRFIT/QTRFITOmpCalculator.h"
-#include "../calculators/QCP/ThRMSDCuda.cuh"
-#include "../calculators/QCP/ThRMSDSerial.h"
-#include "../calculators/QCP/ThRMSDSerialOmp.h"
 #include <vector>
 #include <iostream>
+#include "../calculators/factory/RMSDCalculatorFactory.h"
+#include "../calculators/RMSDCalculator.h"
 using namespace std;
 
-enum calcType{
-	SERIAL_CALCULATOR = 0,
-	OPENMP_CALCULATOR,
-	THEOBALD_CUDA_CALCULATOR,
-	THEOBALD_SERIAL_CALCULATOR,
-	THEOBALD_SERIAL_OMP_CALCULATOR
-};
 
-void parse_params_for_one_vs_others(PyObject *args, calcType& cType,
+void parse_params_for_one_vs_others(PyObject *args, RMSDCalculatorType& calculatorType,
     		int& number_of_atoms, int& conformation_number, int& number_of_conformations,
     		int& number_of_threads, int& threads_per_block,int& blocks_per_grid,
     		double*& coords_list){
 	
 	PyArrayObject* coords_list_obj;
 	
-	if (!PyArg_ParseTuple(args, "iO!iiiiii",&cType,&PyArray_Type, &coords_list_obj,
+	if (!PyArg_ParseTuple(args, "iO!iiiiii",&calculatorType,&PyArray_Type, &coords_list_obj,
 	&number_of_atoms, &conformation_number, &number_of_conformations,
 	&number_of_threads, &threads_per_block, &blocks_per_grid)){
     	PyErr_SetString(PyExc_RuntimeError, "Error parsing parameters");
@@ -46,14 +36,14 @@ void parse_params_for_one_vs_others(PyObject *args, calcType& cType,
 	}
 }
 
-void parse_params_for_condensed_matrix(PyObject *args,calcType& cType,
+void parse_params_for_condensed_matrix(PyObject *args, RMSDCalculatorType& calculatorType,
     		int& number_of_atoms, int& number_of_conformations,
     		int& number_of_threads, int& threads_per_block,int& blocks_per_grid,
     		double*& coords_list){
 
 	PyArrayObject* coords_list_obj;
 
-	if (!PyArg_ParseTuple(args, "iO!iiiii",&cType,&PyArray_Type, &coords_list_obj,
+	if (!PyArg_ParseTuple(args, "iO!iiiii",&calculatorType,&PyArray_Type, &coords_list_obj,
 	&number_of_atoms, &number_of_conformations,
 	&number_of_threads, &threads_per_block, &blocks_per_grid)){
     	PyErr_SetString(PyExc_RuntimeError, "Error parsing parameters");
@@ -87,39 +77,6 @@ PyArrayObject* embed_rmsd_data(vector<double>& rmsd){
 	return rmsds_list_obj;
 }
 
-RMSDCalculator* getCalculator(calcType cType, int numberOfConformations, int atomsPerConformation,
-		int number_of_threads, int threads_per_block, int blocks_per_grid,
-		double* Coordinates){
-
-	switch(cType){
-
-		case SERIAL_CALCULATOR:
-			return new QTRFITSerialCalculator(numberOfConformations,atomsPerConformation,Coordinates);
-			break;
-
-		case OPENMP_CALCULATOR:
-			return new QTRFITOmpCalculator(numberOfConformations,atomsPerConformation,Coordinates);
-			break;
-
-#ifdef USE_CUDA
-		case THEOBALD_CUDA_CALCULATOR:
-			return new ThRMSDCuda(numberOfConformations, atomsPerConformation, Coordinates, threads_per_block, blocks_per_grid);
-			break;
-#endif
-
-		case THEOBALD_SERIAL_CALCULATOR:
-			return new QCPSerialCalculator(numberOfConformations,atomsPerConformation,Coordinates);
-			break;
-
-		case THEOBALD_SERIAL_OMP_CALCULATOR:
-			return new QCPOmpCalculator(numberOfConformations,atomsPerConformation,Coordinates,number_of_threads);
-			break;
-
-		default:
-			return NULL;
-	}
-}
-
 static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 
 	int conformation_number;
@@ -129,17 +86,22 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 	int threads_per_block;
 	int blocks_per_grid;
 
-	calcType cType;
+	RMSDCalculatorType calculatorType;
 	double* all_coordinates;
 	vector<double> rmsd;
 
-	parse_params_for_one_vs_others(args, cType, atoms_per_conformation, conformation_number, number_of_conformations,
+	parse_params_for_one_vs_others(args, calculatorType, atoms_per_conformation, conformation_number, number_of_conformations,
 			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
 
 	rmsd.resize(number_of_conformations-conformation_number-1);
 
-    RMSDCalculator* rmsdCalculator = getCalculator(cType, number_of_conformations, atoms_per_conformation,
-    		number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
+	RMSDCalculator* rmsdCalculator = RMSDCalculatorFactory::createCalculator(
+					calculatorType,
+					number_of_conformations,
+					atoms_per_conformation,
+					all_coordinates);
+    /*RMSDCalculator* rmsdCalculator = getCalculator(calculatorType, number_of_conformations, atoms_per_conformation,
+    		number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);*/
 
     rmsdCalculator->oneVsFollowing(conformation_number,&(rmsd[0]));
 
@@ -155,16 +117,21 @@ static PyObject* iterativeSuperposition(PyObject *self, PyObject *args){
 	int number_of_threads;
 	int threads_per_block;
 	int blocks_per_grid;
-
-	calcType cType;
 	double* all_coordinates;
 	vector<double> rmsd;
+	RMSDCalculatorType calculatorType;
 
-	parse_params_for_condensed_matrix(args, cType, atoms_per_conformation, number_of_conformations,
+
+	parse_params_for_condensed_matrix(args, calculatorType, atoms_per_conformation, number_of_conformations,
 			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
 
-	RMSDCalculator* rmsdCalculator = getCalculator(cType, number_of_conformations, atoms_per_conformation,
-			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
+	RMSDCalculator* rmsdCalculator = RMSDCalculatorFactory::createCalculator(
+				calculatorType,
+				number_of_conformations,
+				atoms_per_conformation,
+				all_coordinates);
+	/*RMSDCalculator* rmsdCalculator = getCalculator(calculatorType, number_of_conformations, atoms_per_conformation,
+			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);*/
 
 	rmsdCalculator->iterativeSuperposition(1e-4);
 
@@ -181,14 +148,21 @@ static PyObject* calculateRMSDCondensedMatrix(PyObject *self, PyObject *args){
 	int threads_per_block;
 	int blocks_per_grid;
 	double* all_coordinates;
-	calcType cType;
 	vector<double> rmsd;
+	RMSDCalculatorType calculatorType;
 
-	parse_params_for_condensed_matrix(args, cType, atoms_per_conformation, number_of_conformations,
+
+	parse_params_for_condensed_matrix(args, calculatorType, atoms_per_conformation, number_of_conformations,
 			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
 
-	RMSDCalculator* rmsdCalculator = getCalculator(cType, number_of_conformations, atoms_per_conformation,
-			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);
+	RMSDCalculator* rmsdCalculator = RMSDCalculatorFactory::createCalculator(
+			calculatorType,
+			number_of_conformations,
+			atoms_per_conformation,
+			all_coordinates);
+
+	/*RMSDCalculator* rmsdCalculator = getCalculator(calculatorType, number_of_conformations, atoms_per_conformation,
+			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);*/
 
 	rmsdCalculator->calculateRMSDCondensedMatrix(rmsd);
 

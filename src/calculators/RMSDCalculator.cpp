@@ -5,7 +5,8 @@
 #include <vector>
 using namespace std;
 
-RMSDCalculator::RMSDCalculator(int numberOfConformations, int atomsPerConformation, double* allCoordinates){
+RMSDCalculator::RMSDCalculator(	int numberOfConformations, int atomsPerConformation,
+									double* allCoordinates, KernelFunctions* kernelFunctions){
 	this->numberOfConformations = numberOfConformations;
 	this->atomsPerConformation = atomsPerConformation;
 	this->allCoordinates = allCoordinates;
@@ -14,7 +15,7 @@ RMSDCalculator::RMSDCalculator(int numberOfConformations, int atomsPerConformati
 	this->coordinatesPerRMSDConformation = 0;
 	this->atomsPerRMSDConformation = 0;
 	this->modifyFittingCoordinates = false;
-	this->kernelFunctions = NULL;
+	this->kernelFunctions = kernelFunctions;
 }
 
 RMSDCalculator::~RMSDCalculator(){
@@ -38,7 +39,6 @@ void RMSDCalculator::oneVsFollowing(int reference_conformation_number, double* r
 		cout<<"Error, this conformation doesn't exist ("<<reference_conformation_number<<")"<<endl;
 	}
 	else{
-
 		if(this->allRMSDCoordinates == NULL){
 			double* reference_conformation = &(allCoordinates[reference_conformation_number*coordinatesPerConformation]);
 
@@ -96,7 +96,7 @@ void RMSDCalculator::_one_vs_following_fit_equals_calc_coords(double* reference,
 	// TODO: change this to gain performance
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
 
-	this->getKernelFunctions()->oneVsFollowingFitEqualCalcWithoutConfRotation(
+	this->kernelFunctions->oneVsFollowingFitEqualCalcWithoutConfRotation(
 			reference,
 			reference_conformation_number,
 			rmsd,
@@ -115,7 +115,7 @@ void RMSDCalculator::_one_vs_following_fit_equals_calc_coords_changing_coordinat
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, centers);
 	delete [] centers;
 
-	this->getKernelFunctions()->oneVsFollowingFitEqualCalcWithConfRotation(
+	this->kernelFunctions->oneVsFollowingFitEqualCalcWithConfRotation(
 			reference,
 			reference_conformation_number,
 			rmsd,
@@ -126,14 +126,13 @@ void RMSDCalculator::_one_vs_following_fit_equals_calc_coords_changing_coordinat
 }
 
 void RMSDCalculator::_one_vs_following_fit_differs_calc_coords(double* fitReference, double* calcReference, int reference_conformation_number, double *rmsd){
-
 	double* fitCenters = new double[numberOfConformations*3];
 	double* calcCenters = new double[numberOfConformations*3];
 
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, numberOfConformations, allCoordinates, fitCenters);
 	RMSDTools::centerAllAtOrigin(atomsPerRMSDConformation, numberOfConformations, allRMSDCoordinates, calcCenters);
 
-	this->getKernelFunctions()->oneVsFollowingFitDiffersCalcWithoutConfRotation(
+	this->kernelFunctions->oneVsFollowingFitDiffersCalcWithoutConfRotation(
 			fitReference,
 			calcReference,
 			reference_conformation_number,
@@ -162,7 +161,7 @@ void RMSDCalculator::_one_vs_following_fit_differs_calc_coords_changing_coordina
 	delete [] fitCenters;
 	delete [] calcCenters;
 
-	this->getKernelFunctions()->oneVsAllFitDiffersCalcWithConfRotation(
+	this->kernelFunctions->oneVsAllFitDiffersCalcWithConfRotation(
 			fitReference,
 			calcReference,
 			reference_conformation_number,
@@ -210,8 +209,7 @@ void RMSDCalculator::iterativeSuperposition(double rmsd_diff_to_stop){
 
 		current_iteration++;
 	}
-	while(rmsd_difference > rmsd_diff_to_stop and
-			current_iteration < MAX_ITERATIONS);
+	while(rmsd_difference > rmsd_diff_to_stop and	current_iteration < MAX_ITERATIONS);
 
 	delete [] reference_coords;
 	delete [] mean_coords;
@@ -238,5 +236,3 @@ void RMSDCalculator::superposition_with_external_reference_and_fit_differs_calc(
 	RMSDTools::applyTranslationToAll(this->atomsPerConformation, this->numberOfConformations, this->allCoordinates, fit_reference_center);
 	RMSDTools::applyTranslationsToAll(this->atomsPerConformation, 1, fit_reference, fit_reference_center);
 }
-
-//void RMSDCalculator::createKernelFunctions(){ cout<<"Creating kernel"<<flush<<endl;this->kernelFunctions = NULL;};

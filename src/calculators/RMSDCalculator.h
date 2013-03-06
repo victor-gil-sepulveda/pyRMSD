@@ -8,7 +8,7 @@
 class RMSDCalculator{
 
 	public:
-		RMSDCalculator(int numberOfConformations, int atomsPerConformation, double* allCoordinates);
+		RMSDCalculator(int numberOfConformations, int atomsPerConformation, double* allCoordinates, KernelFunctions* kernelFunctions);
 		void setCalculationCoordinates(int atomsPerRMSDConformation, double* const allRMSDCoordinates);
 		virtual ~RMSDCalculator();
 		virtual void oneVsFollowing(int conformation, double* rmsd);
@@ -46,7 +46,6 @@ class RMSDCalculator{
 		bool modifyFittingCoordinates;
 
 		KernelFunctions* kernelFunctions;
-		virtual KernelFunctions* getKernelFunctions()=0;
 
 	private:
 		RMSDCalculator(){}
