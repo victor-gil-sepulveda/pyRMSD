@@ -7,14 +7,18 @@
 
 #include "RMSDCalculatorFactory.h"
 #include "../KernelFunctions.h"
+#include "../RMSDCalculator.h"
+#include "../QTRFIT/QTRFITSerialKernel.h"
 #include "../QTRFIT/QTRFITOmpKernel.h"
 #include "../QCP/QCPSerialKernel.h"
 #include "../QCP/QCPOmpKernel.h"
-#include "../RMSDCalculator.h"
+
+#ifdef USE_CUDA
+	#include "../QCP/QCPCUDAKernel.h"
+#endif
 
 #include <iostream>
 #include <cstdlib>
-#include "../QTRFIT/QTRFITSerialKernel.h"
 using namespace std;
 
 RMSDCalculatorFactory::RMSDCalculatorFactory() {}
@@ -25,7 +29,10 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 		RMSDCalculatorType type,
 		int numberOfConformations,
 		int atomsPerConformation,
-		double* allCoordinates) {
+		double* allCoordinates,
+		int number_of_threads,
+		int threads_per_block,
+		int blocks_per_grid) {
 
 	KernelFunctions* kernelFunctions;
 
@@ -38,33 +45,37 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 					kernelFunctions = NULL;
 					break;
 
-		case KABSCH_CUDA_CALCULATOR:
-					kernelFunctions = NULL;
-					break;
-
 		case QTRFIT_SERIAL_CALCULATOR:
 					kernelFunctions = new QTRFITSerialKernel;
 					break;
 
 		case QTRFIT_OMP_CALCULATOR:
-					kernelFunctions = new QTRFITOmpKernel;
+					kernelFunctions = new QTRFITOmpKernel(number_of_threads);
+					break;
+#ifdef USE_CUDA
+		case KABSCH_CUDA_CALCULATOR:
+					kernelFunctions = NULL;
 					break;
 
 		case QTRFIT_CUDA_CALCULATOR:
 					kernelFunctions = NULL;
 					break;
 
+		case QCP_CUDA_CALCULATOR:
+					kernelFunctions = new QCPCUDAKernel(
+							threads_per_block,
+							blocks_per_grid);
+					break;
+#endif
+
 		case QCP_SERIAL_CALCULATOR:
-					kernelFunctions = new ThRMSDSerialKernel;
+					kernelFunctions = new QCPSerialKernel;
 					break;
 
 		case QCP_OMP_CALCULATOR:
-					kernelFunctions = new ThRMSDSerialOmpKernel;
+					kernelFunctions = new QCPOmpKernel(number_of_threads);
 					break;
 
-		case QCP_CUDA_CALCULATOR:
-					kernelFunctions = NULL;
-					break;
 
 		default:
 			cout<<"[ERROR] Not kernel type implementation for type: "<<calculatorTypeToString(type)<<endl;

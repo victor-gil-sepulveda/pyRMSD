@@ -7,10 +7,8 @@
 
 #include "QTRFITSerialKernel.h"
 #include <cstddef>
-#include <algorithm>
 #include "../RMSDTools.h"
 
-using std::copy;
 
 QTRFITSerialKernel::QTRFITSerialKernel() {}
 
@@ -26,7 +24,7 @@ void QTRFITSerialKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
 		double* conformation_coords = &(allCoordinates[i * coordinatesPerConformation]);
 		double* conformation_coords_tmp = new double[coordinatesPerConformation];
 
-		copy(conformation_coords, conformation_coords + coordinatesPerConformation, conformation_coords_tmp);
+		RMSDTools::copyArrays(conformation_coords_tmp,conformation_coords, coordinatesPerConformation);
 
 		superpose(atomsPerConformation, conformation_coords_tmp, reference);
 
@@ -67,14 +65,12 @@ void QTRFITSerialKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
 		int fitCoordsOffset = i * coordinatesPerConformation;
 		double* fit_conformation_coords = &(allCoordinates[fitCoordsOffset]);
 		double* fit_conformation_coords_tmp =	new double[coordinatesPerConformation];
-		copy(fit_conformation_coords, fit_conformation_coords + coordinatesPerConformation,
-				fit_conformation_coords_tmp);
+		RMSDTools::copyArrays(fit_conformation_coords_tmp, fit_conformation_coords,coordinatesPerConformation);
 
 		int calcCoordsOffset = i * coordinatesPerRMSDConformation;
 		double* calc_conformation_coords =	&(allRMSDCoordinates[calcCoordsOffset]);
 		double* calc_conformation_coords_tmp = 	new double[coordinatesPerRMSDConformation];
-		copy(calc_conformation_coords, calc_conformation_coords + coordinatesPerRMSDConformation,
-				calc_conformation_coords_tmp);
+		RMSDTools::copyArrays(calc_conformation_coords_tmp, calc_conformation_coords, coordinatesPerRMSDConformation);
 
 		superpose(atomsPerConformation, fit_conformation_coords_tmp,
 				fitReference, atomsPerRMSDConformation,	calc_conformation_coords_tmp);

@@ -9,7 +9,10 @@ int main(int argc, char **argv){
 			QTRFIT_SERIAL_CALCULATOR,
 			QTRFIT_OMP_CALCULATOR,
 			QCP_SERIAL_CALCULATOR,
-			QCP_OMP_CALCULATOR
+			QCP_OMP_CALCULATOR,
+#ifdef USE_CUDA
+			QCP_CUDA_CALCULATOR
+#endif
 	};
 
 	vector<RMSDCalculatorType> available_calculators( available_calculators_d,

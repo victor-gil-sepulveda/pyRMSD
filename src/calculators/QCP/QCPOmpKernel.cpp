@@ -2,9 +2,13 @@
 #include <iostream>
 #include "QCPOmpKernel.h"
 #include "../RMSDTools.h"
-
+#include <omp.h>
 using namespace std;
 
+QCPOmpKernel::QCPOmpKernel(int number_of_threads){
+	this->number_of_threads = number_of_threads;
+	omp_set_num_threads(number_of_threads);
+}
 
 ///////////////////////////////////////////////////////////////
 /// \remarks
@@ -29,7 +33,7 @@ using namespace std;
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
 
-void ThRMSDSerialOmpKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
+void QCPOmpKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
 		double* reference,
 		int reference_conformation_number,
 		double* rmsd,
@@ -54,7 +58,7 @@ void ThRMSDSerialOmpKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
 }
 
 
-void ThRMSDSerialOmpKernel::oneVsFollowingFitEqualCalcWithConfRotation(
+void QCPOmpKernel::oneVsFollowingFitEqualCalcWithConfRotation(
 		double* reference,
 		int reference_conformation_number,
 		double* rmsd,
@@ -87,7 +91,7 @@ void ThRMSDSerialOmpKernel::oneVsFollowingFitEqualCalcWithConfRotation(
 }
 
 
-void ThRMSDSerialOmpKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
+void QCPOmpKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
 		double* fitReference,
 		double* calcReference,
 		int reference_conformation_number,
@@ -130,7 +134,7 @@ void ThRMSDSerialOmpKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
 		delete [] calc_conformation_coords_copy;
 	}
 }
-void ThRMSDSerialOmpKernel::oneVsAllFitDiffersCalcWithConfRotation(
+void QCPOmpKernel::oneVsAllFitDiffersCalcWithConfRotation(
 		double* fitReference,
 		double* calcReference,
 		int reference_conformation_number,

@@ -6,20 +6,16 @@
  */
 
 #include "QTRFITOmpKernel.h"
-#include <cstdlib>
-#include <algorithm>
 #include "../RMSDTools.h"
+#include <omp.h>
+#include <cstddef>
 
-using std::copy;
-
-QTRFITOmpKernel::QTRFITOmpKernel() {
-	// TODO Auto-generated constructor stub
-
+QTRFITOmpKernel::QTRFITOmpKernel(int number_of_threads){
+	this->number_of_threads = number_of_threads;
+	omp_set_num_threads(number_of_threads);
 }
 
-QTRFITOmpKernel::~QTRFITOmpKernel() {
-	// TODO Auto-generated destructor stub
-}
+QTRFITOmpKernel::~QTRFITOmpKernel(){}
 
 void QTRFITOmpKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
 		double* reference, int reference_conformation_number, double* rmsd,
@@ -32,7 +28,7 @@ void QTRFITOmpKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
 		double* conformation_coords = &(allCoordinates[i * coordinatesPerConformation]);
 		double* conformation_coords_tmp = new double[coordinatesPerConformation];
 
-		copy(conformation_coords, conformation_coords + coordinatesPerConformation, conformation_coords_tmp);
+		RMSDTools::copyArrays(conformation_coords_tmp, conformation_coords, coordinatesPerConformation);
 
 		superpose(atomsPerConformation, conformation_coords_tmp, reference);
 		rmsd[i - (reference_conformation_number + 1)] = RMSDTools::calcRMS(reference,
@@ -72,14 +68,12 @@ void QTRFITOmpKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
 		int fitCoordsOffset = i * coordinatesPerConformation;
 		double* fit_conformation_coords = &(allCoordinates[fitCoordsOffset]);
 		double* fit_conformation_coords_tmp =	new double[coordinatesPerConformation];
-		copy(fit_conformation_coords, fit_conformation_coords + coordinatesPerConformation,
-				fit_conformation_coords_tmp);
+		RMSDTools::copyArrays(fit_conformation_coords_tmp, fit_conformation_coords, coordinatesPerConformation);
 
 		int calcCoordsOffset = i * coordinatesPerRMSDConformation;
 		double* calc_conformation_coords =	&(allRMSDCoordinates[calcCoordsOffset]);
 		double* calc_conformation_coords_tmp = 	new double[coordinatesPerRMSDConformation];
-		copy(calc_conformation_coords, calc_conformation_coords + coordinatesPerRMSDConformation,
-				calc_conformation_coords_tmp);
+		RMSDTools::copyArrays(calc_conformation_coords_tmp, calc_conformation_coords, coordinatesPerRMSDConformation);
 
 		superpose(atomsPerConformation, fit_conformation_coords_tmp,
 				fitReference, atomsPerRMSDConformation,	calc_conformation_coords_tmp);

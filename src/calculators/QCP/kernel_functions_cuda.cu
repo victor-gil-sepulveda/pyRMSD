@@ -1,6 +1,5 @@
-#include "kernel_functions_cuda.cuh"
+#include "kernel_functions_cuda.h"
 
-#define floating_point_type float
 
 ///////////////////////////////////////////////////////////////
 /// \remarks
@@ -249,25 +248,15 @@ __device__ floating_point_type calcRMSDOfTwoConformations(floating_point_type* f
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-__global__ void calcRMSDOfOneVsFollowing(floating_point_type* all_coordinates,
+		
+__global__ void calcRMSDOfOneVsFollowing(
+									 floating_point_type* all_coordinates,
 									 const int base_conformation_id,
 									 const int other_conformations_starting_id,
 									 const int number_of_conformations,
 									 const int atoms_per_conformation,
 									 const int coordinates_per_conformation,
 									 floating_point_type* rmsd){
-	
-	// Usign shared mem for sructure coords doesn't help too much
-	//extern __shared__ floating_point_type first_conformation_fast_coords[];
-	/*if (threadIdx.x == 0){
-		coords_per_conformation = coordinates_per_conformation;
-		
-		floating_point_type* first_conformation_coords = &(all_coordinates[base_conformation_id*coords_per_conformation]);
-		for(int i = 0; i < coords_per_conformation; ++i){
-			first_conformation_fast_coords[i] = first_conformation_coords[i];
-		}
-	}*/
-	
 	
 	floating_point_type* first_conformation_coords = &(all_coordinates[base_conformation_id*coordinates_per_conformation]);
 	int second_conformation_id = other_conformations_starting_id + (blockDim.x*blockIdx.x + threadIdx.x);

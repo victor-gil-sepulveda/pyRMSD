@@ -39,15 +39,27 @@ BASE_DIR = os.getcwd()
 
 if __name__ == '__main__':
     parser = optparse.OptionParser(usage='%prog [--cuda]', version='1.0')
-    parser.add_option('--cuda',  action="store_true",dest = "use_cuda",  help="Use this flag if you want to compile the CUDA calculator.")
+    parser.add_option('--cuda', dest = "cuda_type",  help="Use this flag if you want to compile the CUDA calculator.")
     options, args = parser.parse_args()
+    
+    CUDA_PRECISION_FLAG = ""
+    if not options.cuda_type is None:
+        if options.cuda_type == "single":
+            CUDA_PRECISION_FLAG = "CUDA_PRECISION_SINGLE"
+        elif options.cuda_type =="double":
+            CUDA_PRECISION_FLAG = "CUDA_PRECISION_DOUBLE"
+        else:
+            parser.error("Please, choose  precision for CUDA building: 'single' or 'double'")
+        options.use_cuda = True
+        CUDA_OPTIONS = CUDA_OPTIONS +" -D"+CUDA_PRECISION_FLAG
+    else:
+        options.use_cuda = False
     
     ######################################
     ### Files we are going to use
     ######################################
     files_to_compile_with_nvcc = {
-                                  "src/calculators/QCP":["ThRMSDCuda.cu"],
-                                  "src/calculators/QCP/kernel":["kernel_functions_cuda.cu"]
+                                  "src/calculators/QCP":["QCPCUDAKernel.cu","kernel_functions_cuda.cu"]
     }
     
     files_to_compile_with_gcc = {
@@ -71,9 +83,9 @@ if __name__ == '__main__':
     files_to_link = collections.defaultdict(str)
     
     if options.use_cuda:
-        compile_a_file_collection(BASE_DIR, files_to_compile_with_gcc, "gcc", PYTHON_EXTENSION_OPTIONS+" "+DEFINE_USE_CUDA , [PYTHON_INCLUDE_FOLDER, NUMPY_INCLUDE], ".o",files_to_link)
-    else:
-        compile_a_file_collection(BASE_DIR, files_to_compile_with_gcc, "gcc", PYTHON_EXTENSION_OPTIONS, [PYTHON_INCLUDE_FOLDER, NUMPY_INCLUDE], ".o",files_to_link)
+        PYTHON_EXTENSION_OPTIONS = PYTHON_EXTENSION_OPTIONS+" "+DEFINE_USE_CUDA
+    
+    compile_a_file_collection(BASE_DIR, files_to_compile_with_gcc, "gcc", PYTHON_EXTENSION_OPTIONS, [PYTHON_INCLUDE_FOLDER, NUMPY_INCLUDE], ".o",files_to_link)
         
     compile_a_file_collection(BASE_DIR, files_to_compile_with_gcc_and_openmp, "gcc", PYTHON_EXTENSION_OPTIONS+" "+OPENMP_OPTION, [PYTHON_INCLUDE_FOLDER, NUMPY_INCLUDE], ".o",files_to_link)
     
@@ -113,23 +125,22 @@ if __name__ == '__main__':
                             files_to_link["RMSDCalculator"],
                             files_to_link["pyRMSD"]
     ]
-    
     if options.use_cuda:
-        linkDSL = Link().\
-                        using("g++").\
-                        with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
-                        using_libs([PYTHON_LIBRARY,CUDA_LIBRARY]).\
-                        using_lib_locations([CUDA_LIBRARIES_FOLDER,PYTHON_LIBRARY_FOLDER]).\
-                        this_object_files(calculator_obj_files).\
-                        to_produce("calculators.so")
+        calculator_obj_files.extend([files_to_link["QCPCUDAKernel"],files_to_link["kernel_functions_cuda"]])
+        calculator_libraries = [PYTHON_LIBRARY,CUDA_LIBRARY]
+        calculator_library_locations  = [PYTHON_LIBRARY_FOLDER, CUDA_LIBRARIES_FOLDER]
+        
     else:
-        linkDSL = Link().\
-                        using("g++").\
-                        with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
-                        using_libs([PYTHON_LIBRARY]).\
-                        using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
-                        this_object_files(calculator_obj_files).\
-                        to_produce("calculators.so")
+        calculator_libraries = [PYTHON_LIBRARY]
+        calculator_library_locations  = [PYTHON_LIBRARY_FOLDER]
+    
+    linkDSL = Link().\
+                    using("g++").\
+                    with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
+                    using_libs(calculator_libraries).\
+                    using_lib_locations(calculator_library_locations).\
+                    this_object_files(calculator_obj_files).\
+                    to_produce("calculators.so")
     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
     os.system(linkDSL.getLinkingCommand())
@@ -140,8 +151,8 @@ if __name__ == '__main__':
     linkDSL = Link().\
                     using("g++").\
                     with_options([OPENMP_OPTION]).\
-                    using_libs([]).\
-                    using_lib_locations([]).\
+                    using_libs(calculator_libraries).\
+                    using_lib_locations(calculator_library_locations).\
                     this_object_files(test_obj_files).\
                     to_produce("test_rmsdtools_main")
                     
@@ -157,12 +168,12 @@ if __name__ == '__main__':
     if options.use_cuda:
         calcs_str = """
 def availableCalculators():
-    return {"KABSCH_PYTHON_CALCULATOR":-1,"QTRFIT_SERIAL_CALCULATOR":2,"QTRFIT_OMP_CALCULATOR":3,"QCP_SERIAL_CALCULATOR":4,"QCP_OMP_CALCULATOR":5,"QCP_CUDA_CALCULATOR":6}
+    return {"KABSCH_PYTHON_CALCULATOR":-1,"QTRFIT_SERIAL_CALCULATOR":2,"QTRFIT_OMP_CALCULATOR":3,"QCP_SERIAL_CALCULATOR":5,"QCP_OMP_CALCULATOR":6,"QCP_CUDA_CALCULATOR":7}
 """
     else:
         calcs_str = """
 def availableCalculators():
-    return {"KABSCH_PYTHON_CALCULATOR":-1,"QTRFIT_SERIAL_CALCULATOR":2,"QTRFIT_OMP_CALCULATOR":3,"QCP_SERIAL_CALCULATOR":4,"QCP_OMP_CALCULATOR":5}
+    return {"KABSCH_PYTHON_CALCULATOR":-1,"QTRFIT_SERIAL_CALCULATOR":2,"QTRFIT_OMP_CALCULATOR":3,"QCP_SERIAL_CALCULATOR":5,"QCP_OMP_CALCULATOR":6}
 """
     os.system('echo "\033[33mWriting available calculators...\033[0m"')
     open("pyRMSD/availableCalculators.py","w").write(calcs_str)

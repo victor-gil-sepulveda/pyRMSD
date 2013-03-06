@@ -59,7 +59,6 @@ class QTRFITSerialKernel: public KernelFunctions {
 				int atomsPerRMSDConformation,
 				double *allRMSDCoordinates);
 
-
 		virtual void superpose(unsigned int n, double * const coord_fit, double* const coord_ref);
 
 		virtual void superpose(unsigned int fit_n, double * const fit_coords, double* const fit_ref_coords,

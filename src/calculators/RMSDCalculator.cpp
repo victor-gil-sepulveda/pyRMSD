@@ -5,8 +5,8 @@
 #include <vector>
 using namespace std;
 
-RMSDCalculator::RMSDCalculator(	int numberOfConformations, int atomsPerConformation,
-									double* allCoordinates, KernelFunctions* kernelFunctions){
+RMSDCalculator::RMSDCalculator(int numberOfConformations, int atomsPerConformation,
+								   double* allCoordinates, KernelFunctions* kernelFunctions){
 	this->numberOfConformations = numberOfConformations;
 	this->atomsPerConformation = atomsPerConformation;
 	this->allCoordinates = allCoordinates;
@@ -16,6 +16,11 @@ RMSDCalculator::RMSDCalculator(	int numberOfConformations, int atomsPerConformat
 	this->atomsPerRMSDConformation = 0;
 	this->modifyFittingCoordinates = false;
 	this->kernelFunctions = kernelFunctions;
+	this->kernelFunctions->init(
+			this->allCoordinates,
+			this->atomsPerConformation,
+			this->coordinatesPerConformation,
+			this->numberOfConformations);
 }
 
 RMSDCalculator::~RMSDCalculator(){
@@ -31,6 +36,7 @@ void RMSDCalculator::setCalculationCoordinates(int atomsPerRMSDConformation, dou
 	this->atomsPerRMSDConformation = atomsPerRMSDConformation;
 	this->coordinatesPerRMSDConformation = atomsPerRMSDConformation*3;
 	this->allRMSDCoordinates = allRMSDCoordinates;
+	this->kernelFunctions->changeCalculationCoords(allRMSDCoordinates);
 }
 
 void RMSDCalculator::oneVsFollowing(int reference_conformation_number, double* rmsd){

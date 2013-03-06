@@ -24,7 +24,7 @@ using namespace std;
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-double ThRMSDSerialKernel::innerProduct(double* A, double* first_conformation_coords,
+double QCPSerialKernel::innerProduct(double* A, double* first_conformation_coords,
 														double* second_conformation_coords, int number_of_atoms){
     double x1, x2, y1, y2, z1, z2;
     int i;
@@ -78,7 +78,7 @@ double ThRMSDSerialKernel::innerProduct(double* A, double* first_conformation_co
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-double ThRMSDSerialKernel::calcRMSDForTwoConformationsWithTheobaldMethod(double *A, double E0, int number_of_atoms, double* rot_matrix){
+double QCPSerialKernel::calcRMSDForTwoConformationsWithTheobaldMethod(double *A, double E0, int number_of_atoms, double* rot_matrix){
     double Sxx, Sxy, Sxz, Syx, Syy, Syz, Szx, Szy, Szz;
     double Szz2, Syy2, Sxx2, Sxy2, Syz2, Sxz2, Syx2, Szy2, Szx2,
            SyzSzymSyySzz2, Sxx2Syy2Szz2Syz2Szy2, Sxy2Sxz2Syx2Szx2,
@@ -264,7 +264,7 @@ double ThRMSDSerialKernel::calcRMSDForTwoConformationsWithTheobaldMethod(double 
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-double ThRMSDSerialKernel::calcRMSDOfTwoConformations(double* first_conformation_coords,
+double QCPSerialKernel::calcRMSDOfTwoConformations(double* first_conformation_coords,
 									 						  double* second_conformation_coords,
 									 						  int number_of_atoms, double* rot_matrix){
 
@@ -296,7 +296,7 @@ double ThRMSDSerialKernel::calcRMSDOfTwoConformations(double* first_conformation
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
 
-void ThRMSDSerialKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
+void QCPSerialKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
 		double* reference,
 		int reference_conformation_number,
 		double* rmsd,
@@ -320,7 +320,7 @@ void ThRMSDSerialKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
 }
 
 
-void ThRMSDSerialKernel::oneVsFollowingFitEqualCalcWithConfRotation(
+void QCPSerialKernel::oneVsFollowingFitEqualCalcWithConfRotation(
 		double* reference,
 		int reference_conformation_number,
 		double* rmsd,
@@ -352,7 +352,7 @@ void ThRMSDSerialKernel::oneVsFollowingFitEqualCalcWithConfRotation(
 }
 
 
-void ThRMSDSerialKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
+void QCPSerialKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
 		double* fitReference,
 		double* calcReference,
 		int reference_conformation_number,
@@ -394,7 +394,7 @@ void ThRMSDSerialKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
 		delete [] calc_conformation_coords_copy;
 	}
 }
-void ThRMSDSerialKernel::oneVsAllFitDiffersCalcWithConfRotation(
+void QCPSerialKernel::oneVsAllFitDiffersCalcWithConfRotation(
 		double* fitReference,
 		double* calcReference,
 		int reference_conformation_number,

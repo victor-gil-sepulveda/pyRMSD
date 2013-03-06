@@ -17,7 +17,8 @@ class RMSDCalculatorFactory {
 		virtual ~RMSDCalculatorFactory();
 
 		static RMSDCalculator* createCalculator(RMSDCalculatorType type, int numberOfConformations,
-				int atomsPerConformation, double* allCoordinates);
+				int atomsPerConformation, double* allCoordinates,int number_of_threads = 4,
+						int threads_per_block = 8, int blocks_per_grid = 16);
 };
 
 #endif /* RMSDCALCULATORFACTORY_H_ */

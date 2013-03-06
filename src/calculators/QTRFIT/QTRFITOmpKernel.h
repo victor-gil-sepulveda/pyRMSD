@@ -12,7 +12,7 @@
 
 class QTRFITOmpKernel: public QTRFITSerialKernel {
 	public:
-		QTRFITOmpKernel();
+		QTRFITOmpKernel(int number_of_threads);
 		virtual ~QTRFITOmpKernel();
 
 		virtual void oneVsFollowingFitEqualCalcWithoutConfRotation(
@@ -58,6 +58,11 @@ class QTRFITOmpKernel: public QTRFITSerialKernel {
 				int coordinatesPerRMSDConformation,
 				int atomsPerRMSDConformation,
 				double *allRMSDCoordinates);
+
+		int number_of_threads;
+
+	private:
+		QTRFITOmpKernel(){number_of_threads = 0;};
 };
 
 #endif /* QTRFITOMPKERNEL_H_ */

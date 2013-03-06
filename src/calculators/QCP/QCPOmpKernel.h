@@ -3,10 +3,10 @@
 
 #include "QCPSerialKernel.h"
 
-class ThRMSDSerialOmpKernel: public ThRMSDSerialKernel{
+class QCPOmpKernel: public QCPSerialKernel{
 	public:
-		ThRMSDSerialOmpKernel(){}
-		virtual ~ThRMSDSerialOmpKernel(){}
+		QCPOmpKernel(int number_of_threads);
+		virtual ~QCPOmpKernel(){}
 
 		virtual void oneVsFollowingFitEqualCalcWithoutConfRotation(
 							double* reference,
@@ -52,5 +52,9 @@ class ThRMSDSerialOmpKernel: public ThRMSDSerialKernel{
 					int atomsPerRMSDConformation,
 					double *allRMSDCoordinates);
 
+		int number_of_threads;
+
+	private:
+		QCPOmpKernel(){number_of_threads =0;};
 };
 #endif

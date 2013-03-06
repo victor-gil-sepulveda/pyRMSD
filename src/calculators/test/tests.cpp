@@ -271,7 +271,7 @@ void test_QCP_Kernel(){
 			0.6469047956562158, 2.857379330566034, 4.192628267746734
 	};
 
-	ThRMSDSerialKernel kernel;
+	QCPSerialKernel kernel;
 	double rot_matrix [9];
 	double translations[3];
 

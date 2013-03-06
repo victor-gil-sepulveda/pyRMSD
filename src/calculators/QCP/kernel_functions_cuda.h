@@ -1,7 +1,11 @@
 #ifndef _DEVICE_RMSD_2_H_
 #define _DEVICE_RMSD_2_H_
 
-#define floating_point_type float
+#ifdef CUDA_PRECISION_SINGLE
+	#define floating_point_type float
+#else
+	#define floating_point_type double
+#endif
 
 __global__ void centerCoordsOfAllConformations(const int number_of_conformations, const int number_of_atoms, floating_point_type* all_coordinates);
 
