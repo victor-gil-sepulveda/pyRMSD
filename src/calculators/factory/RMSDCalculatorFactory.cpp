@@ -52,6 +52,7 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 		case QTRFIT_OMP_CALCULATOR:
 					kernelFunctions = new QTRFITOmpKernel(number_of_threads);
 					break;
+
 #ifdef USE_CUDA
 		case KABSCH_CUDA_CALCULATOR:
 					kernelFunctions = NULL;

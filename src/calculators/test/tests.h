@@ -17,4 +17,5 @@
 	void test_superposition_with_coordinates_change(RMSDCalculatorType type);
 	void test_superposition_with_different_fit_and_calc_coordsets(RMSDCalculatorType type);
 	void test_QCP_Kernel();
+	void test_KABSCH_Kernel();
 #endif /* TESTS_H_ */

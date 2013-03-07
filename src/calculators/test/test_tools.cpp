@@ -54,7 +54,7 @@ bool expectedVectorEqualsCalculatedWithinPrecision(const double * const expected
 
     for(int i=0;i<dimension;++i)
     {
-        if( fabs(expectedVector[i]-calculatedVector[i]) >= precision )
+        if( isnan(calculatedVector[i]) || fabs(expectedVector[i]-calculatedVector[i]) >= precision )
         {
             equal = false;
 

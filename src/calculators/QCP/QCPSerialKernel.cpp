@@ -264,9 +264,9 @@ double QCPSerialKernel::calcRMSDForTwoConformationsWithTheobaldMethod(double *A,
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-double QCPSerialKernel::calcRMSDOfTwoConformations(double* first_conformation_coords,
-									 						  double* second_conformation_coords,
-									 						  int number_of_atoms, double* rot_matrix){
+double QCPSerialKernel::calcRMSDOfTwoConformations(	double* first_conformation_coords,
+															double* second_conformation_coords,
+															int number_of_atoms, double* rot_matrix){
 
 	double A[9];
 	double E0 = innerProduct(A, first_conformation_coords, second_conformation_coords, number_of_atoms);

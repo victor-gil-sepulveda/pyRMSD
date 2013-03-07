@@ -37,11 +37,21 @@ namespace RMSDTools{
 
 	void jacobi(double a[4][4], double d[4], double v[4][4], int nrot = 30);
 
+	bool diagonalize_symmetric(double matrix[3][3], double eigen_vec[3][3], double eigenval[3]);
+
 	void initializeTo(double*, double, int);
 
 	void copyArrays(double*, double*, int);
 
 	void calculateMeanCoordinates(double* , double* , int , int );
+
+	void normalize(double*);
+
+	double dot(double*, double*);
+
+	void cross(double* , double*, double*);
+
+	bool jacobi3(double a[3][3], double d[3], double v[3][3], int n_rot = 50);
 }
 
 #endif

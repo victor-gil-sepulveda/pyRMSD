@@ -7,6 +7,7 @@
 #include "../QCP/QCPSerialKernel.h"
 #include "../QTRFIT/QTRFITOmpKernel.h"
 #include "../factory/RMSDCalculatorFactory.h"
+#include "../KABSCH/KABSCHSerialKernel.h"
 
 using namespace std;
 
@@ -14,8 +15,22 @@ void test_initialize(){
 	print_test_tittle(__FUNCTION__);
 	double expected_initialized[] = {3,3,3,3,3,3,3,3,3,3};
 	double initialiazed[10];
+	double matrix_mode[3][3];
+	double matrix_mode_copy[9];
+	double expected_matrix_mode_copy[] ={5,5,5,5,5,5,5,5,5};
+
 	RMSDTools::initializeTo(initialiazed, 3, 10);
-	compareVectors("\tTesting initialization: ", expected_initialized, initialiazed, 10, 1e-10);
+	compareVectors("\tTesting initialization: ", expected_initialized, initialiazed, 10, 1e-16);
+
+	RMSDTools::initializeTo(matrix_mode[0],5, 9);
+	int k = 0;
+	for (int i = 0; i < 3; i++){
+		for (int j = 0; j < 3; j++){
+			matrix_mode_copy[k]=matrix_mode[i][j];
+			k = k+1;
+		}
+	}
+	compareVectors("\tTesting initialization (matrix): ", expected_matrix_mode_copy, matrix_mode_copy, 5, 1e-16);
 }
 
 void test_copy_array(){
@@ -280,9 +295,13 @@ void test_QCP_Kernel(){
 	RMSDTools::copyArrays(frag_b_copy,frag_b,atoms_len*3);
 	RMSDTools::centerAllAtOrigin(atoms_len,1,frag_a,translations);
 	RMSDTools::centerAllAtOrigin(atoms_len,1,frag_b_copy,translations);
+
 	double rmsd = kernel.calcRMSDOfTwoConformations(frag_a,frag_b_copy,atoms_len,rot_matrix);
+	double expected_rmsd =  0.719106;
+	compareVectors("\tTesting RMSD: ", &expected_rmsd, &rmsd, 1, 1e-6);
+
 	compareVectors("\tTesting rotation matrix: ", expected_rotation, rot_matrix, 9, 1e-14);
-	//cout<<"RMSD: "<<rmsd<<endl;//must be 0.719106
+
 	RMSDTools::rotate3D(atoms_len, frag_b_copy, rot_matrix);
 	compareVectors("\tTesting rotated coordinates: ", expected_rotated_coordinates, frag_b_copy, atoms_len*3, 1e-14);
 
@@ -298,4 +317,66 @@ void test_QCP_Kernel(){
 			atoms_len,
 			frag_b_copy);
 	compareVectors("\tTesting rotated coordinates: ", expected_rotated_coordinates, frag_b_copy, atoms_len*3, 1e-14);
+}
+
+void test_KABSCH_Kernel(){
+	print_test_tittle(__FUNCTION__);
+
+		int atoms_len = 7;
+
+		double frag_a [] =  {-2.803, -15.373, 24.556, 0.893, -16.062, 25.147,  1.368, -12.371, 25.885, -1.651, -12.153, 28.177, -0.440,
+		-15.218, 30.068,  2.551, -13.273, 31.372,  0.105, -11.330, 33.567};
+
+		double frag_b [] =  {-14.739, -18.673,  15.040, -12.473, -15.810,  16.074, -14.802, -13.307,  14.408, -17.782, -14.852,  16.171, -16.124, -14.617,
+		19.584, -15.029, -11.037,  18.902, -18.577, -10.001,  17.996};
+
+		double frag_b_copy[atoms_len*3];
+
+		double expected_rotation [] = {0.7221635837820651, 0.6911893731786908, -0.02714790348982324,
+									-0.5203825657891069, 0.5170083254696894, -0.6796354733368274,
+									-0.4557211246823982, 0.5049352847641727, 0.7330474846272469};
+
+		double expected_rotated_coordinates [] = {
+				-2.495176411277905, -1.614342696222044, -4.102116562817358,
+				1.092050512774367, -2.016077833910722, -2.931179811963272,
+				1.185406934426247, 1.622237699041897, -1.827209404202237,
+				-2.082389880657943, 1.176002542749938, 0.04307724778849886,
+				-0.8152689506610532, -1.884890665341617, 1.908042480017456,
+				2.46847299974008, -0.1403083768834845, 2.716757783430188,
+				0.6469047956562158, 2.857379330566034, 4.192628267746734
+		};
+
+		KABSCHSerialKernel kernel;
+		double rot_matrix [9];
+		double translations[3];
+		double U[3][3];
+
+		// Do it step by step
+		RMSDTools::copyArrays(frag_b_copy,frag_b,atoms_len*3);
+		RMSDTools::centerAllAtOrigin(atoms_len,1,frag_a,translations);
+		RMSDTools::centerAllAtOrigin(atoms_len,1,frag_b_copy,translations);
+
+		double rmsd = kernel.calculate_rotation_rmsd(frag_a,frag_b_copy,atoms_len,U);
+
+		double expected_rmsd =  0.719106;
+		compareVectors("\tTesting RMSD: ", &expected_rmsd, &rmsd, 1, 1e-6);
+
+		compareVectors("\tTesting rotation matrix: ", expected_rotation, rot_matrix, 9, 1e-14);
+
+		RMSDTools::rotate3D(atoms_len, frag_b_copy, rot_matrix);
+		compareVectors("\tTesting rotated coordinates: ", expected_rotated_coordinates, frag_b_copy, atoms_len*3, 1e-14);
+
+		// Using the function modifying coords
+		RMSDTools::copyArrays(frag_b_copy,frag_b,atoms_len*3);
+		RMSDTools::centerAllAtOrigin(atoms_len,1,frag_b_copy,translations);
+		kernel.oneVsFollowingFitEqualCalcWithConfRotation(
+				frag_a,
+				-1,
+				&rmsd,
+				1,
+				atoms_len*3,
+				atoms_len,
+				frag_b_copy);
+		compareVectors("\tTesting rotated coordinates: ", expected_rotated_coordinates, frag_b_copy, atoms_len*3, 1e-14);
+
 }

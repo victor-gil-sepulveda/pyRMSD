@@ -1,6 +1,7 @@
 #include "tests.h"
 #include "../factory/RMSDCalculatorTypes.h"
 #include <vector>
+#include <cstdlib>
 using std::vector;
 
 int main(int argc, char **argv){
@@ -24,6 +25,8 @@ int main(int argc, char **argv){
 	test_translations();
 
 	test_QCP_Kernel();
+	test_KABSCH_Kernel();
+		exit(1);
 
 	for(unsigned int i = 0; i < available_calculators.size();++i)
 		test_superposition_with_coordinates_change(available_calculators[i]);
