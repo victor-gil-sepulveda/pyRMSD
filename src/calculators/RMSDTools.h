@@ -37,6 +37,10 @@ namespace RMSDTools{
 
 	void jacobi(double a[4][4], double d[4], double v[4][4], int nrot = 30);
 
+	void transposeMatrix(const double (*const source_matrix)[3], double matrix[3][3]);
+
+	void transposeMatrix(const double (*const source_matrix)[4], double matrix[3][3]);
+
 	bool diagonalize_symmetric(double matrix[3][3], double eigen_vec[3][3], double eigenval[3]);
 
 	void initializeTo(double*, double, int);

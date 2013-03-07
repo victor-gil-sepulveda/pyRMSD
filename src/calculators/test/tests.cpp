@@ -128,7 +128,7 @@ void test_superposition_with_coordinates_change(RMSDCalculatorType type){
 			coordinates_copy);
 
 	calculator->superposition_with_external_reference_and_fit_equals_calc(reference_coordinates, rmsds);
-	//print_vector("rmsd:",rmsds, 4);
+
 	compareVectors("\tTesting RMSD: ", expected_rmsds, rmsds, number_of_conformations, 1e-8);
 	compareVectors("\tTesting coordinates: ", expected_coordinates, coordinates_copy,
 				number_of_atoms*3*number_of_conformations, 1e-5);

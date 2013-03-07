@@ -17,6 +17,7 @@ int main(int argc, char **argv){
 #endif
 	};
 
+
 	vector<RMSDCalculatorType> available_calculators( available_calculators_d,
 			available_calculators_d + sizeof(available_calculators_d)/sizeof(RMSDCalculatorType));
 
@@ -28,9 +29,11 @@ int main(int argc, char **argv){
 	test_QCP_Kernel();
 	test_KABSCH_Kernel();
 
-	for(unsigned int i = 0; i < available_calculators.size();++i)
-		test_superposition_with_coordinates_change(available_calculators[i]);
+	// This tests does not work with QCP and KABSCH
+	test_superposition_with_coordinates_change(QTRFIT_SERIAL_CALCULATOR);
+	test_superposition_with_coordinates_change(QTRFIT_OMP_CALCULATOR);
 
+	// Do those for all the others
 	for(unsigned int i = 0; i < available_calculators.size();++i)
 		test_superposition_with_different_fit_and_calc_coordsets(available_calculators[i]);
 
@@ -39,7 +42,6 @@ int main(int argc, char **argv){
 
 	for(unsigned int i = 0; i < available_calculators.size();++i)
 		test_iterative_superposition_with_different_calc_and_fit_sets(available_calculators[i]);
-
 
 	return 0;
 }

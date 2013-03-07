@@ -66,6 +66,7 @@ void KABSCHSerialKernel::oneVsFollowingFitEqualCalcWithConfRotation(
 			}
 
 			RMSDTools::rotate3D(atomsPerConformation, second_conformation_coords, rot_matrix);
+			//cout<<rot_matrix[0][0]<<endl;
 		}
 }
 
@@ -152,6 +153,13 @@ void KABSCHSerialKernel::oneVsFollowingFitDiffersCalcWithConfRotation(
 	}
 }
 
+
+//-------------------------------------------
+// Code based on the work of Dr. Bosco K. Ho
+//
+// http://boscoh.com/code/rmsd.c
+//
+//-------------------------------------------
 void KABSCHSerialKernel::calc_correlation_matrix_and_E0(
 		double (*const R)[3],
 		double* const _E0,
@@ -201,8 +209,8 @@ void KABSCHSerialKernel::calc_correlation_matrix_and_E0(
 bool KABSCHSerialKernel::calculate_rotation_matrix(
 		const double (*const R)[3],
 		double (*const U)[3],
-        double E0,
-        double* residual){
+		double E0,
+		double* residual){
 
 	int i, j, k;
 	double Rt[3][3], RtR[3][3];
@@ -210,14 +218,15 @@ bool KABSCHSerialKernel::calculate_rotation_matrix(
 	double v[3];
 	double sigma;
 
-	/* build Rt, transpose of R  */
-	for (i=0; i<3; i++){
-		for (j=0; j<3; j++){
-			Rt[i][j] = R[j][i];
-		}
-	}
+	// build Rt, transpose of R
+//	for (i=0; i<3; i++){
+//		for (j=0; j<3; j++){
+//			Rt[i][j] = R[j][i];
+//		}
+//	}
+	RMSDTools::transposeMatrix(R,Rt);
 
-	/* make symmetric RtR = Rt X R */
+	// make symmetric RtR = Rt X R
 	for (i=0; i<3; i++){
 		for (j=0; j<3; j++)	{
 			RtR[i][j] = 0.0;
@@ -231,15 +240,16 @@ bool KABSCHSerialKernel::calculate_rotation_matrix(
 		return(false);
 	}
 
+	//cout<<"Reigenvec "<<right_eigenvec[0][0]<<endl;
 	/* right_eigenvec's should be an orthogonal system but could be left
-	* or right-handed. Let's force into right-handed system.
-	*/
+	 * or right-handed. Let's force into right-handed system.
+	 */
 	RMSDTools::cross(&right_eigenvec[2][0], &right_eigenvec[0][0], &right_eigenvec[1][0]);
 
 	/* From the Kabsch algorithm, the eigenvec's of RtR
-	* are identical to the right_eigenvec's of R.
-	* This means that left_eigenvec = R x right_eigenvec
-	*/
+	 * are identical to the right_eigenvec's of R.
+	 * This means that left_eigenvec = R x right_eigenvec
+	 */
 	for (i=0; i<3; i++){
 		for (j=0; j<3; j++){
 			left_eigenvec[i][j] = RMSDTools::dot(&right_eigenvec[i][0], &Rt[j][0]);
@@ -250,13 +260,14 @@ bool KABSCHSerialKernel::calculate_rotation_matrix(
 		RMSDTools::normalize(&left_eigenvec[i][0]);
 	}
 
+	//cout<<"Leigenvec "<<left_eigenvec[0][0]<<endl;
 	/*
-	* Force left_eigenvec[2] to be orthogonal to the other vectors.
-	* First check if the rotational matrices generated from the
-	* orthogonal eigenvectors are in a right-handed or left-handed
-	* co-ordinate system - given by sigma. Sigma is needed to
-	* resolve this ambiguity in calculating the RMSD.
-	*/
+	 * Force left_eigenvec[2] to be orthogonal to the other vectors.
+	 * First check if the rotational matrices generated from the
+	 * orthogonal eigenvectors are in a right-handed or left-handed
+	 * co-ordinate system - given by sigma. Sigma is needed to
+	 * resolve this ambiguity in calculating the RMSD.
+	 */
 	RMSDTools::cross(v, &left_eigenvec[0][0], &left_eigenvec[1][0]);
 
 	if(RMSDTools::dot(v, &left_eigenvec[2][0]) < 0.0){
@@ -272,19 +283,22 @@ bool KABSCHSerialKernel::calculate_rotation_matrix(
 
 	/* calc optimal rotation matrix U that minimizes residual */
 	for (i=0;i<3; i++){
-		for (j=0; j<3; j++)
-		{
-		  U[i][j] = 0.0;
-		  for (k=0; k<3; k++){
-			  U[i][j] += left_eigenvec[k][i] * right_eigenvec[k][j];
-		  }
+		for (j=0; j<3; j++){
+			U[i][j] = 0.0;
+			for (k=0; k<3; k++){
+				//cout<<"U["<<i<<"]["<<j<<"] "<<left_eigenvec[k][i] <<" "<< right_eigenvec[k][j]<<endl;
+				if(!isnan(left_eigenvec[k][i]) && !isnan(right_eigenvec[k][i]))
+					U[i][j] += left_eigenvec[k][i] * right_eigenvec[k][j];
+			}
+			//cout<<"U["<<i<<"]["<<j<<"] "<<U[i][j]<<endl;
 		}
 	}
 
 	*residual = E0 - (double) sqrt(fabs(eigenval[0]))
-				 - (double) sqrt(fabs(eigenval[1]))
-				 - sigma * (double) sqrt(fabs(eigenval[2]));
+						 - (double) sqrt(fabs(eigenval[1]))
+						 - sigma * (double) sqrt(fabs(eigenval[2]));
 
+	//cout<<"Residual/E0 "<<*residual<<" "<<E0<<endl;
 	return (true);
 }
 

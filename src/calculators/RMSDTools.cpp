@@ -273,117 +273,88 @@ void RMSDTools::jacobi(double a[4][4], double d[4], double v[4][4], int nrot){
 	}
 }
 
-/*
- * diagonalize_symmetric
- *
- *    Diagonalize a 3x3 matrix & sort eigenval by size
- */
-bool RMSDTools::diagonalize_symmetric(double matrix[3][3],
-                          double eigen_vec[3][3],
-                          double eigenval[3])
-{
-  int i, j, k;
-  double vec[3][3];
-  double val;
-
-  if (!RMSDTools::jacobi3(matrix, eigenval, vec))
-  {
-    cout<<"[ERROR RMSDTools::diagonalize_symmetric] Convergence failed\n"<<endl;
-    return (false);
-  }
-
-  /* sort solutions by eigenval */
-  for (i=0; i<3; i++)
-  {
-    k = i;
-    val = eigenval[i];
-
-    for (j=i+1; j<3; j++)
-      if (eigenval[j] >= val)
-      {
-        k = j;
-        val = eigenval[k];
-      }
-
-    if (k != i)
-    {
-      eigenval[k] = eigenval[i];
-      eigenval[i] = val;
-      for (j=0; j<3; j++)
-      {
-        val = vec[j][i];
-        vec[j][i] = vec[j][k];
-        vec[j][k] = val;
-      }
-    }
-  }
-
-  /* transpose such that first index refers to solution index */
-  for (i=0; i<3; i++)
-    for (j=0; j<3; j++)
-      eigen_vec[i][j] = vec[j][i];
-
-  return (true);
+void RMSDTools::transposeMatrix(const double (*const source_matrix)[3], double matrix[3][3]){
+	for (int i = 0; i < 3; i++){
+		for (int j = 0; j < 3; j++){
+			matrix[i][j] = source_matrix[j][i];
+		}
+	}
 }
-//bool RMSDTools::diagonalize_symmetric(
-//		double matrix[3][3],
-//        double eigen_vec[3][3],
-//        double eigenval[3]){
+
+void RMSDTools::transposeMatrix(const double (*const source_matrix)[4], double matrix[3][3]){
+	for (int i = 0; i < 3; i++){
+		for (int j = 0; j < 3; j++){
+			matrix[i][j] = source_matrix[j][i];
+		}
+	}
+}
+
+//-------------------------------------------
+// Code based on the work of Dr. Bosco K. Ho
 //
-//	int i, j, k;
-//	double vec[4][4];
-//	double val;
+// http://boscoh.com/code/rmsd.c
 //
-//	double tmp_matrix[4][4];
-//
-//	for(int i = 0; i <4; ++i){
-//		for(int j = 0; j< 4; ++j){
-//			tmp_matrix[i][j] = 0.;
-//		}
-//	}
-//
-//	for(int i = 0; i <3; ++i){
-//		for(int j = 0; j< 3;++j){
-//			tmp_matrix[i][j] = matrix[i][j];
-//		}
-//	}
-//
-//	tmp_matrix[3][3] = 1;
-//
-//	RMSDTools::jacobi(tmp_matrix, eigenval, vec);
-//
-//	/* sort solutions by eigenval */
-//	for (i=0; i < 3; i++){
-//		k = i;
-//		val = eigenval[i];
-//
-//		for (j=i+1; j<3; j++){
-//			if (eigenval[j] >= val)	{
-//				k = j;
-//				val = eigenval[k];
-//			}
-//		}
-//
-//		if (k != i){
-//			eigenval[k] = eigenval[i];
-//			eigenval[i] = val;
-//			for (j=0; j<3; j++){
-//				val = vec[j][i];
-//				vec[j][i] = vec[j][k];
-//				vec[j][k] = val;
-//			}
-//		}
-//	}
-//
-//	/* transpose such that first index refers to solution index */
-//	for (i = 0; i < 3; i++){
-//		for (j = 0; j < 3; j++){
-//			eigen_vec[i][j] = vec[j][i];
-//		}
-//	}
-//
-//	return (true);
-//}
+//-------------------------------------------
+/*
+ *    Diagonalize a 3x3 matrix & sort eigenval by magnitude
+ */
+bool RMSDTools::diagonalize_symmetric(
+		double matrix[3][3],
+        double eigen_vec[3][3],
+        double eigenval[3]){
+
+	double val;
+	double vec[4][4];
+
+	double tmp_matrix[4][4];
+	RMSDTools::initializeTo(tmp_matrix[0],0,16);
+
+	for(int i = 0; i <3; ++i){
+		for(int j = 0; j< 3;++j){
+			tmp_matrix[i][j] = matrix[i][j];
+		}
+	}
+
+	RMSDTools::jacobi(tmp_matrix, eigenval, vec);
+
+	//Sort solutions by eigenvalue
+	int k;
+	for (int i = 0; i < 4; ++i){
+		k = i;
+		val = eigenval[i];
+
+		// Find a bigger eigenvalue
+		for (int j = i+1; j < 4; j++){
+			if (eigenval[j] > val)	{
+				k = j;
+				val = eigenval[k];
+			}
+		}
+
+		// If there was a bigger eigenvalue...
+		if (k != i){
+			eigenval[k] = eigenval[i];
+			eigenval[i] = val;
+			// Swap columns i and j
+			for (int j = 0; j < 4; ++j){
+				swap(vec[j][i],vec[j][k]);
+				/*val = vec[j][i];
+				vec[j][i] = vec[j][k];
+				vec[j][k] = val;*/
+			}
+		}
+	}
+
+	// Transpose such that first index refers to solution index
+	/*for (int i = 0; i < 3; i++){
+		for (int j = 0; j < 3; j++){
+			eigen_vec[i][j] = vec[j][i];
+		}
+	}*/
+	RMSDTools::transposeMatrix(vec,eigen_vec);
+
+	return (true);
+}
 
 void RMSDTools::normalize(double* a){
   double  b;
@@ -403,136 +374,3 @@ void RMSDTools::cross(double* a, double* b, double* c)	{
 	  a[1] = b[2]*c[0] - b[0]*c[2];
 	  a[2] = b[0]*c[1] - b[1]*c[0];
 }
-
-
-#define ROTATE(a,i,j,k,l) { g = a[i][j]; \
-                            h = a[k][l]; \
-                            a[i][j] = g-s*(h+g*tau); \
-                            a[k][l] = h+s*(g-h*tau); }
-/*
- * jacobi3
- *
- *    computes eigenval and eigen_vec of a real 3x3
- * symmetric matrix. On output, elements of a that are above
- * the diagonal are destroyed. d[1..3] returns the
- * eigenval of a. v[1..3][1..3] is a matrix whose
- * columns contain, on output, the normalized eigen_vec of
- * a. n_rot returns the number of Jacobi rotations that were required.
- */
-bool RMSDTools::jacobi3(double a[3][3], double d[3], double v[3][3], int n_rot)
-{
-  int count, k, i, j;
-  double tresh, theta, tau, t, sum, s, h, g, c, b[3], z[3];
-
-  /*Initialize v to the identity matrix.*/
-  for (i=0; i<3; i++)
-  {
-    for (j=0; j<3; j++)
-      v[i][j] = 0.0;
-    v[i][i] = 1.0;
-  }
-
-  /* Initialize b and d to the diagonal of a */
-  for (i=0; i<3; i++)
-    b[i] = d[i] = a[i][i];
-
-  /* z will accumulate terms */
-  for (i=0; i<3; i++)
-    z[i] = 0.0;
-
-  n_rot = 0;
-
-  /* 50 tries */
-  for (count=0; count<50; count++)
-  {
-
-    /* sum off-diagonal elements */
-    sum = 0.0;
-    for (i=0; i<2; i++)
-    {
-      for (j=i+1; j<3; j++)
-         sum += fabs(a[i][j]);
-    }
-
-    /* if converged to machine underflow */
-    if (sum == 0.0)
-      return(true);
-
-    /* on 1st three sweeps... */
-    if (count < 3)
-      tresh = sum * 0.2 / 9.0;
-    else
-      tresh = 0.0;
-
-    for (i=0; i<2; i++)
-    {
-      for (j=i+1; j<3; j++)
-      {
-        g = 100.0 * fabs(a[i][j]);
-
-        /*  after four sweeps, skip the rotation if
-         *   the off-diagonal element is small
-         */
-        if ( count > 3  &&  fabs(d[i])+g == fabs(d[i])
-              &&  fabs(d[j])+g == fabs(d[j]) )
-        {
-          a[i][j] = 0.0;
-        }
-        else if (fabs(a[i][j]) > tresh)
-        {
-          h = d[j] - d[i];
-
-          if (fabs(h)+g == fabs(h))
-          {
-            t = a[i][j] / h;
-          }
-          else
-          {
-            theta = 0.5 * h / (a[i][j]);
-            t = 1.0 / ( fabs(theta) +
-                        (double)sqrt(1.0 + theta*theta) );
-            if (theta < 0.0)
-              t = -t;
-          }
-
-          c = 1.0 / (double) sqrt(1 + t*t);
-          s = t * c;
-          tau = s / (1.0 + c);
-          h = t * a[i][j];
-
-          z[i] -= h;
-          z[j] += h;
-          d[i] -= h;
-          d[j] += h;
-
-          a[i][j] = 0.0;
-
-          for (k=0; k<=i-1; k++)
-            ROTATE(a, k, i, k, j)
-
-          for (k=i+1; k<=j-1; k++)
-            ROTATE(a, i, k, k, j)
-
-          for (k=j+1; k<3; k++)
-            ROTATE(a, i, k, j, k)
-
-          for (k=0; k<3; k++)
-            ROTATE(v, k, i, k, j)
-
-          ++n_rot;
-        }
-      }
-    }
-
-    for (i=0; i<3; i++)
-    {
-      b[i] += z[i];
-      d[i] = b[i];
-      z[i] = 0.0;
-    }
-  }
-
-  return (false);
-}
-
-
