@@ -260,9 +260,18 @@ __global__ void calcRMSDOfOneVsFollowing(
 	
 	floating_point_type* first_conformation_coords = &(all_coordinates[base_conformation_id*coordinates_per_conformation]);
 	int second_conformation_id = other_conformations_starting_id + (blockDim.x*blockIdx.x + threadIdx.x);
+
 	while(second_conformation_id < number_of_conformations){
 		floating_point_type* second_conformation_coords = &(all_coordinates[second_conformation_id*coordinates_per_conformation]);
-		rmsd[second_conformation_id] = calcRMSDOfTwoConformations(first_conformation_coords, second_conformation_coords, atoms_per_conformation);
+
+		rmsd[second_conformation_id-(base_conformation_id+1)] = calcRMSDOfTwoConformations(
+				first_conformation_coords,
+				second_conformation_coords,
+				atoms_per_conformation);
+
+		/*rmsd[second_conformation_id] = calcRMSDOfTwoConformations(first_conformation_coords, second_conformation_coords, atoms_per_conformation);
+		*/
+
 		second_conformation_id += blockDim.x*gridDim.x;
 	}
 }

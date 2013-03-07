@@ -175,8 +175,8 @@ def availableCalculators():
     return {
             "KABSCH_PYTHON_CALCULATOR":-1, 
             "KABSCH_SERIAL_CALCULATOR": 0, 
-            #"KABSCH_OMP_CALCULATOR":1, 
-            "KABSCH_CUDA_CALCULATOR":2, 
+            "KABSCH_OMP_CALCULATOR":1, 
+            #"KABSCH_CUDA_CALCULATOR":2, 
             "QTRFIT_SERIAL_CALCULATOR":3,
             "QTRFIT_OMP_CALCULATOR":4,
             #"QTRFIT_CUDA_CALCULATOR":5,

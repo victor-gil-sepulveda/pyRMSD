@@ -30,6 +30,19 @@ class QCPCUDAKernel: public KernelFunctions{
 
 		virtual void changeCalculationCoords(double*);
 
+		void updateDeviceCoordinates(
+				int numberOfConformations,
+				int coordinatesPerConformation,
+				double * allCoordinates
+				);
+
+		void updateHostRMSDs(
+				int numberOfConformations,
+				int reference_conformation_number,
+				double* rmsd
+				);
+
+
 		double calcRMSDOfTwoConformations( double* first_conformation_coords, double* second_conformation_coords,
 				int number_of_atoms, double* rot_matrix = NULL);
 

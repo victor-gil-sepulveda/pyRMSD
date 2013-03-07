@@ -57,7 +57,6 @@ void QCPOmpKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
 	}
 }
 
-
 void QCPOmpKernel::oneVsFollowingFitEqualCalcWithConfRotation(
 		double* reference,
 		int reference_conformation_number,
@@ -89,7 +88,6 @@ void QCPOmpKernel::oneVsFollowingFitEqualCalcWithConfRotation(
 		RMSDTools::rotate3D(atomsPerConformation, second_conformation_coords, rot_matrix);
 	}
 }
-
 
 void QCPOmpKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
 		double* fitReference,
