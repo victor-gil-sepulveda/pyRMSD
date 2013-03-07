@@ -319,7 +319,6 @@ void QCPSerialKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
 	}
 }
 
-
 void QCPSerialKernel::oneVsFollowingFitEqualCalcWithConfRotation(
 		double* reference,
 		int reference_conformation_number,
@@ -350,7 +349,6 @@ void QCPSerialKernel::oneVsFollowingFitEqualCalcWithConfRotation(
 		RMSDTools::rotate3D(atomsPerConformation, second_conformation_coords, rot_matrix);
 	}
 }
-
 
 void QCPSerialKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
 		double* fitReference,
@@ -394,7 +392,8 @@ void QCPSerialKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
 		delete [] calc_conformation_coords_copy;
 	}
 }
-void QCPSerialKernel::oneVsAllFitDiffersCalcWithConfRotation(
+
+void QCPSerialKernel::oneVsFollowingFitDiffersCalcWithConfRotation(
 		double* fitReference,
 		double* calcReference,
 		int reference_conformation_number,

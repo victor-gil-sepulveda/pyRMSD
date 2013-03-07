@@ -52,7 +52,7 @@ class KernelFunctions{
 				int atomsPerRMSDConformation,
 				double *allRMSDCoordinates) = 0;
 
-		virtual void oneVsAllFitDiffersCalcWithConfRotation(
+		virtual void oneVsFollowingFitDiffersCalcWithConfRotation(
 				double* fitReference,
 				double* calcReference,
 				int reference_conformation_number,

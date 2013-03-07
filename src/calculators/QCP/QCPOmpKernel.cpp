@@ -134,7 +134,7 @@ void QCPOmpKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
 		delete [] calc_conformation_coords_copy;
 	}
 }
-void QCPOmpKernel::oneVsAllFitDiffersCalcWithConfRotation(
+void QCPOmpKernel::oneVsFollowingFitDiffersCalcWithConfRotation(
 		double* fitReference,
 		double* calcReference,
 		int reference_conformation_number,

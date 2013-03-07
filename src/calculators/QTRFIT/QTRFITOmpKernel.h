@@ -46,7 +46,7 @@ class QTRFITOmpKernel: public QTRFITSerialKernel {
 				int atomsPerRMSDConformation,
 				double *allRMSDCoordinates);
 
-		virtual void oneVsAllFitDiffersCalcWithConfRotation(
+		virtual void oneVsFollowingFitDiffersCalcWithConfRotation(
 				double* fitReference,
 				double* calcReference,
 				int reference_conformation_number,

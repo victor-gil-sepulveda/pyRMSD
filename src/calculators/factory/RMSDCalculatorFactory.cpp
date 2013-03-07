@@ -8,6 +8,7 @@
 #include "RMSDCalculatorFactory.h"
 #include "../KernelFunctions.h"
 #include "../RMSDCalculator.h"
+#include "../KABSCH/KABSCHSerialKernel.h"
 #include "../QTRFIT/QTRFITSerialKernel.h"
 #include "../QTRFIT/QTRFITOmpKernel.h"
 #include "../QCP/QCPSerialKernel.h"
@@ -38,7 +39,7 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 
 	switch (type) {
 		case KABSCH_SERIAL_CALCULATOR:
-					kernelFunctions = NULL;
+					kernelFunctions = new KABSCHSerialKernel;
 					break;
 
 		case KABSCH_OMP_CALCULATOR:
@@ -51,6 +52,15 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 
 		case QTRFIT_OMP_CALCULATOR:
 					kernelFunctions = new QTRFITOmpKernel(number_of_threads);
+					break;
+
+
+		case QCP_SERIAL_CALCULATOR:
+					kernelFunctions = new QCPSerialKernel;
+					break;
+
+		case QCP_OMP_CALCULATOR:
+					kernelFunctions = new QCPOmpKernel(number_of_threads);
 					break;
 
 #ifdef USE_CUDA
@@ -68,15 +78,6 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 							blocks_per_grid);
 					break;
 #endif
-
-		case QCP_SERIAL_CALCULATOR:
-					kernelFunctions = new QCPSerialKernel;
-					break;
-
-		case QCP_OMP_CALCULATOR:
-					kernelFunctions = new QCPOmpKernel(number_of_threads);
-					break;
-
 
 		default:
 			cout<<"[ERROR] Not kernel type implementation for type: "<<calculatorTypeToString(type)<<endl;

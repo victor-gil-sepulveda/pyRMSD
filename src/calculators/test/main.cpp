@@ -7,6 +7,7 @@ using std::vector;
 int main(int argc, char **argv){
 
 	RMSDCalculatorType available_calculators_d [] =  {
+			KABSCH_SERIAL_CALCULATOR,
 			QTRFIT_SERIAL_CALCULATOR,
 			QTRFIT_OMP_CALCULATOR,
 			QCP_SERIAL_CALCULATOR,
@@ -26,7 +27,6 @@ int main(int argc, char **argv){
 
 	test_QCP_Kernel();
 	test_KABSCH_Kernel();
-		exit(1);
 
 	for(unsigned int i = 0; i < available_calculators.size();++i)
 		test_superposition_with_coordinates_change(available_calculators[i]);

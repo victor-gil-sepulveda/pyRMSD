@@ -53,9 +53,9 @@ public:
 			double *allCoordinates,
 			int coordinatesPerRMSDConformation,
 			int atomsPerRMSDConformation,
-			double *allRMSDCoordinates){};
+			double *allRMSDCoordinates);
 
-	virtual void oneVsAllFitDiffersCalcWithConfRotation(
+	virtual void oneVsFollowingFitDiffersCalcWithConfRotation(
 			double* fitReference,
 			double* calcReference,
 			int reference_conformation_number,
@@ -66,7 +66,7 @@ public:
 			double *allCoordinates,
 			int coordinatesPerRMSDConformation,
 			int atomsPerRMSDConformation,
-			double *allRMSDCoordinates){};
+			double *allRMSDCoordinates);
 
 	void calc_correlation_matrix_and_E0(
 			double (*const R)[3],

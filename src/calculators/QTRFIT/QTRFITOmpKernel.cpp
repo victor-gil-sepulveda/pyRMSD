@@ -86,7 +86,7 @@ void QTRFITOmpKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
 	}
 }
 
-void QTRFITOmpKernel::oneVsAllFitDiffersCalcWithConfRotation(
+void QTRFITOmpKernel::oneVsFollowingFitDiffersCalcWithConfRotation(
 		double* fitReference, double* calcReference, int reference_conformation_number,
 		double* rmsd, int numberOfConformations,
 		int coordinatesPerConformation, int atomsPerConformation, double *allCoordinates,

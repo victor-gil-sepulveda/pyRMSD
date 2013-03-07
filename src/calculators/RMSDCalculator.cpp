@@ -167,7 +167,7 @@ void RMSDCalculator::_one_vs_following_fit_differs_calc_coords_changing_coordina
 	delete [] fitCenters;
 	delete [] calcCenters;
 
-	this->kernelFunctions->oneVsAllFitDiffersCalcWithConfRotation(
+	this->kernelFunctions->oneVsFollowingFitDiffersCalcWithConfRotation(
 			fitReference,
 			calcReference,
 			reference_conformation_number,
@@ -225,6 +225,7 @@ void RMSDCalculator::iterativeSuperposition(double rmsd_diff_to_stop){
 // In this case (used for iterative superposition) conformations are recentered over the reference conformation.
 void RMSDCalculator::superposition_with_external_reference_and_fit_equals_calc(double* reference, double* rmsds){
 	double reference_center[3];
+
 	RMSDTools::centerAllAtOrigin(atomsPerConformation, 1, reference, reference_center);
 
 	_one_vs_following_fit_equals_calc_coords_changing_coordinates(reference, -1, rmsds);
