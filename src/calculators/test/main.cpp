@@ -8,6 +8,7 @@ int main(int argc, char **argv){
 
 	RMSDCalculatorType available_calculators_d [] =  {
 			KABSCH_SERIAL_CALCULATOR,
+			KABSCH_OMP_CALCULATOR,
 			QTRFIT_SERIAL_CALCULATOR,
 			QTRFIT_OMP_CALCULATOR,
 			QCP_SERIAL_CALCULATOR,

@@ -16,7 +16,8 @@ CUDA_INCLUDE_FOLDER = CUDA_BASE+"/include"         # CUDA headers path
 CUDA_LIBRARIES_FOLDER = CUDA_BASE+"/lib64"            # CUDA libs path ( /lib if you're running it in a 32b machine)
 CUDA_ARCHITECHTURE = "sm_11"                         # CUDA architecture of your card.
 CUDA_LIBRARY = "cudart"
-PYTHON_EXTENSION_OPTIONS = "-pthread -fno-strict-aliasing -fmessage-length=0 -O3 -Wall -D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -fPIC"
+PYTHON_EXTENSION_OPTIONS = "-pthread -g -fno-strict-aliasing -fmessage-length=0 -O3 -Wall \
+-D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -fPIC"
 PYTHON_INCLUDE_FOLDER = os.path.dirname(sysconfig.get_paths()['include'])
 PYTHON_LIBRARY_FOLDER = os.path.dirname(sysconfig.get_paths()['stdlib'])
 PYTHON_LIBRARY = "python2.7"
@@ -63,7 +64,7 @@ if __name__ == '__main__':
     }
     
     files_to_compile_with_gcc = {
-                                 "src/calculators":["RMSDCalculator.cpp"],
+                                 "src/calculators":["RMSDCalculator.cpp","RMSDTools.cpp"],
                                  "src/calculators/factory":["RMSDCalculatorFactory.cpp"],
                                  "src/calculators/KABSCH":["KABSCHSerialKernel.cpp"],
                                  "src/calculators/QTRFIT":["QTRFITSerialKernel.cpp"],
@@ -75,7 +76,7 @@ if __name__ == '__main__':
     }
     
     files_to_compile_with_gcc_and_openmp = {
-                                            "src/calculators":["RMSDTools.cpp"],
+                                            "src/calculators/KABSCH":["KABSCHOmpKernel.cpp"],
                                             "src/calculators/QTRFIT":["QTRFITOmpKernel.cpp"],
                                             "src/calculators/QCP":["QCPOmpKernel.cpp"],
     }
@@ -119,6 +120,7 @@ if __name__ == '__main__':
     calculator_obj_files = [
                             files_to_link["RMSDTools"],
                             files_to_link["KABSCHSerialKernel"],
+                            files_to_link["KABSCHOmpKernel"],
                             files_to_link["QTRFITSerialKernel"],
                             files_to_link["QTRFITOmpKernel"],
                             files_to_link["QCPSerialKernel"],
@@ -170,12 +172,34 @@ if __name__ == '__main__':
     if options.use_cuda:
         calcs_str = """
 def availableCalculators():
-    return {"KABSCH_PYTHON_CALCULATOR":-1,"QTRFIT_SERIAL_CALCULATOR":2,"QTRFIT_OMP_CALCULATOR":3,"QCP_SERIAL_CALCULATOR":5,"QCP_OMP_CALCULATOR":6,"QCP_CUDA_CALCULATOR":7}
+    return {
+            "KABSCH_PYTHON_CALCULATOR":-1, 
+            "KABSCH_SERIAL_CALCULATOR": 0, 
+            #"KABSCH_OMP_CALCULATOR":1, 
+            "KABSCH_CUDA_CALCULATOR":2, 
+            "QTRFIT_SERIAL_CALCULATOR":3,
+            "QTRFIT_OMP_CALCULATOR":4,
+            #"QTRFIT_CUDA_CALCULATOR":5,
+            "QCP_SERIAL_CALCULATOR":6,
+            "QCP_OMP_CALCULATOR":7,
+            "QCP_CUDA_CALCULATOR":8
+    }
 """
     else:
         calcs_str = """
 def availableCalculators():
-    return {"KABSCH_PYTHON_CALCULATOR":-1,"QTRFIT_SERIAL_CALCULATOR":2,"QTRFIT_OMP_CALCULATOR":3,"QCP_SERIAL_CALCULATOR":5,"QCP_OMP_CALCULATOR":6}
+    return {
+            "KABSCH_PYTHON_CALCULATOR":-1, 
+            "KABSCH_SERIAL_CALCULATOR": 0, 
+            "KABSCH_OMP_CALCULATOR":1, 
+            #"KABSCH_CUDA_CALCULATOR":2, 
+            "QTRFIT_SERIAL_CALCULATOR":3,
+            "QTRFIT_OMP_CALCULATOR":4,
+            #"QTRFIT_CUDA_CALCULATOR":5,
+            "QCP_SERIAL_CALCULATOR":6,
+            "QCP_OMP_CALCULATOR":7,
+            #"QCP_CUDA_CALCULATOR":8
+    }
 """
     os.system('echo "\033[33mWriting available calculators...\033[0m"')
     open("pyRMSD/availableCalculators.py","w").write(calcs_str)

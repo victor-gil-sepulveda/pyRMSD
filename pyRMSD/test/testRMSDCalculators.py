@@ -102,6 +102,24 @@ class TestRMSDCalculators(unittest.TestCase):
         rmsd = calculator.pairwiseRMSDMatrix()
         numpy.testing.assert_array_almost_equal(rmsd, expected_rmsd_data,4)
     
+    def test_kabsch_serial(self):
+        """
+        Calculates the whole pairwise matrix by calculating each of the rows of the matrix.
+        """
+        for conf_num in self.expected_rmsd:
+            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(self.coordsets, "KABSCH_SERIAL_CALCULATOR")
+            rmsd = calculator.oneVsFollowing(conf_num)
+            numpy.testing.assert_array_almost_equal(rmsd, self.expected_rmsd[conf_num],8)
+    
+    def test_kabsch_OpenMP(self):
+        """
+        Calculates the whole pairwise matrix by calculating each of the rows of the matrix.
+        """
+        for conf_num in self.expected_rmsd:
+            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(self.coordsets, "KABSCH_OMP_CALCULATOR")
+            rmsd = calculator.oneVsFollowing(conf_num)
+            numpy.testing.assert_array_almost_equal(rmsd, self.expected_rmsd[conf_num],8)
+    
     def test_serial(self):
         """
         Calculates the whole pairwise matrix by calculating each of the rows of the matrix.

@@ -12,11 +12,15 @@ using namespace std;
  * Centers all the conformations to origin and stores the movement vectors.
  *
  */
-void RMSDTools::centerAllAtOrigin(unsigned int atomsPerConformation, unsigned int numberOfConformations, double * const all_coords, double* const translations){
+void RMSDTools::centerAllAtOrigin(
+		unsigned int atomsPerConformation,
+		unsigned int numberOfConformations,
+		double * const all_coords,
+		double* const translations){
 
 	unsigned int coordsPerConformation = atomsPerConformation * 3;
 
-	#pragma omp parallel for
+	//#pragma omp parallel for
 	for (unsigned int i = 0; i < numberOfConformations; ++i){
 		double* center = &(translations[3*i]);
 		double* coords = &(all_coords[coordsPerConformation*i]);
@@ -28,7 +32,7 @@ void RMSDTools::centerAllAtOrigin(unsigned int atomsPerConformation, unsigned in
 void RMSDTools::applyTranslationsToAll(unsigned int atomsPerConformation, unsigned int numberOfConformations, double * const all_coords, double* const translations){
 	unsigned int coordsPerConformation = atomsPerConformation * 3;
 
-	#pragma omp parallel for
+	//#pragma omp parallel for
 	for (unsigned int i = 0; i < numberOfConformations; ++i){
 		double* translation_vector = &(translations[3*i]);
 		double* coords = &(all_coords[coordsPerConformation*i]);
@@ -39,7 +43,7 @@ void RMSDTools::applyTranslationsToAll(unsigned int atomsPerConformation, unsign
 void RMSDTools::applyTranslationToAll(unsigned int atomsPerConformation, unsigned int numberOfConformations, double * const all_coords, double* const translation_vector){
 	unsigned int coordsPerConformation = atomsPerConformation * 3;
 
-	#pragma omp parallel for
+	//#pragma omp parallel for
 	for (unsigned int i = 0; i < numberOfConformations; ++i){
 		double* coords = &(all_coords[coordsPerConformation*i]);
 		RMSDTools::shift3D(atomsPerConformation, coords, translation_vector, 1.);
@@ -139,7 +143,7 @@ void RMSDTools::calculateMeanCoordinates(double* meanCoordinates, double* allCoo
 	// Do calculation
 	for (int i  = 0; i <  numberOfConformations; ++i){
 		int conformation_offset = i*atomsPerConformation*3;
-		#pragma omp parallel for shared(meanCoordinates)
+		//#pragma omp parallel for shared(meanCoordinates)
 		for (int j = 0; j < atomsPerConformation; ++j){
 			int atom_offset = 3*j;
 			int offset = conformation_offset + atom_offset;
@@ -150,7 +154,7 @@ void RMSDTools::calculateMeanCoordinates(double* meanCoordinates, double* allCoo
 	}
 
 	// Divide by the number of conformations
-	#pragma omp parallel for shared(meanCoordinates)
+	//#pragma omp parallel for shared(meanCoordinates)
 	for (int i = 0; i < atomsPerConformation*3; ++i){
 		meanCoordinates[i] /= numberOfConformations;
 	}

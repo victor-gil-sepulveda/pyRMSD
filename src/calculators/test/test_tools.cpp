@@ -49,10 +49,14 @@ void compareVectors(const char* message, const double * const expectedVector, co
 	}
 }
 
-bool expectedVectorEqualsCalculatedWithinPrecision(const double * const expectedVector, const double * const calculatedVector, int dimension, double precision){
+bool expectedVectorEqualsCalculatedWithinPrecision(
+		const double * const expectedVector,
+		const double * const calculatedVector,
+		int dimension,
+		double precision){
 	bool equal = true;
 
-    for(int i=0;i<dimension;++i)
+    for(int i = 0; i < dimension; ++i)
     {
         if( isnan(calculatedVector[i]) || fabs(expectedVector[i]-calculatedVector[i]) >= precision )
         {

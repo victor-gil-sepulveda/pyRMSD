@@ -9,6 +9,7 @@
 #include "../KernelFunctions.h"
 #include "../RMSDCalculator.h"
 #include "../KABSCH/KABSCHSerialKernel.h"
+#include "../KABSCH/KABSCHOmpKernel.h"
 #include "../QTRFIT/QTRFITSerialKernel.h"
 #include "../QTRFIT/QTRFITOmpKernel.h"
 #include "../QCP/QCPSerialKernel.h"
@@ -43,7 +44,7 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 					break;
 
 		case KABSCH_OMP_CALCULATOR:
-					kernelFunctions = NULL;
+					kernelFunctions = new KABSCHOmpKernel(number_of_threads);
 					break;
 
 		case QTRFIT_SERIAL_CALCULATOR:
