@@ -136,9 +136,9 @@ void test_superposition_with_coordinates_change(RMSDCalculatorType type){
 	delete calculator;
 }
 
-void test_iterative_superposition_with_equal_calc_and_fit_sets(RMSDCalculatorType type){
+void test_iterative_superposition_with_equal_calc_and_fit_sets(RMSDCalculatorType type, double precision_of_check){
 	print_test_tittle(__FUNCTION__);
-	cout<<"- Using "<<calculatorTypeToString(type)<<":"<<endl;
+	cout<<"- Using "<<calculatorTypeToString(type)<<" (prec. "<<precision_of_check<<"):"<<endl;
 
 	int number_of_coordsets = 5;
 	int number_of_atoms = 3239;
@@ -161,13 +161,17 @@ void test_iterative_superposition_with_equal_calc_and_fit_sets(RMSDCalculatorTyp
 
 
 	calculator->iterativeSuperposition();
-	compareVectors("\tTesting iterposed coordinates: ", &(iterposed_coordinates[0]),&(not_aligned_coordinates[0]), not_aligned_coordinates.size(), 1e-6);
+	compareVectors("\tTesting iterposed coordinates: ",
+			&(iterposed_coordinates[0]),
+			&(not_aligned_coordinates[0]),
+			not_aligned_coordinates.size(),
+			precision_of_check);
 	delete calculator;
 }
 
-void test_iterative_superposition_with_different_calc_and_fit_sets(RMSDCalculatorType type){
+void test_iterative_superposition_with_different_calc_and_fit_sets(RMSDCalculatorType type, double precision_check){
 	print_test_tittle(__FUNCTION__);
-	cout<<"- Using "<<calculatorTypeToString(type)<<":"<<endl;
+	cout<<"- Using "<<calculatorTypeToString(type)<<" (prec. "<<precision_check<<"):"<<endl;
 
 	int number_of_coordsets = 5;
 	int number_of_atoms = 3239;
@@ -193,14 +197,14 @@ void test_iterative_superposition_with_different_calc_and_fit_sets(RMSDCalculato
 
 	calculator->setCalculationCoordinates(number_of_atoms, &(not_iterposed_coordinates[0]));
 	calculator->iterativeSuperposition();
-	compareVectors("\tTesting iterposed coordinates: ", &(iterposed_coordinates[0]),&(not_iterposed_coordinates[0]), not_iterposed_coordinates.size(), 1e-6);
+	compareVectors("\tTesting iterposed coordinates: ", &(iterposed_coordinates[0]),&(not_iterposed_coordinates[0]), not_iterposed_coordinates.size(), precision_check);
 	//writeVector( not_iterposed_coordinates, "vector.out");
 	delete calculator;
 }
 
-void test_superposition_with_different_fit_and_calc_coordsets(RMSDCalculatorType type){
+void test_superposition_with_different_fit_and_calc_coordsets(RMSDCalculatorType type, double precision_check){
 	print_test_tittle(__FUNCTION__);
-	cout<<"- Using "<<calculatorTypeToString(type)<<":"<<endl;
+	cout<<"- Using "<<calculatorTypeToString(type)<<" (prec. "<<precision_check<<"):"<<endl;
 
 	int number_of_coordsets = 5;
 	int number_of_atoms = 3239;
@@ -230,7 +234,7 @@ void test_superposition_with_different_fit_and_calc_coordsets(RMSDCalculatorType
 	calculator1->oneVsFollowing(0, rmsds);
 	//print_vector("rmsd:",rmsds, 5);
 	double expected_rmsds []= {1.864003731005552, 2.076760850428891, 3.596135117728627, 2.182685209336899, 0};
-	compareVectors("\tTesting RMSD 1: ", expected_rmsds, rmsds, number_of_coordsets, 1e-12); // Only the fourth decimal, as it was obtained with cout without more precission:P
+	compareVectors("\tTesting RMSD 1: ", expected_rmsds, rmsds, number_of_coordsets, precision_check); // Only the fourth decimal, as it was obtained with cout without more precission:P
 	delete calculator1;
 
 	// RMSD of CA using CA for superposition (default behavior)
@@ -242,7 +246,7 @@ void test_superposition_with_different_fit_and_calc_coordsets(RMSDCalculatorType
 	calculator2->oneVsFollowing(0, rmsds);
 //	print_vector("rmsd:",rmsds, 5);
 	double expected_rmsds_2 []= {0.767947519172927, 0.8838644164683896, 0.4177715823462121, 0.3383320758562839, 0};
-	compareVectors("\tTesting RMSD 2: ", expected_rmsds_2, rmsds, number_of_coordsets, 1e-12);
+	compareVectors("\tTesting RMSD 2: ", expected_rmsds_2, rmsds, number_of_coordsets, precision_check);
 	delete calculator2;
 
 	// RMSD  of CA using CA for superposition (using the same selection and RMSD subsets)
@@ -254,7 +258,7 @@ void test_superposition_with_different_fit_and_calc_coordsets(RMSDCalculatorType
 	calculator3->setCalculationCoordinates(number_of_CAs, &(not_aligned_CA[0]));
 	calculator3->oneVsFollowing(0, rmsds);
 //	print_vector("rmsd:",rmsds, 5);
-	compareVectors("\tTesting RMSD 3: ", expected_rmsds_2, rmsds, number_of_coordsets, 1e-12);
+	compareVectors("\tTesting RMSD 3: ", expected_rmsds_2, rmsds, number_of_coordsets, precision_check);
 	delete calculator3;
 }
 

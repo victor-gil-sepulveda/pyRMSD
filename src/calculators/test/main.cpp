@@ -4,6 +4,21 @@
 #include <cstdlib>
 using std::vector;
 
+
+void set_precision_if(
+		RMSDCalculatorType calctype,
+		double alternative_precision,
+		double else_precision,
+		double& precision){
+	precision = else_precision;
+	#ifdef USE_CUDA
+		#ifdef CUDA_PRECISION_SINGLE
+		if (calctype == QCP_CUDA_CALCULATOR)
+			precision = alternative_precision;
+		#endif
+	#endif
+}
+
 int main(int argc, char **argv){
 
 	RMSDCalculatorType available_calculators_d [] =  {
@@ -17,7 +32,6 @@ int main(int argc, char **argv){
 			QCP_CUDA_CALCULATOR
 #endif
 	};
-
 
 	vector<RMSDCalculatorType> available_calculators( available_calculators_d,
 			available_calculators_d + sizeof(available_calculators_d)/sizeof(RMSDCalculatorType));
@@ -35,14 +49,30 @@ int main(int argc, char **argv){
 	test_superposition_with_coordinates_change(QTRFIT_OMP_CALCULATOR);
 
 	// Do those for all the others
-	for(unsigned int i = 0; i < available_calculators.size();++i)
-		test_superposition_with_different_fit_and_calc_coordsets(available_calculators[i]);
+	for(unsigned int i = 0; i < available_calculators.size();++i){
+		double precision;
+		set_precision_if(
+				available_calculators[i],
+				1e-4,
+				1e-6,
+				precision);
 
-	for(unsigned int i = 0; i < available_calculators.size();++i)
-		test_iterative_superposition_with_equal_calc_and_fit_sets(available_calculators[i]);
+		test_iterative_superposition_with_equal_calc_and_fit_sets(available_calculators[i], precision);
 
-	for(unsigned int i = 0; i < available_calculators.size();++i)
-		test_iterative_superposition_with_different_calc_and_fit_sets(available_calculators[i]);
+		set_precision_if(
+					available_calculators[i],
+					1e-4,
+					1e-12,
+					precision);
+		test_superposition_with_different_fit_and_calc_coordsets(available_calculators[i], precision);
+
+		set_precision_if(
+					available_calculators[i],
+					1e-4,
+					1e-6,
+					precision);
+		test_iterative_superposition_with_different_calc_and_fit_sets(available_calculators[i], precision);
+	}
 
 	return 0;
 }

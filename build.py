@@ -53,6 +53,7 @@ if __name__ == '__main__':
             parser.error("Please, choose  precision for CUDA building: 'single' or 'double'")
         options.use_cuda = True
         CUDA_OPTIONS = CUDA_OPTIONS +" -D"+CUDA_PRECISION_FLAG
+        DEFINE_USE_CUDA = DEFINE_USE_CUDA +" -D"+CUDA_PRECISION_FLAG
     else:
         options.use_cuda = False
     

@@ -3,7 +3,6 @@
 #include "kernel_functions_cuda.h"
 #include "QCPCUDAKernel.h"
 #include "../RMSDTools.h"
-
 using namespace std;
 
 ///////////////////////////////////////////////////////////////
@@ -18,9 +17,9 @@ using namespace std;
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-inline void checkCudaError(char* message, cudaError_t error_code){
+inline void checkCudaError(char* message, cudaError error_code){
 	if (error_code != 0){
-		std::cout<<"Error in "<<message<<" . Error code: "<<error_code<<". Exiting..."<<std::flush<<std::endl;
+		std::cout<<"Error in "<<message<<". Error code: "<<error_code<<". Exiting..."<<std::flush<<std::endl;
 		exit(-1);
 	}
 }
@@ -31,21 +30,23 @@ void QCPCUDAKernel::init(
 		int coordinatesPerConformation, 
 		int numberOfConformations){
 
-	int device;
-	cudaDeviceProp props;
 	
-	checkCudaError("cudaGetDevice",
-			cudaGetDevice(
-					&device));
-	
-	checkCudaError("cudaGetDeviceProperties",
-			cudaGetDeviceProperties(
-					&props, 
-					device));
-
-	if(!props.deviceOverlap){
-		cout<<"There are no multiple streams, so this implementation may not work properly :S"<<endl;
-	}
+//	Now I'm  not using streams anymore as it didn't give me any speedup
+//	int device;
+//	cudaDeviceProp props;
+//	
+//	checkCudaError("cudaGetDevice",
+//			cudaGetDevice(
+//					&device));
+//	
+//	checkCudaError("cudaGetDeviceProperties",
+//			cudaGetDeviceProperties(
+//					&props, 
+//					device));
+//
+//	if(!props.deviceOverlap){
+//		cout<<"There are no multiple streams, so this implementation may not work properly :S"<<endl;
+//	}
 
 	int totalNumberOfCoordinates = coordinatesPerConformation*numberOfConformations;
 
@@ -53,75 +54,162 @@ void QCPCUDAKernel::init(
 		// Allocate space for temporary coords
 		this->tmpHostCoords = new float[totalNumberOfCoordinates];
 		this->tmpHostRMSDs = new float[numberOfConformations];
-	#else
-		this->tmpHostCoords = NULL;
-		this->tmpHostRMSDs = NULL;//new double[numberOfConformations];
+		this->tmpHostReference = new float[coordinatesPerConformation];
+
 	#endif
 		
 	// GPU Data allocation for input
-	checkCudaError(" Malloc Device Coords. ", 
+	checkCudaError("Malloc Device Coords", 
+				cudaMalloc(
+						(void **) &deviceReference, 
+						coordinatesPerConformation * sizeof(floating_point_type)));
+	
+	checkCudaError("Malloc Device Coords", 
 			cudaMalloc(
 					(void **) &deviceCoords, 
 					totalNumberOfCoordinates * sizeof(floating_point_type)));
 	
 
 	// GPU Data allocation for output
-	checkCudaError(" Malloc RMSDs ", 
+	checkCudaError("Malloc RMSDs", 
 			cudaMalloc(
 					(void **) &deviceRMSDs, 
 					numberOfConformations * sizeof(floating_point_type)));
 
-	/*centerCoordsOfAllConformations<<<this->blocks_per_grid, this->threads_per_block>>>(
-			numberOfConformations,
-			atomsPerConformation,
-			deviceCoords);*/
+//	Coordinates come centered
+//	centerCoordsOfAllConformations<<<this->blocks_per_grid, this->threads_per_block>>>(
+//			numberOfConformations,
+//			atomsPerConformation,
+//			deviceCoords);
 }
 
 QCPCUDAKernel::~QCPCUDAKernel(){
-	checkCudaError(" deviceCoords cudaFree ", cudaFree(this->deviceCoords));
-	checkCudaError(" deviceRMSDs cudaFree ", cudaFree(this->deviceRMSDs));
+
+	checkCudaError("deviceReference cudaFree", 
+				cudaFree(this->deviceReference));
+	
+	checkCudaError("deviceCoords cudaFree", 
+			cudaFree(this->deviceCoords));
+	
+	checkCudaError("deviceRMSDs cudaFree", 
+			cudaFree(this->deviceRMSDs));
 
 	if (tmpHostCoords != NULL){
 		delete [] tmpHostCoords;
 	}
 
+	if (tmpHostReference != NULL){
+		delete [] tmpHostReference;
+	}
+	
 	if (tmpHostRMSDs != NULL){
 		delete [] tmpHostRMSDs;
 	}
-}
-
-void QCPCUDAKernel::changeCalculationCoords(double*){
-
 	
+	if (tmpCalcHostCoords != NULL){
+		delete [] tmpCalcHostCoords;
+	}
+
+	if (deviceCalcCoords != NULL){
+		checkCudaError("deviceCalcCoords cudaFree", 
+				cudaFree(this->deviceCalcCoords));
+	}
+
+	if (tmpCalcHostReference != NULL){
+		delete [] tmpCalcHostReference;
+	}
+
+	if (deviceCalcReference != NULL){
+		checkCudaError("deviceCalcReference cudaFree", 
+				cudaFree(this->deviceCalcReference));
+	}
 }
+
+void QCPCUDAKernel::changeCalculationCoords(
+		double* calcCoords, 
+		int number_of_atoms, 
+		int numberOfConformations){
+	
+	#ifdef CUDA_PRECISION_SINGLE
+			// Allocate space for temporary coords and copy contents
+			this->tmpCalcHostReference = new float[number_of_atoms*3];
+			this->tmpCalcHostCoords = new float[numberOfConformations*number_of_atoms*3];
+	#endif
+	
+	checkCudaError("Malloc Device Calc Coords", 
+				cudaMalloc(
+						(void **) &deviceCalcReference, 
+						number_of_atoms * 3 * sizeof(floating_point_type)));
+	
+	checkCudaError("Malloc Device Calc Coords", 
+			cudaMalloc(
+					(void **) &deviceCalcCoords, 
+					number_of_atoms * 3 * numberOfConformations * sizeof(floating_point_type)));
+}
+
 
 void QCPCUDAKernel::updateDeviceCoordinates(
-		int numberOfConformations,
-		int coordinatesPerConformation,
-		double * allCoordinates
-		){
+		double * coordinates,
+		floating_point_type* device_coordinates,
+		float* tmp_coordinates,
+		int coordinates_per_conformation,
+		int number_of_conformations){
 	
-	int totalNumberOfCoordinates = coordinatesPerConformation*numberOfConformations;
+	int total_number_of_coordinates = coordinates_per_conformation*number_of_conformations;
 	
 	#ifdef CUDA_PRECISION_SINGLE
 		// Convert to our floating point type
-		
-		for(int i = 0; i < totalNumberOfCoordinates; ++i){
-			this->tmpHostCoords[i] = (float) allCoordinates[i];
+		for(int i = 0; i < total_number_of_coordinates; ++i){
+			tmp_coordinates[i] = static_cast<float>( coordinates[i] );
 		}
-		checkCudaError(" Copying Coords to Device (single). ", 
+		
+		checkCudaError("Copying Coords to Device (single)", 
 					cudaMemcpy(
-							deviceCoords, 
-							tmpHostCoords, 
-							totalNumberOfCoordinates * sizeof(float),
+							device_coordinates, 
+							tmp_coordinates, 
+							total_number_of_coordinates * sizeof(float),
 							cudaMemcpyHostToDevice));
 	#else	
-		checkCudaError(" Copying Coords to Device (double). ", 
+		checkCudaError("Copying Coords to Device (double)", 
 				cudaMemcpy(
-						deviceCoords, 
-						allCoordinates, 
-						totalNumberOfCoordinates * sizeof(double),
+						device_coordinates, 
+						coordinates, 
+						total_number_of_coordinates * sizeof(double),
 						cudaMemcpyHostToDevice));
+	#endif
+}
+
+void QCPCUDAKernel::updateHostCoordinates(
+		double * coordinates,
+		floating_point_type * device_coordinates,
+		float * tmp_coordinates,
+		int number_of_conformations,
+		int coordinates_per_conformation
+		){
+	
+	int total_number_of_coordinates = coordinates_per_conformation*number_of_conformations;
+	
+	#ifdef CUDA_PRECISION_SINGLE
+		// Convert to our floating point type
+		checkCudaError("Copying Coords to Host (single)", 
+				cudaMemcpy(
+						tmp_coordinates, 
+						device_coordinates,
+						total_number_of_coordinates * sizeof(float),
+						cudaMemcpyDeviceToHost));
+		
+		// Conversion
+		for(int i = 0; i < total_number_of_coordinates; ++i){
+			coordinates[i] = static_cast<double>( tmp_coordinates[i]);
+		}
+		
+	#else	
+		checkCudaError("Copying Coords to Host (single)", 
+				cudaMemcpy(
+						coordinates, 
+						device_coordinates, 
+						total_number_of_coordinates * sizeof(double),
+						cudaMemcpyDeviceToHost));
 	#endif
 }
 
@@ -132,7 +220,7 @@ void QCPCUDAKernel::updateHostRMSDs(
 	
 	#ifdef CUDA_PRECISION_SINGLE
 		// Get RMSDs from device
-		checkCudaError(" Getting RMSDs from Device (single). ", 
+		checkCudaError("Getting RMSDs from Device (single)", 
 				cudaMemcpy(
 						this->tmpHostRMSDs,
 						this->deviceRMSDs,
@@ -145,7 +233,7 @@ void QCPCUDAKernel::updateHostRMSDs(
 		}
 		
 	#else	
-		checkCudaError(" Getting RMSDs from Device (double). ", 
+		checkCudaError("Getting RMSDs from Device (double)", 
 				cudaMemcpy(
 						rmsd,
 						this->deviceRMSDs,
@@ -164,27 +252,37 @@ void QCPCUDAKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
 		int atomsPerConformation,
 		double *allCoordinates){
 	
+	// Update reference in device
+	updateDeviceCoordinates(
+			reference,
+			deviceReference,
+			tmpHostCoords,
+			coordinatesPerConformation,
+			1);
+	
 	// Put the centered coordinates on the device
 	updateDeviceCoordinates(
-			numberOfConformations,
+			allCoordinates,
+			deviceCoords,
+			tmpHostCoords,
 			coordinatesPerConformation,
-			allCoordinates);
+			numberOfConformations);
 
 	// Do the calculations
-	calcRMSDOfOneVsFollowing<<<this->blocks_per_grid, this->threads_per_block>>>(
-			 this->deviceCoords,
-			 reference_conformation_number,
-			 reference_conformation_number+1,
-			 numberOfConformations,
-			 atomsPerConformation,
-			 coordinatesPerConformation,
-			 this->deviceRMSDs);
+	calcRMSDOfOneVsFollowing CUDA_KERNEL_DIM(this->blocks_per_grid, this->threads_per_block)(
+			this->deviceReference, 
+			reference_conformation_number,
+			this->deviceCoords,
+			numberOfConformations,
+			atomsPerConformation,
+			coordinatesPerConformation,
+			this->deviceRMSDs);
 
 	// Get RMSDs
 	updateHostRMSDs(
-				numberOfConformations,
-				reference_conformation_number,
-				rmsd);
+			numberOfConformations,
+			reference_conformation_number,
+			rmsd);
 }
 
 void QCPCUDAKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
@@ -199,10 +297,62 @@ void QCPCUDAKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
 		int coordinatesPerRMSDConformation,
 		int atomsPerRMSDConformation,
 		double *allRMSDCoordinates){
+	
+	// Update references in device
+	updateDeviceCoordinates(
+			fitReference,
+			deviceReference,
+			tmpHostCoords,
+			coordinatesPerConformation,
+			1);
+	
+	if(calcReference!=NULL){
+		updateDeviceCoordinates(
+				calcReference,
+				deviceCalcReference,
+				tmpCalcHostReference,
+				coordinatesPerRMSDConformation,
+				1);
+	}
+	
+	// Put the centered coordinates on the device
+	updateDeviceCoordinates(
+			allCoordinates,
+			deviceCoords,
+			tmpHostCoords,
+			coordinatesPerConformation,
+			numberOfConformations);
 
+	updateDeviceCoordinates(
+			allRMSDCoordinates,
+			deviceCalcCoords,
+			tmpCalcHostCoords,
+			coordinatesPerRMSDConformation,
+			numberOfConformations);
 
+	// Do the calculations
+	calcRMSDOfOneVsFollowingFitDiffersCalc CUDA_KERNEL_DIM(this->blocks_per_grid, this->threads_per_block)(
+			deviceReference,
+			deviceCalcReference,
+			reference_conformation_number,
+			deviceRMSDs,
+			numberOfConformations,
+			coordinatesPerConformation,
+			atomsPerConformation,
+			deviceCoords,
+			coordinatesPerRMSDConformation,
+			atomsPerRMSDConformation,
+			deviceCalcCoords);
+
+	if(rmsd!=NULL){
+		// Get RMSDs
+		updateHostRMSDs(
+					numberOfConformations,
+					reference_conformation_number,
+					rmsd);
+				
+	}
 }
-
 
 void QCPCUDAKernel::oneVsFollowingFitEqualCalcWithConfRotation(
 		double* reference,
@@ -212,42 +362,48 @@ void QCPCUDAKernel::oneVsFollowingFitEqualCalcWithConfRotation(
 		int coordinatesPerConformation,
 		int atomsPerConformation,
 		double *allCoordinates){
-		/*
-		// Update the reference (it can be from another coordinate set)
-		updateReferenceCoordinates(
-				numberOfConformations,
-				coordinatesPerConformation,
-				allCoordinates);
+		
+	// Update reference in device
+	updateDeviceCoordinates(
+			reference,
+			deviceReference,
+			tmpHostCoords,
+			coordinatesPerConformation,
+			1);
 	
-		// Put the centered coordinates on the device
-		updateDeviceCoordinates(
-				numberOfConformations,
-				coordinatesPerConformation,
-				allCoordinates);
+	// Put the centered coordinates on the device
+	updateDeviceCoordinates(
+			allCoordinates,
+			deviceCoords,
+			tmpHostCoords,
+			coordinatesPerConformation,
+			numberOfConformations);
 
-		// Do the calculations
-		calcRMSDOfOneVsFollowingWithRotation<<<this->blocks_per_grid, this->threads_per_block>>>(
-				 this->deviceCoords,
-				 reference_conformation_number,
-				 reference_conformation_number+1,
-				 numberOfConformations,
-				 atomsPerConformation,
-				 coordinatesPerConformation,
-				 this->deviceRMSDs);
-		
-		// Update rotated coordinates
-		updateHostCoordinates(
-				numberOfConformations,
-				coordinatesPerConformation,
-				allCoordinates);
-		
-		if(rmsd!=NULL){
-			// Get RMSDs
-			updateHostRMSDs(
-						numberOfConformations,
-						reference_conformation_number,
-						rmsd);
-		}*/
+	// Do the calculations
+	calcRMSDOfOneVsFollowingWithRotation CUDA_KERNEL_DIM(this->blocks_per_grid, this->threads_per_block)(
+			this->deviceReference, 
+			reference_conformation_number,
+			this->deviceCoords,
+			numberOfConformations,
+			atomsPerConformation,
+			coordinatesPerConformation,
+			this->deviceRMSDs);
+
+	updateHostCoordinates(
+			allCoordinates,
+			deviceCoords,
+			tmpHostCoords,
+			numberOfConformations,
+			coordinatesPerConformation);
+	
+	if(rmsd!=NULL){
+		// Get RMSDs
+		updateHostRMSDs(
+					numberOfConformations,
+					reference_conformation_number,
+					rmsd);
+				
+	}
 }
 
 void QCPCUDAKernel::oneVsFollowingFitDiffersCalcWithConfRotation(
@@ -263,5 +419,32 @@ void QCPCUDAKernel::oneVsFollowingFitDiffersCalcWithConfRotation(
 		int atomsPerRMSDConformation,
 		double *allRMSDCoordinates){
 
+	oneVsFollowingFitDiffersCalcWithoutConfRotation(
+			fitReference,
+			calcReference,
+			reference_conformation_number,
+			rmsd,
+			numberOfConformations,
+			coordinatesPerConformation,
+			atomsPerConformation,
+			allCoordinates,
+			coordinatesPerRMSDConformation,
+			atomsPerRMSDConformation,
+			allRMSDCoordinates);
+
+	updateHostCoordinates(
+				allCoordinates,
+				deviceCoords,
+				tmpHostCoords,
+				numberOfConformations,
+				coordinatesPerConformation);
+	
+	updateHostCoordinates(
+				allRMSDCoordinates,
+				deviceCalcCoords,
+				tmpCalcHostCoords,
+				numberOfConformations,
+				coordinatesPerConformation);
+	
 }
 

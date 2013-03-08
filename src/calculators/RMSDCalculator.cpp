@@ -36,7 +36,10 @@ void RMSDCalculator::setCalculationCoordinates(int atomsPerRMSDConformation, dou
 	this->atomsPerRMSDConformation = atomsPerRMSDConformation;
 	this->coordinatesPerRMSDConformation = atomsPerRMSDConformation*3;
 	this->allRMSDCoordinates = allRMSDCoordinates;
-	this->kernelFunctions->changeCalculationCoords(allRMSDCoordinates);
+	this->kernelFunctions->changeCalculationCoords(
+			allRMSDCoordinates,
+			atomsPerRMSDConformation,
+			numberOfConformations);
 }
 
 void RMSDCalculator::oneVsFollowing(int reference_conformation_number, double* rmsd){

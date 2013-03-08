@@ -19,7 +19,10 @@ class KernelFunctions{
 						int coordinatesPerConformation,
 						int numberOfConformations){}
 
-		virtual void changeCalculationCoords(double*){}
+		virtual void changeCalculationCoords(
+				double* calcCoords,
+				int number_of_atoms,
+				int numberOfConformations){}
 
 		virtual void oneVsFollowingFitEqualCalcWithoutConfRotation(
 				double* reference,

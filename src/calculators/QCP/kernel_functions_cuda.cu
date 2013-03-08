@@ -1,5 +1,5 @@
 #include "kernel_functions_cuda.h"
-
+#include <cstddef>
 
 ///////////////////////////////////////////////////////////////
 /// \remarks
@@ -133,9 +133,11 @@ __device__ floating_point_type innerProduct(floating_point_type* A,
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-__device__ floating_point_type calcRMSDForTwoConformationsWithTheobaldMethod(floating_point_type *A, 
-																			 const floating_point_type E0, 
-																			 const int number_of_atoms){
+__device__ floating_point_type calcRMSDForTwoConformationsWithTheobaldMethod(
+		floating_point_type *A,
+		const floating_point_type E0,
+		const int number_of_atoms,
+		floating_point_type * rot_matrix){
     floating_point_type Sxx, Sxy, Sxz, Syx, Syy, Syz, Szx, Szy, Szz;
     floating_point_type Szz2, Syy2, Sxx2, Sxy2, Syz2, Sxz2, Syx2, Szy2, Szx2,
            SyzSzymSyySzz2, Sxx2Syy2Szz2Syz2Szy2, Sxy2Sxz2Syx2Szx2,
@@ -198,6 +200,97 @@ __device__ floating_point_type calcRMSDForTwoConformationsWithTheobaldMethod(flo
             break;
     }
 
+    if (rot_matrix != NULL ){
+    		double a11, a12, a13, a14, a21, a22, a23, a24,
+    				a31, a32, a33, a34, a41, a42, a43, a44;
+
+    		double a3344_4334, a3244_4234, a3243_4233,
+    				a3143_4133, a3144_4134, a3142_4132;
+
+    		double q1, q2, q3, q4, normq;
+
+    		double evecprec = 1e-6;
+
+    		double a2, x2, y2, z2;
+
+    		double xy, az, zx, ay, yz, ax;
+
+    		a11 = SxxpSyy + Szz - mxEigenV;
+    		a12 = SyzmSzy;
+    		a13 = -SxzmSzx;
+    		a14 = SxymSyx;
+    		a21 = SyzmSzy; a22 = SxxmSyy - Szz-mxEigenV; a23 = SxypSyx; a24= SxzpSzx;
+    		a31 = a13; a32 = a23; a33 = Syy-Sxx-Szz - mxEigenV; a34 = SyzpSzy;
+    		a41 = a14; a42 = a24; a43 = a34; a44 = Szz - SxxpSyy - mxEigenV;
+    		a3344_4334 = a33 * a44 - a43 * a34; a3244_4234 = a32 * a44-a42*a34;
+    		a3243_4233 = a32 * a43 - a42 * a33; a3143_4133 = a31 * a43-a41*a33;
+    		a3144_4134 = a31 * a44 - a41 * a34; a3142_4132 = a31 * a42-a41*a32;
+    		q1 =  a22*a3344_4334-a23*a3244_4234+a24*a3243_4233;
+    		q2 = -a21*a3344_4334+a23*a3144_4134-a24*a3143_4133;
+    		q3 =  a21*a3244_4234-a22*a3144_4134+a24*a3142_4132;
+    		q4 = -a21*a3243_4233+a22*a3143_4133-a23*a3142_4132;
+
+    		double qsqr = q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4;
+
+    		if (qsqr < evecprec)
+    		{
+    			q1 =  a12*a3344_4334 - a13*a3244_4234 + a14*a3243_4233;
+    			q2 = -a11*a3344_4334 + a13*a3144_4134 - a14*a3143_4133;
+    			q3 =  a11*a3244_4234 - a12*a3144_4134 + a14*a3142_4132;
+    			q4 = -a11*a3243_4233 + a12*a3143_4133 - a13*a3142_4132;
+    			qsqr = q1*q1 + q2 *q2 + q3*q3+q4*q4;
+
+    			if (qsqr < evecprec)
+    			{
+    				double a1324_1423 = a13 * a24 - a14 * a23, a1224_1422 = a12 * a24 - a14 * a22;
+    				double a1223_1322 = a12 * a23 - a13 * a22, a1124_1421 = a11 * a24 - a14 * a21;
+    				double a1123_1321 = a11 * a23 - a13 * a21, a1122_1221 = a11 * a22 - a12 * a21;
+
+    				q1 =  a42 * a1324_1423 - a43 * a1224_1422 + a44 * a1223_1322;
+    				q2 = -a41 * a1324_1423 + a43 * a1124_1421 - a44 * a1123_1321;
+    				q3 =  a41 * a1224_1422 - a42 * a1124_1421 + a44 * a1122_1221;
+    				q4 = -a41 * a1223_1322 + a42 * a1123_1321 - a43 * a1122_1221;
+    				qsqr = q1*q1 + q2 *q2 + q3*q3+q4*q4;
+
+    				if (qsqr < evecprec)
+    				{
+    					q1 =  a32 * a1324_1423 - a33 * a1224_1422 + a34 * a1223_1322;
+    					q2 = -a31 * a1324_1423 + a33 * a1124_1421 - a34 * a1123_1321;
+    					q3 =  a31 * a1224_1422 - a32 * a1124_1421 + a34 * a1122_1221;
+    					q4 = -a31 * a1223_1322 + a32 * a1123_1321 - a33 * a1122_1221;
+    					qsqr = q1*q1 + q2 *q2 + q3*q3 + q4*q4;
+    				}
+    			}
+    		}
+
+    		normq = sqrt(qsqr);
+    		q1 /= normq;
+    		q2 /= normq;
+    		q3 /= normq;
+    		q4 /= normq;
+
+    		a2 = q1 * q1;
+    		x2 = q2 * q2;
+    		y2 = q3 * q3;
+    		z2 = q4 * q4;
+
+    		xy = q2 * q3;
+    		az = q1 * q4;
+    		zx = q4 * q2;
+    		ay = q1 * q3;
+    		yz = q3 * q4;
+    		ax = q1 * q2;
+
+    		rot_matrix[0] = a2 + x2 - y2 - z2;
+    		rot_matrix[1] = 2 * (xy + az);
+    		rot_matrix[2] = 2 * (zx - ay);
+    		rot_matrix[3] = 2 * (xy - az);
+    		rot_matrix[4] = a2 - x2 + y2 - z2;
+    		rot_matrix[5] = 2 * (yz + ax);
+    		rot_matrix[6] = 2 * (zx + ay);
+    		rot_matrix[7] = 2 * (yz - ax);
+    		rot_matrix[8] = a2 - x2 - y2 + z2;
+        }
     return sqrt(fabs(2.0f * (E0 - mxEigenV)/number_of_atoms));
 }
 
@@ -216,13 +309,51 @@ __device__ floating_point_type calcRMSDForTwoConformationsWithTheobaldMethod(flo
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-__device__ floating_point_type calcRMSDOfTwoConformations(floating_point_type* first_conformation_coords, 
-									 			floating_point_type* second_conformation_coords, 
-									 			const int number_of_atoms){
+__device__ floating_point_type calcRMSDOfTwoConformations(
+		floating_point_type* first_conformation_coords,
+		floating_point_type* second_conformation_coords,
+		const int number_of_atoms,
+		floating_point_type* rot_matrix){
 
 	floating_point_type A[9];
 	floating_point_type E0 = innerProduct(A, first_conformation_coords, second_conformation_coords, number_of_atoms);
-	return calcRMSDForTwoConformationsWithTheobaldMethod(A, E0, number_of_atoms);
+	return calcRMSDForTwoConformationsWithTheobaldMethod(
+			A,
+			E0,
+			number_of_atoms,
+			rot_matrix);
+}
+
+__device__ void rotate3D(
+		unsigned int number_of_atoms,
+		floating_point_type * const coords,
+		floating_point_type* u){
+
+	// We go through all selected atoms
+	for(unsigned int i=0; i<number_of_atoms; ++i){
+		int offset = i*3;
+		floating_point_type x_tmp_0,x_tmp_1,x_tmp_2;
+		x_tmp_0 = coords[offset];
+		x_tmp_1 = coords[offset+1];
+		x_tmp_2 = coords[offset+2];
+
+		// An rotate each of them
+		coords[offset] 	= u[0] * x_tmp_0 + u[1] * x_tmp_1 + u[2] * x_tmp_2;
+		coords[offset+1] = u[3] * x_tmp_0 + u[4] * x_tmp_1 + u[5] * x_tmp_2;
+		coords[offset+2] = u[6] * x_tmp_0 + u[7] * x_tmp_1 + u[8] * x_tmp_2;
+	}
+}
+__device__ floating_point_type calcRMS(
+		floating_point_type* x,
+		floating_point_type* y,
+		unsigned int num_atoms){
+	double sum_res = 0.0;
+
+	for(unsigned int i=0; i<num_atoms*3; ++i){
+		sum_res += (x[i] - y[i]) * (x[i] - y[i]);
+	}
+
+	return sqrt(sum_res/num_atoms);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -248,18 +379,16 @@ __device__ floating_point_type calcRMSDOfTwoConformations(floating_point_type* f
 /// \author victor_gil
 /// \date 05/10/2012
 ///////////////////////////////////////////////////////////////
-		
 __global__ void calcRMSDOfOneVsFollowing(
-									 floating_point_type* all_coordinates,
+									 floating_point_type* first_conformation_coords,
 									 const int base_conformation_id,
-									 const int other_conformations_starting_id,
+									 floating_point_type* all_coordinates,
 									 const int number_of_conformations,
 									 const int atoms_per_conformation,
 									 const int coordinates_per_conformation,
 									 floating_point_type* rmsd){
 	
-	floating_point_type* first_conformation_coords = &(all_coordinates[base_conformation_id*coordinates_per_conformation]);
-	int second_conformation_id = other_conformations_starting_id + (blockDim.x*blockIdx.x + threadIdx.x);
+	int second_conformation_id = base_conformation_id + 1 + (blockDim.x*blockIdx.x + threadIdx.x);
 
 	while(second_conformation_id < number_of_conformations){
 		floating_point_type* second_conformation_coords = &(all_coordinates[second_conformation_id*coordinates_per_conformation]);
@@ -269,9 +398,85 @@ __global__ void calcRMSDOfOneVsFollowing(
 				second_conformation_coords,
 				atoms_per_conformation);
 
-		/*rmsd[second_conformation_id] = calcRMSDOfTwoConformations(first_conformation_coords, second_conformation_coords, atoms_per_conformation);
-		*/
+		second_conformation_id += blockDim.x*gridDim.x;
+	}
+}
+
+
+
+__global__ void calcRMSDOfOneVsFollowingWithRotation(
+									 floating_point_type* first_conformation_coords,
+									 const int base_conformation_id,
+									 floating_point_type* all_coordinates,
+									 const int number_of_conformations,
+									 const int atoms_per_conformation,
+									 const int coordinates_per_conformation,
+									 floating_point_type* rmsd){
+
+	int second_conformation_id = base_conformation_id + 1 + (blockDim.x*blockIdx.x + threadIdx.x);
+
+	while(second_conformation_id < number_of_conformations){
+		floating_point_type* second_conformation_coords = &(all_coordinates[second_conformation_id*coordinates_per_conformation]);
+		floating_point_type rot_matrix[9];
+
+		rmsd[second_conformation_id-(base_conformation_id+1)] = calcRMSDOfTwoConformations(
+				first_conformation_coords,
+				second_conformation_coords,
+				atoms_per_conformation,
+				rot_matrix);
+
+		rotate3D(
+				atoms_per_conformation,
+				second_conformation_coords,
+				rot_matrix);
 
 		second_conformation_id += blockDim.x*gridDim.x;
 	}
 }
+
+__global__ void calcRMSDOfOneVsFollowingFitDiffersCalc(
+		floating_point_type* fitReference,
+		floating_point_type* calcReference,
+		int reference_conformation_number,
+		floating_point_type* rmsd,
+		int numberOfConformations,
+		int coordinatesPerConformation,
+		int atomsPerConformation,
+		floating_point_type *allCoordinates,
+		int coordinatesPerRMSDConformation,
+		int atomsPerRMSDConformation,
+		floating_point_type *allRMSDCoordinates){
+
+	int second_conformation_id = reference_conformation_number + 1 + (blockDim.x*blockIdx.x + threadIdx.x);
+
+	while(second_conformation_id < numberOfConformations){
+		floating_point_type* second_conformation_coords = &(allCoordinates[second_conformation_id*coordinatesPerConformation]);
+		floating_point_type rot_matrix[9];
+
+		calcRMSDOfTwoConformations(
+						fitReference,
+						second_conformation_coords,
+						atomsPerConformation,
+						rot_matrix);
+
+		floating_point_type* second_calc_conformation_coords = &(allRMSDCoordinates[second_conformation_id*coordinatesPerRMSDConformation]);
+
+		rotate3D(
+				atomsPerConformation,
+				second_conformation_coords,
+				rot_matrix);
+
+		rotate3D(
+				atomsPerRMSDConformation,
+				second_calc_conformation_coords,
+				rot_matrix);
+
+		rmsd[second_conformation_id-(reference_conformation_number+1)] = calcRMS(
+				calcReference,
+				second_calc_conformation_coords,
+				atomsPerRMSDConformation);
+
+		second_conformation_id += blockDim.x*gridDim.x;
+	}
+}
+
