@@ -176,6 +176,11 @@ class TestRMSDCalculators(unittest.TestCase):
         calculator = pyRMSD.RMSDCalculator.RMSDCalculator(self.coordsets, "QCP_CUDA_CALCULATOR")
         rmsd = calculator.pairwiseRMSDMatrix()
         numpy.testing.assert_array_almost_equal(rmsd, self.expected_serial_matrix, 4)
+        
+    ########################
+    # C TESTS              #
+    ########################
+    
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
