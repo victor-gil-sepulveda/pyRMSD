@@ -180,7 +180,125 @@ class TestRMSDCalculators(unittest.TestCase):
     ########################
     # C TESTS              #
     ########################
-    
+
+            
+    def test_superposition_with_different_fit_and_calc_coordsets(self):
+        number_of_coordsets = 5;
+        number_of_atoms = 3239;
+        number_of_CAs = 224;
+        
+
+#      load_vector(not_aligned_CA, "../../src/calculators/test/data/ligand_mini_CAs");
+        not_aligned_CA = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_CAs"),(number_of_coordsets,number_of_CAs,3))
+        
+#      load_vector(not_aligned_coordinates, "data/ligand_mini_all");
+        not_aligned_coordinates = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_all"),(number_of_coordsets,number_of_atoms,3))
+            
+#       load_vector(aligned_coordinates, "data/ligand_mini_all_aligned");
+        aligned_coordinates = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_all_aligned"),(number_of_coordsets,number_of_atoms,3))
+
+#     // RMSD of all atoms using CA for superposition
+#     RMSDCalculator* calculator1 = RMSDCalculatorFactory::createCalculator(
+#                                                             type,
+#                                                             number_of_coordsets,
+#                                                             number_of_CAs,
+#                                                             &(not_aligned_CA[0]),
+#                                                             // Setting calculation coordinates
+#                                                             number_of_atoms,
+#                                                             &(not_aligned_coordinates[0]));
+
+        calculator1 = pyRMSD.RMSDCalculator.RMSDCalculator(not_aligned_CA, "QCP_OMP_CALCULATOR")
+        calculator1.setCalculationCoordinates(not_aligned_coordinates)
+        numpy.testing.assert_almost_equal(
+                              [1.864003731005552, 2.076760850428891, 3.596135117728627, 2.182685209336899],
+                              calculator1.oneVsFollowing(0),
+                              12)
+        
+#     // RMSD of CA using CA for superposition (default behavior)
+#     RMSDCalculator* calculator2 = RMSDCalculatorFactory::createCalculator(
+#                                                                 type,
+#                                                                 number_of_coordsets,
+#                                                                 number_of_CAs,
+#                                                                 &(not_aligned_CA[0]));
+
+        calculator2 = pyRMSD.RMSDCalculator.RMSDCalculator(not_aligned_CA, "QCP_OMP_CALCULATOR")
+        numpy.testing.assert_almost_equal(
+                              [0.767947519172927, 0.8838644164683896, 0.4177715823462121, 0.3383320758562839],
+                              calculator2.oneVsFollowing(0),
+                              12)
+
+#     // RMSD  of CA using CA for superposition (using the same selection and RMSD subsets)
+#     RMSDCalculator* calculator3 = RMSDCalculatorFactory::createCalculator(
+#                                                                 type,
+#                                                                 number_of_coordsets,
+#                                                                 number_of_CAs,
+#                                                                 &(not_aligned_CA[0]),
+#                                                                 // Setting calculation coordinates
+#                                                                 number_of_CAs,
+#                                                                 &(not_aligned_CA[0]));
+        calculator3 = pyRMSD.RMSDCalculator.RMSDCalculator(not_aligned_CA, "QTRFIT_OMP_CALCULATOR")
+        calculator3.setCalculationCoordinates(not_aligned_CA)
+        numpy.testing.assert_almost_equal(
+                              [0.767947519172927, 0.8838644164683896, 0.4177715823462121, 0.3383320758562839],
+                              calculator3.oneVsFollowing(0),
+                              12)
+        
+    def test_iterative_superposition_with_equal_calc_and_fit_sets(self):
+        number_of_coordsets = 5
+        number_of_atoms = 3239
+        
+        not_aligned_coordinates = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_all"),(number_of_coordsets,number_of_atoms,3))
+        
+        iterposed_coordinates = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_iterposed_all"),(number_of_coordsets,number_of_atoms,3))
+        
+#     // Iterposition
+#     RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
+#             type,
+#             number_of_coordsets,
+#             number_of_atoms,
+#             &(not_aligned_coordinates[0]));
+
+        calculator = pyRMSD.RMSDCalculator.RMSDCalculator(not_aligned_coordinates, "QTRFIT_OMP_CALCULATOR")
+        
+        calculator.iterativeSuperposition()
+        
+        numpy.testing.assert_almost_equal(
+                              iterposed_coordinates,
+                              not_aligned_coordinates,
+                              6)
+
+    def test_iterative_superposition_with_different_calc_and_fit_sets(self):
+
+        number_of_coordsets = 5
+        number_of_atoms = 3239
+        number_of_CAs = 224
+        
+        not_aligned_CA = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_CAs"),(number_of_coordsets,number_of_CAs,3))
+        
+        not_iterposed_coordinates = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_all"),(number_of_coordsets,number_of_atoms,3))
+        
+        iterposed_coordinates = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_iterposed_with_cas_all_atom"),(number_of_coordsets,number_of_atoms,3))
+        
+#     RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
+#                 type,
+#                 number_of_coordsets,
+#                 number_of_CAs,
+#                 &(not_aligned_CA[0]),
+#                 // "Calculation" coordinates
+#                 number_of_atoms,
+#                 &(not_iterposed_coordinates[0]));
+        
+        # Iterposes CA atoms using all atoms (weird but useful as a test)
+        calculator = pyRMSD.RMSDCalculator.RMSDCalculator(not_aligned_CA, "QTRFIT_OMP_CALCULATOR")
+        
+        calculator.setCalculationCoordinates(not_iterposed_coordinates)
+        
+        calculator.iterativeSuperposition()
+        
+        numpy.testing.assert_almost_equal(
+                              iterposed_coordinates,
+                              not_iterposed_coordinates,
+                              6)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

@@ -153,7 +153,7 @@ void test_iterative_superposition_with_equal_calc_and_fit_sets(RMSDCalculatorTyp
 	test_vector_len(not_aligned_coordinates, number_of_atoms*number_of_coordsets*3, "all not aligned atoms");
 	test_vector_len(iterposed_coordinates, number_of_atoms*number_of_coordsets*3, "all iterposed atoms");
 
-	// Iterposition with QTRFIT
+	// Iterposition
 	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
 			type,
 			number_of_coordsets,

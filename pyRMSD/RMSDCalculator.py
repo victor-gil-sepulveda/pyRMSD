@@ -1,4 +1,3 @@
-import numpy.linalg
 import pyRMSD.calculators
 from pyRMSD.utils.proteinReading import flattenCoords
 from pyRMSD.availableCalculators import availableCalculators
@@ -185,7 +184,32 @@ class RMSDCalculator(object):
                                                                    np_coords_calc, self.number_of_calculation_atoms,
                                                                    self.number_of_conformations,
                                                                    self.__number_of_threads, self.__blocks_per_grid, self.__blocks_per_grid)
-            
+    
+    def iterativeSuperposition(self):
+        """
+        Calculates an iterative superposition of a set of conformations. It changes the coordinates.
+        
+        @author: vgil
+        @date: 27/03/2013
+        """
+        np_coords = flattenCoords(self.fitting_coordinates)
+        if (self.calculation_coordinates is None):
+            pyRMSD.calculators.iterativeSuperposition(
+                               availableCalculators()[self.calculatorType], 
+                               np_coords, self.number_of_fitting_atoms, 
+                               numpy.array([]), 0,
+                               self.number_of_conformations,
+                               self.__number_of_threads, self.__blocks_per_grid, self.__blocks_per_grid)
+        else:
+            np_coords_calc = flattenCoords(self.calculation_coordinates)
+            pyRMSD.calculators.iterativeSuperposition(
+                               availableCalculators()[self.calculatorType], 
+                               np_coords, self.number_of_fitting_atoms, 
+                               np_coords_calc, self.number_of_calculation_atoms,
+                               self.number_of_conformations,
+                               self.__number_of_threads, self.__blocks_per_grid, self.__blocks_per_grid)
+    
+    
     def setNumberOfOpenMPThreads(self, number_of_threads):
         """
         Sets the number of threads to be used by an OpenMP calculator.
