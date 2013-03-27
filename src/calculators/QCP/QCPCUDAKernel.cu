@@ -147,7 +147,6 @@ void QCPCUDAKernel::changeCalculationCoords(
 					number_of_atoms * 3 * numberOfConformations * sizeof(floating_point_type)));
 }
 
-
 void QCPCUDAKernel::updateDeviceCoordinates(
 		double * coordinates,
 		floating_point_type* device_coordinates,
@@ -402,7 +401,6 @@ void QCPCUDAKernel::oneVsFollowingFitEqualCalcWithConfRotation(
 					numberOfConformations,
 					reference_conformation_number,
 					rmsd);
-				
 	}
 }
 

@@ -30,8 +30,10 @@ RMSDCalculatorFactory::~RMSDCalculatorFactory() {}
 RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 		RMSDCalculatorType type,
 		int numberOfConformations,
-		int atomsPerConformation,
-		double* allCoordinates,
+		int atomsPerFittingConformation,
+		double* allFittingCoordinates,
+		int atomsPerCalculationConformation,
+		double* allCalculationCoordinates,
 		int number_of_threads,
 		int threads_per_block,
 		int blocks_per_grid) {
@@ -85,6 +87,12 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 			exit(-1);
 	}
 
-	return new RMSDCalculator(numberOfConformations,
-			atomsPerConformation, allCoordinates, kernelFunctions);
+	RMSDCalculator* calculator = new RMSDCalculator(numberOfConformations,
+			atomsPerFittingConformation, allFittingCoordinates, kernelFunctions);
+
+	if(allCalculationCoordinates != NULL && atomsPerCalculationConformation!= 0){
+		calculator->setCalculationCoordinates(atomsPerCalculationConformation, allCalculationCoordinates);
+	}
+
+	return calculator;
 }

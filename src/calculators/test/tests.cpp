@@ -30,6 +30,7 @@ void test_initialize(){
 			k = k+1;
 		}
 	}
+
 	compareVectors("\tTesting initialization (matrix): ", expected_matrix_mode_copy, matrix_mode_copy, 5, 1e-16);
 }
 
@@ -193,9 +194,12 @@ void test_iterative_superposition_with_different_calc_and_fit_sets(RMSDCalculato
 				type,
 				number_of_coordsets,
 				number_of_CAs,
-				&(not_aligned_CA[0]));
+				&(not_aligned_CA[0]),
+				// "Calculation" coordinates
+				number_of_atoms,
+				&(not_iterposed_coordinates[0]));
 
-	calculator->setCalculationCoordinates(number_of_atoms, &(not_iterposed_coordinates[0]));
+	//calculator->setCalculationCoordinates(number_of_atoms, &(not_iterposed_coordinates[0]));
 	calculator->iterativeSuperposition();
 	compareVectors("\tTesting iterposed coordinates: ", &(iterposed_coordinates[0]),&(not_iterposed_coordinates[0]), not_iterposed_coordinates.size(), precision_check);
 	//writeVector( not_iterposed_coordinates, "vector.out");
@@ -226,11 +230,15 @@ void test_superposition_with_different_fit_and_calc_coordsets(RMSDCalculatorType
 
 	// RMSD of all atoms using CA for superposition
 	RMSDCalculator* calculator1 = RMSDCalculatorFactory::createCalculator(
-		type,
-		number_of_coordsets,
-		number_of_CAs,
-		&(not_aligned_CA[0]));
-	calculator1->setCalculationCoordinates(number_of_atoms, &(not_aligned_coordinates[0]));
+															type,
+															number_of_coordsets,
+															number_of_CAs,
+															&(not_aligned_CA[0]),
+															// Setting calculation coordinates
+															number_of_atoms,
+															&(not_aligned_coordinates[0]));
+
+	//calculator1->setCalculationCoordinates(number_of_atoms, &(not_aligned_coordinates[0]));
 	calculator1->oneVsFollowing(0, rmsds);
 	//print_vector("rmsd:",rmsds, 5);
 	double expected_rmsds []= {1.864003731005552, 2.076760850428891, 3.596135117728627, 2.182685209336899, 0};
@@ -239,10 +247,10 @@ void test_superposition_with_different_fit_and_calc_coordsets(RMSDCalculatorType
 
 	// RMSD of CA using CA for superposition (default behavior)
 	RMSDCalculator* calculator2 = RMSDCalculatorFactory::createCalculator(
-		type,
-		number_of_coordsets,
-		number_of_CAs,
-		&(not_aligned_CA[0]));
+																type,
+																number_of_coordsets,
+																number_of_CAs,
+																&(not_aligned_CA[0]));
 	calculator2->oneVsFollowing(0, rmsds);
 //	print_vector("rmsd:",rmsds, 5);
 	double expected_rmsds_2 []= {0.767947519172927, 0.8838644164683896, 0.4177715823462121, 0.3383320758562839, 0};
@@ -251,11 +259,14 @@ void test_superposition_with_different_fit_and_calc_coordsets(RMSDCalculatorType
 
 	// RMSD  of CA using CA for superposition (using the same selection and RMSD subsets)
 	RMSDCalculator* calculator3 = RMSDCalculatorFactory::createCalculator(
-		type,
-		number_of_coordsets,
-		number_of_CAs,
-		&(not_aligned_CA[0]));
-	calculator3->setCalculationCoordinates(number_of_CAs, &(not_aligned_CA[0]));
+																type,
+																number_of_coordsets,
+																number_of_CAs,
+																&(not_aligned_CA[0]),
+																// Setting calculation coordinates
+																number_of_CAs,
+																&(not_aligned_CA[0]));
+	//calculator3->setCalculationCoordinates(number_of_CAs, &(not_aligned_CA[0]));
 	calculator3->oneVsFollowing(0, rmsds);
 //	print_vector("rmsd:",rmsds, 5);
 	compareVectors("\tTesting RMSD 3: ", expected_rmsds_2, rmsds, number_of_coordsets, precision_check);

@@ -100,11 +100,11 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 					number_of_conformations,
 					atoms_per_conformation,
 					all_coordinates,
+					0,
+					NULL,
 					number_of_threads,
 					threads_per_block,
 					blocks_per_grid);
-    /*RMSDCalculator* rmsdCalculator = getCalculator(calculatorType, number_of_conformations, atoms_per_conformation,
-    		number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);*/
 
     rmsdCalculator->oneVsFollowing(conformation_number,&(rmsd[0]));
 
@@ -133,11 +133,11 @@ static PyObject* iterativeSuperposition(PyObject *self, PyObject *args){
 				number_of_conformations,
 				atoms_per_conformation,
 				all_coordinates,
+				0,
+				NULL,
 				number_of_threads,
 				threads_per_block,
 				blocks_per_grid);
-	/*RMSDCalculator* rmsdCalculator = getCalculator(calculatorType, number_of_conformations, atoms_per_conformation,
-			number_of_threads, threads_per_block, blocks_per_grid, all_coordinates);*/
 
 	rmsdCalculator->iterativeSuperposition(1e-4);
 
@@ -166,6 +166,8 @@ static PyObject* calculateRMSDCondensedMatrix(PyObject *self, PyObject *args){
 			number_of_conformations,
 			atoms_per_conformation,
 			all_coordinates,
+			0,
+			NULL,
 			number_of_threads,
 			threads_per_block,
 			blocks_per_grid);
