@@ -4,6 +4,25 @@ from pyRMSD.availableCalculators import availableCalculators
 import numpy
 
 class RMSDCalculator(object):
+    """
+    Using the calculator will sometimes modify your initial fitting coordinates (calculation coordinates can also be
+    modified, so we recommend those to be a copy):
+    
+    - pairwise: will not modify coordinates as it does an internal copy. If the modification flag is ON, it will return 
+    the modified coordinates along with the rmsd value.
+    
+    - oneVsall: does exactly the same that pairwise, so initial coordinates may remain untouched. If the modification flag is ON, it will return 
+    the modified coordinates along with the rmsds value.
+    
+    - oneVsOther: also does an initial copy. If modification flag is ON, conformations are just centered at 0,0,0 and superposed
+    to the desired conformation, and returned along with rmsds.
+    
+    - pairwiseRMSDMatrix: will never modify coordinates, as it does an internal copy. Modification flag doesn't affect it.
+    
+    - iterativeSuperposition: will always modify coordinates by centering them and doing the actual iterative
+    superposition (it's a nonsense otherwise).
+    """
+    
     def __init__(self, coordsets, calculatorType, modifyCoordinates = False):
         """
         Class constructor
@@ -80,7 +99,7 @@ class RMSDCalculator(object):
         # Working with fitting coordinates
         first_coords = self.fitting_coordinates[first_conformation_number]
         second_coords = self.fitting_coordinates[second_conformation_number]
-        tmp_coordsets = numpy.array([first_coords,second_coords])
+        tmp_coordsets = numpy.copy(numpy.array([first_coords,second_coords]))
         
         # Then with calculation coordinates (if available)
         tmp_calculation_coordsets = None
@@ -111,13 +130,13 @@ class RMSDCalculator(object):
         # Rearrange fitting coordinates
         previous_coords = self.fitting_coordinates[:conformation_number]
         following_coords = self.fitting_coordinates[conformation_number+1:]
-        rearranged_coords_list = [self.fitting_coordinates[conformation_number]]
+        rearranged_coords_list = [numpy.copy(self.fitting_coordinates[conformation_number])]
                 
         for coords in previous_coords:
-            rearranged_coords_list.append(coords)
+            rearranged_coords_list.append(numpy.copy(coords))
         
         for coords in following_coords:
-            rearranged_coords_list.append(coords)
+            rearranged_coords_list.append(numpy.copy(coords))
         
         rearranged_coords = numpy.array(rearranged_coords_list)
         
@@ -151,7 +170,7 @@ class RMSDCalculator(object):
         @author: vgil
         @date: 26/11/2012
         """     
-        np_coords_fit = flattenCoords(self.fitting_coordinates)
+        np_coords_fit = numpy.copy(flattenCoords(self.fitting_coordinates))
         if (self.calculation_coordinates is None):
             
             rmsds =  pyRMSD.calculators.oneVsFollowing(
@@ -167,7 +186,7 @@ class RMSDCalculator(object):
             else:
                 return (rmsds, np_coords_fit)
         else:
-            np_coords_calc = flattenCoords(self.calculation_coordinates)
+            np_coords_calc = numpy.copy(flattenCoords(self.calculation_coordinates))
             
             rmsds =  pyRMSD.calculators.oneVsFollowing(
                              availableCalculators()[self.calculatorType], 
@@ -191,7 +210,7 @@ class RMSDCalculator(object):
         @author: vgil
         @date: 26/11/2012
         """
-        np_coords = flattenCoords(self.fitting_coordinates)
+        np_coords = numpy.copy(flattenCoords(self.fitting_coordinates))
         if (self.calculation_coordinates is None):
             return pyRMSD.calculators.calculateRMSDCondensedMatrix(
                                                                    availableCalculators()[self.calculatorType], 
@@ -210,7 +229,10 @@ class RMSDCalculator(object):
     
     def iterativeSuperposition(self):
         """
-        Calculates an iterative superposition of a set of conformations. It changes the coordinates.
+        Calculates an iterative superposition of a set of conformations. When using this function,
+        the coordinates of the 
+        
+        @return: The iteratively superposed cooordinates. 
         
         @author: vgil
         @date: 27/03/2013

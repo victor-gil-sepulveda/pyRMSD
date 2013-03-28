@@ -305,10 +305,9 @@ class TestRMSDCalculators(unittest.TestCase):
         number_of_atoms = 3239
         
         not_aligned_coordinates = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_all"),(number_of_coordsets,number_of_atoms,3))
-        
+
         iterposed_coordinates = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_iterposed_all"),(number_of_coordsets,number_of_atoms,3))
         
-#     // Iterposition
 #     RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
 #             type,
 #             number_of_coordsets,
