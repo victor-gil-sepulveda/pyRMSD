@@ -7,6 +7,7 @@ import unittest
 import pyRMSD.utils.proteinReading
 import pyRMSD.RMSDCalculator
 import numpy
+from prody import *
 
 class TestRMSDCalculators(unittest.TestCase):
     
@@ -176,12 +177,71 @@ class TestRMSDCalculators(unittest.TestCase):
         calculator = pyRMSD.RMSDCalculator.RMSDCalculator(self.coordsets, "QCP_CUDA_CALCULATOR")
         rmsd = calculator.pairwiseRMSDMatrix()
         numpy.testing.assert_array_almost_equal(rmsd, self.expected_serial_matrix, 4)
+    
+    def test_coordinates_change(self):
+        """
+        Tests if 
+        """
+        number_of_coordsets = 5;
+        number_of_atoms = 3239;
+        number_of_CAs = 224;
         
-    ########################
-    # C TESTS              #
-    ########################
 
-            
+#      load_vector(not_aligned_CA, "../../src/calculators/test/data/ligand_mini_CAs");
+        not_aligned_CA = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_CAs"),(number_of_coordsets,number_of_CAs,3))
+        
+#       load_vector(aligned_coordinates, "data/ligand_mini_all_aligned");
+        aligned_coordinates = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_all_aligned"),(number_of_coordsets,number_of_atoms,3))
+
+        reference_copy = numpy.copy(not_aligned_CA[0])
+        target_copy = numpy.copy(not_aligned_CA[4])
+        calculator = pyRMSD.RMSDCalculator.RMSDCalculator(not_aligned_CA, "QTRFIT_OMP_CALCULATOR", False)
+        self.assertAlmostEqual(calculator.pairwise(0,4), 0.3383320758562839, 12)
+        
+        # The RMSD result must be the same
+        calculator.modify_coordinates = True
+        rmsd, coords =  calculator.pairwise(0,4)
+        self.assertAlmostEqual(rmsd, 0.3383320758562839, 12)
+
+        # After the calculations, the target and reference coordinates have not changed ...
+        numpy.testing.assert_almost_equal(not_aligned_CA[0],reference_copy,16)
+        numpy.testing.assert_almost_equal(not_aligned_CA[4],target_copy,16)
+
+        # .. but returned reference has been modified (centered)
+        reference_coords = not_aligned_CA[0]
+        reference_geom_center = reference_coords.mean(0)
+        reference_at_origin = (reference_coords - reference_geom_center)    
+        numpy.testing.assert_almost_equal(reference_at_origin, coords[0], 12)
+
+
+    ################################################
+    # PART NOT NECESSARY WITH REGRESSION TEST      #
+    ################################################
+#         # Returned target has also been modified (centered and superposed)
+#         pdb = parsePDB('../../src/calculators/test/data/ligand_mini_CA_aligned_to_frame_0.pdb')
+#         print pdb.numAtoms()
+#         pdb.addCoordset(aligned_coordinates[4])
+#         alphas = pdb.select("name CA")
+#         pdb_target_coords= alphas.getCoordsets()[5]
+#         pdb_target_geom_center = pdb_target_coords.mean(0)
+#         pdb_target_at_origin = (pdb_target_coords - pdb_target_geom_center)
+#         numpy.testing.assert_almost_equal(pdb_target_at_origin, coords[1], 2)
+#         
+#         
+#         pdb = parsePDB('../../src/calculators/test/data/ligand_mini.pdb')
+#         alphas = pdb.select("name CA")
+#         pdb_target_coords= alphas.getCoordsets()[4]
+#         numpy.testing.assert_almost_equal(pdb_target_coords, target_copy, 2)
+#         
+#         # Proof that the superposition was done
+#         self.assertRaises( AssertionError, numpy.testing.assert_almost_equal, *( pdb_target_coords, coords[1], 2) )
+
+        regression_coords1 = numpy.loadtxt("./data/ligand_mini_CA_4_aligned_to_0")
+        numpy.testing.assert_almost_equal(regression_coords1, coords[1], 12)
+    
+    ########################
+    # PORTS OF C TESTS     #
+    ########################
     def test_superposition_with_different_fit_and_calc_coordsets(self):
         number_of_coordsets = 5;
         number_of_atoms = 3239;
@@ -194,9 +254,6 @@ class TestRMSDCalculators(unittest.TestCase):
 #      load_vector(not_aligned_coordinates, "data/ligand_mini_all");
         not_aligned_coordinates = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_all"),(number_of_coordsets,number_of_atoms,3))
             
-#       load_vector(aligned_coordinates, "data/ligand_mini_all_aligned");
-        aligned_coordinates = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_all_aligned"),(number_of_coordsets,number_of_atoms,3))
-
 #     // RMSD of all atoms using CA for superposition
 #     RMSDCalculator* calculator1 = RMSDCalculatorFactory::createCalculator(
 #                                                             type,

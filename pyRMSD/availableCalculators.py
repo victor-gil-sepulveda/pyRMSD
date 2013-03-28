@@ -1,7 +1,6 @@
 
 def availableCalculators():
     return {
-            "KABSCH_PYTHON_CALCULATOR":-1, 
             "KABSCH_SERIAL_CALCULATOR": 0, 
             "KABSCH_OMP_CALCULATOR":1, 
             #"KABSCH_CUDA_CALCULATOR":2, 

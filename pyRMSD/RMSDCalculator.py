@@ -4,7 +4,7 @@ from pyRMSD.availableCalculators import availableCalculators
 import numpy
 
 class RMSDCalculator(object):
-    def __init__(self, coordsets, calculatorType):
+    def __init__(self, coordsets, calculatorType, modifyCoordinates = False):
         """
         Class constructor
         
@@ -22,7 +22,8 @@ class RMSDCalculator(object):
         @date: 26/11/2012
         """
         self.calculation_coordinates = None
-
+        self.modify_coordinates = modifyCoordinates
+        
         if not calculatorType in availableCalculators():
             print "Calculator ", calculatorType, " is not an available calculator."
             raise KeyError
@@ -56,7 +57,7 @@ class RMSDCalculator(object):
         @author: vgil
         @date: 27/03/2013
         """
-        calculator = RMSDCalculator(fitting_coordinates, self.calculatorType)
+        calculator = RMSDCalculator(fitting_coordinates, self.calculatorType, self.modify_coordinates)
         if (calculation_coordinates is not None):
             calculator.setCalculationCoordinates(calculation_coordinates)
         return calculator
@@ -69,7 +70,8 @@ class RMSDCalculator(object):
         
         @param second_conformation_number: Id of the conformation that will be superposed into the reference conformation.
         
-        @return: The RMSD value.
+        @return: The RMSD value if 'modify_coordinates' is set to False, or a tuple containing the rmsd value of the 
+        superposition plus both modified coordsets ( both centered at origin and the second coordset superposed over the first)
         
         @author: vgil
         @date: 26/11/2012
@@ -87,7 +89,11 @@ class RMSDCalculator(object):
             second_calculation_coords = self.calculation_coordinates[second_conformation_number]
             tmp_calculation_coordsets = numpy.array([first_calculation_coords,second_calculation_coords])
         
-        return self.__getInternalCalculator(tmp_coordsets, tmp_calculation_coordsets).oneVsFollowing(0)[0]
+        if (self.modify_coordinates):
+            rmsds, coords = self.__getInternalCalculator(tmp_coordsets, tmp_calculation_coordsets).oneVsFollowing(0)
+            return rmsds[0], numpy.reshape(coords,(2,len(first_coords),3))
+        else:
+            return self.__getInternalCalculator(tmp_coordsets, tmp_calculation_coordsets).oneVsFollowing(0)[0]
     
     def oneVsTheOthers(self, conformation_number):
         """
@@ -95,7 +101,9 @@ class RMSDCalculator(object):
         
         @param conformation_number: The id of the reference structure.
         
-        @return: A numpy array of RMSD values.
+        @return: A numpy array of RMSD values if 'modify_coordinates' is set to False, or a tuple containing the rmsd value of the 
+        superposition plus all modified coordsets ( all centered at origin and superposed to the first). The first coordset will be
+        the one which was in 'conformation_number' position into the coordsets array.
         
         @author: vgil
         @date: 26/11/2012
@@ -137,28 +145,43 @@ class RMSDCalculator(object):
         
         @param conformation_number: The id of the reference structure.
         
-        @return: A numpy array of RMSD values.
+        @return: A numpy array of RMSD values if 'modify_coordinates' is set to False, or a tuple containing the rmsd value of the 
+        superposition plus all modified coordsets (all centered at origin and superposed to the first).
         
         @author: vgil
         @date: 26/11/2012
         """     
         np_coords_fit = flattenCoords(self.fitting_coordinates)
         if (self.calculation_coordinates is None):
-            return pyRMSD.calculators.oneVsFollowing(
-                                                     availableCalculators()[self.calculatorType], 
-                                                     np_coords_fit, self.number_of_fitting_atoms, 
-                                                     numpy.array([]), 0,
-                                                     conformation_number, self.number_of_conformations,
-                                                     self.__number_of_threads, self.__threads_per_block, self.__blocks_per_grid)
+            
+            rmsds =  pyRMSD.calculators.oneVsFollowing(
+                             availableCalculators()[self.calculatorType], 
+                             np_coords_fit, self.number_of_fitting_atoms, 
+                             numpy.array([]), 0,
+                             conformation_number, self.number_of_conformations,
+                             self.__number_of_threads, self.__threads_per_block, self.__blocks_per_grid,
+                             self.modify_coordinates)
+            
+            if (not self.modify_coordinates):
+                return rmsds
+            else:
+                return (rmsds, np_coords_fit)
         else:
             np_coords_calc = flattenCoords(self.calculation_coordinates)
-            return pyRMSD.calculators.oneVsFollowing(
-                                                     availableCalculators()[self.calculatorType], 
-                                                     np_coords_fit, self.number_of_fitting_atoms, 
-                                                     np_coords_calc, self.number_of_calculation_atoms,
-                                                     conformation_number, self.number_of_conformations,
-                                                     self.__number_of_threads, self.__threads_per_block, self.__blocks_per_grid)
-        
+            
+            rmsds =  pyRMSD.calculators.oneVsFollowing(
+                             availableCalculators()[self.calculatorType], 
+                             np_coords_fit, self.number_of_fitting_atoms, 
+                             np_coords_calc, self.number_of_calculation_atoms,
+                             conformation_number, self.number_of_conformations,
+                             self.__number_of_threads, self.__threads_per_block, self.__blocks_per_grid,
+                             self.modify_coordinates)
+            
+            if (not self.modify_coordinates):
+                return rmsds
+            else:
+                return (rmsds, np_coords_fit)
+            
     def pairwiseRMSDMatrix(self):
         """
         Calculates the pairwise RMSD matrix for all conformations in the coordinates set.

@@ -13,19 +13,21 @@ void parse_params_for_one_vs_others(
 		double*& coords_list, int& number_of_atoms,
 		double*& calc_coords_list, int& number_of_calc_atoms,
 		int& conformation_number, int& number_of_conformations,
-    	int& number_of_threads,	int& threads_per_block,	int& blocks_per_grid){
+    	int& number_of_threads,	int& threads_per_block,	int& blocks_per_grid,
+    	int& modify_coordinates){
 	
 	PyArrayObject* coords_list_obj,
 				 * calc_coords_list_obj;
 
 	if (!PyArg_ParseTuple(
 			args,
-			"iO!iO!iiiiii",
+			"iO!iO!iiiiiii",
 			&calculatorType,
 			&PyArray_Type, &coords_list_obj, &number_of_atoms,
 			&PyArray_Type, &calc_coords_list_obj, &number_of_calc_atoms,
 			&conformation_number, &number_of_conformations,
-			&number_of_threads, &threads_per_block, &blocks_per_grid)){
+			&number_of_threads, &threads_per_block, &blocks_per_grid,
+			&modify_coordinates)){
 
 		PyErr_SetString(
 				PyExc_RuntimeError,
@@ -122,6 +124,7 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 	int number_of_threads;
 	int threads_per_block;
 	int blocks_per_grid;
+	int modify_coordinates;
 
 	RMSDCalculatorType calculatorType;
 	double* all_coordinates;
@@ -134,7 +137,8 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 			all_coordinates, atoms_per_conformation,
 			all_calc_coordinates, atoms_per_calc_conformation,
 			conformation_number, number_of_conformations,
-			number_of_threads, threads_per_block, blocks_per_grid);
+			number_of_threads, threads_per_block, blocks_per_grid,
+			modify_coordinates);
 
 	rmsd.resize(number_of_conformations-conformation_number-1);
 
@@ -147,7 +151,8 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 					all_calc_coordinates,
 					number_of_threads,
 					threads_per_block,
-					blocks_per_grid);
+					blocks_per_grid,
+					(bool) modify_coordinates);
 
     rmsdCalculator->oneVsFollowing(conformation_number,&(rmsd[0]));
 
