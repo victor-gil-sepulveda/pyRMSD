@@ -72,7 +72,7 @@ static int condensedMatrix_init(CondensedMatrix *self, PyObject *args, PyObject 
 
     if (rmsd_numpy_array == NULL){
     	PyErr_SetString(PyExc_RuntimeError, "Impossible to create intermediary data.\n"
-    										"Check that the parameter is a sequence and there's memory available.");
+    										  "Check that the parameter is a sequence and there's memory available.");
     	return -1;
     }
 
@@ -88,7 +88,7 @@ static int condensedMatrix_init(CondensedMatrix *self, PyObject *args, PyObject 
 	}
 
 	// Let's alloc the statistics object
-	self->statisticsCalculator =  new StatisticsCalculator(self->data,self->data_size);
+	self->statisticsCalculator =  new StatisticsCalculator(self->data, self->data_size);
 
 	if(!numpy){
     	Py_DECREF(rmsd_numpy_array);
@@ -112,8 +112,8 @@ static PyObject* condensedMatrix_get_number_of_rows(CondensedMatrix* self, PyObj
 }
 
 static PyObject* condensedMatrix_get_data(CondensedMatrix* self, PyObject *args){
-	npy_intp dims[1] = {self->data_size};
-	return  PyArray_SimpleNewFromData(1,dims,NPY_FLOAT,self->data);
+	npy_intp dims[] = {self->data_size};
+	return  PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, self->data);
 }
 
 #include "Matrix.Statistics.cpp"

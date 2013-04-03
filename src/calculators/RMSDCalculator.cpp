@@ -214,7 +214,7 @@ void RMSDCalculator::iterativeSuperposition(double rmsd_diff_to_stop){
 		// reference = mean
 		RMSDTools::copyArrays(reference_coords, mean_coords, coordinatesPerConformation);
 
-		cout<<"step: "<< current_iteration<<" rmsd diff: "<<rmsd_difference<<endl;
+		//cout<<"step: "<< current_iteration<<" rmsd diff: "<<rmsd_difference<<endl;
 
 		current_iteration++;
 	}
