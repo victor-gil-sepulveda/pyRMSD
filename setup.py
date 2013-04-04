@@ -6,7 +6,7 @@ Created on 25/02/2013
 from distutils.core import setup, Extension
 import numpy
 setup(name='pyRMSD',
-      version='2.0',
+      version='3.0',
       description='pyRMSD is a small Python package that aims to offer an integrative and efficient way of performing RMSD calculations of large sets of structures. It is specially tuned to do fast collective RMSD calculations, as pairwise RMSD matrices.',
       author='Victor Alejandro Gil Sepulveda',
       author_email='victor.gil.sepulveda@gmail.com',
@@ -29,16 +29,18 @@ setup(name='pyRMSD',
                              sources = [
                                         'src/python/pyRMSD.cpp',
                                         
-                                        'src/calculators/RMSD.cpp',
+                                        'src/calculators/RMSDCalculator.cpp',
                                         'src/calculators/RMSDTools.cpp',
-                                        
-                                        'src/calculators/QTRFIT/RMSDSerial.cpp',
-                                        'src/calculators/QTRFIT/RMSDomp.cpp',
+                                        'src/calculators/factory/RMSDTools.cpp',
 
-                                        'src/calculators/QCP/kernel_functions_omp.cpp',
-                                        'src/calculators/QCP/kernel_functions_serial.cpp',
-                                        'src/calculators/QCP/ThRMSDSerial.cpp',
-                                        'src/calculators/QCP/ThRMSDSerialOmp.cpp'
+                                        'src/calculators/KABSCH/KABSCHSerialKernel.cpp',
+                                        'src/calculators/KABSCH/KABSCHOmpKernel.cpp',
+                                        
+                                        'src/calculators/QTRFIT/QTRFITSerialKernel.cpp',
+                                        'src/calculators/QTRFIT/QTRFITOmpKernel.cpp',
+                                        
+                                        'src/calculators/QCP/QCPSerialKernel.cpp',
+                                        'src/calculators/QCP/QCPOmpKernel.cpp',
                              ],
                              extra_compile_args=['-fopenmp'],
                              extra_link_args=['-fopenmp']
