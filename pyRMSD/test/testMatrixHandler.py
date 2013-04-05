@@ -26,7 +26,7 @@ class TestMatrixHandler(unittest.TestCase):
         numpy.testing.assert_array_equal(recovered_data, data) 
         
         # Clean it!
-        os.system("rm matrix.bin")
+        os.system("rm matrix.npy")
         
     def test_create_with_reader(self):
         self.fail("TODO")

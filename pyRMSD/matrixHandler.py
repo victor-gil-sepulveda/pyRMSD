@@ -59,11 +59,11 @@ class MatrixHandler(object):
     
     @classmethod
     def save_matrix(cls, matrix_file_without_extension, distance_matrix):
-        numpy.save(matrix_file_without_extension+".bin",distance_matrix.get_data())
+        numpy.save(matrix_file_without_extension,distance_matrix.get_data())
     
     @classmethod
     def load_matrix(cls, matrix_file_without_extension):
-        return CondensedMatrix(list(numpy.load(matrix_file_without_extension+".bin")))
+        return CondensedMatrix(list(numpy.load(matrix_file_without_extension+".npy")))
     
     @classmethod
     def save_statistics(cls, statistics_folder , distance_matrix):
