@@ -4,7 +4,7 @@ Created on 19/09/2012
 @author: victor
 '''
 import json
-import pickle
+import numpy
 import pyRMSD.RMSDCalculator
 from pyRMSD.condensedMatrix import CondensedMatrix #@UnresolvedImport
 from pyRMSD.utils.proteinReading import Reader
@@ -59,16 +59,11 @@ class MatrixHandler(object):
     
     @classmethod
     def save_matrix(cls, matrix_file_without_extension, distance_matrix):
-        output_handler = open(matrix_file_without_extension+".bin",'w')
-        pickle.dump(distance_matrix.get_data(),output_handler)
-        output_handler.close()
+        numpy.save(matrix_file_without_extension+".bin",distance_matrix.get_data())
     
     @classmethod
     def load_matrix(cls, matrix_file_without_extension):
-        input_file_handler = open(matrix_file_without_extension+".bin","r")
-        rmsd_data = pickle.load(input_file_handler)
-        input_file_handler.close()
-        return CondensedMatrix(list(rmsd_data))
+        return CondensedMatrix(list(numpy.load(matrix_file_without_extension+".bin")))
     
     @classmethod
     def save_statistics(cls, statistics_folder , distance_matrix):
