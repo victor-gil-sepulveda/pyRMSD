@@ -7,11 +7,11 @@ import unittest
 from pyRMSD.condensedMatrix import CondensedMatrix
 import random 
 import numpy
-import scipy.stats
 
 class testMatrixStatistics(unittest.TestCase):
     
     def setUp(self):
+        random.seed(12345)
         num_elems = 50*49/2;
         self.contents = random.sample(xrange(num_elems+1),num_elems)
         self.condensedMatrix = CondensedMatrix(self.contents)
@@ -23,10 +23,10 @@ class testMatrixStatistics(unittest.TestCase):
         self.assertAlmostEquals(self.condensedMatrix.calculateVariance(), numpy.var(self.contents))#, delta = 1)
     
     def test_skewness(self):
-        self.assertAlmostEquals(self.condensedMatrix.calculateSkewness(), scipy.stats.skew(self.contents))#d, delta = 1)
+        self.assertAlmostEquals(self.condensedMatrix.calculateSkewness(), -0.000733274016748)#scipy.stats.skew(self.contents))#d, delta = 1)
     
     def test_kurtosis(self):
-        self.assertAlmostEquals(self.condensedMatrix.calculateKurtosis(), scipy.stats.kurtosis(self.contents))#, delta = 1)
+        self.assertAlmostEquals(self.condensedMatrix.calculateKurtosis(), -1.20119577613)#scipy.stats.kurtosis(self.contents))#, delta = 1)
     
     def test_max(self):
         self.assertAlmostEquals(self.condensedMatrix.calculateMax(), numpy.max(self.contents))#, delta = 1)
