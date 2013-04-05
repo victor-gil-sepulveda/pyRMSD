@@ -1,5 +1,4 @@
 import pyRMSD.calculators
-from pyRMSD.utils.proteinReading import flattenCoords
 from pyRMSD.availableCalculators import availableCalculators
 import numpy
 
@@ -170,7 +169,7 @@ class RMSDCalculator(object):
         @author: vgil
         @date: 26/11/2012
         """     
-        np_coords_fit = numpy.copy(flattenCoords(self.fitting_coordinates))
+        np_coords_fit = numpy.copy(numpy.reshape(self.fitting_coordinates,self.number_of_conformations*self.number_of_fitting_atoms*3))
         if (self.calculation_coordinates is None):
             
             rmsds =  pyRMSD.calculators.oneVsFollowing(
@@ -186,7 +185,7 @@ class RMSDCalculator(object):
             else:
                 return (rmsds, np_coords_fit)
         else:
-            np_coords_calc = numpy.copy(flattenCoords(self.calculation_coordinates))
+            np_coords_calc = numpy.copy(numpy.reshape(self.calculation_coordinates,self.number_of_conformations*self.number_of_calculation_atoms*3))
             
             rmsds =  pyRMSD.calculators.oneVsFollowing(
                              availableCalculators()[self.calculatorType], 
@@ -210,7 +209,7 @@ class RMSDCalculator(object):
         @author: vgil
         @date: 26/11/2012
         """
-        np_coords = numpy.copy(flattenCoords(self.fitting_coordinates))
+        np_coords = numpy.copy(numpy.reshape(self.fitting_coordinates,self.number_of_conformations*self.number_of_fitting_atoms*3))
         if (self.calculation_coordinates is None):
             return pyRMSD.calculators.calculateRMSDCondensedMatrix(
                                                                    availableCalculators()[self.calculatorType], 
@@ -219,7 +218,7 @@ class RMSDCalculator(object):
                                                                    self.number_of_conformations,
                                                                    self.__number_of_threads, self.__blocks_per_grid, self.__blocks_per_grid)
         else:
-            np_coords_calc = flattenCoords(self.calculation_coordinates)
+            np_coords_calc = numpy.copy(numpy.reshape(self.calculation_coordinates,self.number_of_conformations*self.number_of_calculation_atoms*3))
             return pyRMSD.calculators.calculateRMSDCondensedMatrix(
                                                                    availableCalculators()[self.calculatorType], 
                                                                    np_coords, self.number_of_fitting_atoms, 
@@ -237,7 +236,7 @@ class RMSDCalculator(object):
         @author: vgil
         @date: 27/03/2013
         """
-        np_coords = flattenCoords(self.fitting_coordinates)
+        np_coords = numpy.reshape(self.fitting_coordinates,self.number_of_conformations*self.number_of_fitting_atoms*3)
         if (self.calculation_coordinates is None):
             pyRMSD.calculators.iterativeSuperposition(
                                availableCalculators()[self.calculatorType], 
@@ -246,7 +245,7 @@ class RMSDCalculator(object):
                                self.number_of_conformations,
                                self.__number_of_threads, self.__blocks_per_grid, self.__blocks_per_grid)
         else:
-            np_coords_calc = flattenCoords(self.calculation_coordinates)
+            np_coords_calc = numpy.reshape(self.calculation_coordinates,self.number_of_conformations*self.number_of_calculation_atoms*3)
             pyRMSD.calculators.iterativeSuperposition(
                                availableCalculators()[self.calculatorType], 
                                np_coords, self.number_of_fitting_atoms, 
