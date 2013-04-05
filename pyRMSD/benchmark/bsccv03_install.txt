@@ -1,0 +1,44 @@
+Se crea el directorio Python en $HOME
+Siempre que se puede se hacen los connfigure con --prefix=$HOME o python, dependiendo de si instalamos librerías o python packages.
+
+
+python con ./configure y luego make altinstall prefix=~/Python exec-prefix=~/Python
+export PYTHONSTARTUP="" -> para evitar que haga el startup de la versión por defecto
+
+----
+descomprimir lapack.
+lapack , make lib y copia de las librerias a ~/lib
+
+lapack se tiene que hacer make con el añadido 
+
+OPTS = -O2 -fPIC (y -m64 para 64 bits)
+NOOPT = -O0 -fPIC (y -m64 para 64 bits)
+----
+
+fftw ./configure --prefix=$HOME , make, make install
+
+---
+alias python="~/Python/bin/python2.7" nos permite ejecutar python más fácilmente, sin embargo
+si se usa con python file.py, llama al interprete anterior
+
+----
+numpy : python setup.py install --prefix=~/Python
+-----
+
+
+Una vez compilado este y fftw se puede instalar scipy, tras añadir
+export LAPACK=~/lib/liblapack.a para que sepa donde se encuentra la librería.
+
+meter las libs de python lapack  en LD_LIBRARY
+
+---
+
+instalar fastcluster
+
+---
+
+instalar scikit-learn
+
+---
+
+

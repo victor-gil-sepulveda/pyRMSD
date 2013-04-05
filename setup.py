@@ -31,7 +31,7 @@ setup(name='pyRMSD',
                                         
                                         'src/calculators/RMSDCalculator.cpp',
                                         'src/calculators/RMSDTools.cpp',
-                                        'src/calculators/factory/RMSDTools.cpp',
+                                        'src/calculators/factory/RMSDCalculatorFactory.cpp',
 
                                         'src/calculators/KABSCH/KABSCHSerialKernel.cpp',
                                         'src/calculators/KABSCH/KABSCHOmpKernel.cpp',
