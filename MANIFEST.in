@@ -1,0 +1,8 @@
+include src/matrix/*.h
+include src/pdbreaderlite/*.h
+include src/calculators/*.h
+include src/calculators/QCP/*.h
+include src/calculators/factory/*.h
+include src/calculators/QTRFIT/*.h
+include src/calculators/KABSCH/*.h
+include src//externalToolBuilders
