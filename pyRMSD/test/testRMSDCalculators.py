@@ -30,15 +30,10 @@ class TestRMSDCalculators(unittest.TestCase):
                                        0.93694602,0.76944618,0.82288799,0.91196003,0.75938856,0.68278426,
                                        0.76302383]
         
-        reader = pyRMSD.utils.proteinReading.Reader("PRODY_READER")
-        reader.readThisFile('data/amber_mini.pdb').gettingOnlyCAs()
-        self.coordsets_mini =  reader.read()
-        
-        reader = pyRMSD.utils.proteinReading.Reader("PRODY_READER")
-        reader.readThisFile('data/amber_short.pdb').gettingOnlyCAs()
-        self.coordsets =  reader.read()
-        self.number_of_conformations = reader.numberOfFrames
-        self.number_of_atoms = reader.numberOfAtoms
+        self.coordsets_mini =  numpy.load("data/coordsets_mini.npy")
+        self.coordsets =  numpy.load("data/coordsets.npy")
+        self.number_of_conformations = self.coordsets.shape[0]
+        self.number_of_atoms = self.coordsets.shape[1]
     
     def test_serial_omp_pairwise(self):
         """
