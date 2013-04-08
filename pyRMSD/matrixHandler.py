@@ -7,7 +7,6 @@ import json
 import numpy
 import pyRMSD.RMSDCalculator
 from pyRMSD.condensedMatrix import CondensedMatrix #@UnresolvedImport
-from pyRMSD.utils.proteinReading import Reader
 
 class MatrixHandler(object):
     
@@ -24,24 +23,6 @@ class MatrixHandler(object):
         self.distance_matrix = CondensedMatrix(rmsd)
         self.distance_matrix.recalculateStatistics()
         self.__save_statistics()
-        print " Done\n"
-        return self.distance_matrix
-    
-    def createMatrixReadingOnlyCAs(self, pdb_file, reader_type = "LITE_READER", calculator = "QCP_OMP_CALCULATOR"):
-        reader = Reader(reader_type).readThisFile(pdb_file).gettingOnlyCAs()
-        return self.__createMatrixWithReader(reader, calculator)
-    
-    def createMatrixWithReader(self, pdb_file, reader_type = "LITE_READER", calculator = "QCP_OMP_CALCULATOR"):
-        reader = Reader(reader_type).readThisFile(pdb_file)
-        return self.__createMatrixWithReader(reader, calculator)
-    
-    def __createMatrixWithReader(self, reader, calculator = "QCP_OMP_CALCULATOR"):
-        pdb_coordsets = reader.read()
-        print "Calculating matrix..."
-        rmsd = pyRMSD.RMSDCalculator.RMSDCalculator(pdb_coordsets, calculator).pairwiseRMSDMatrix()
-        self.distance_matrix = CondensedMatrix(rmsd)
-        self.distance_matrix.recalculateStatistics()
-        MatrixHandler.save_statistics(self.statistics_folder, self.distance_matrix)
         print " Done\n"
         return self.distance_matrix
         
