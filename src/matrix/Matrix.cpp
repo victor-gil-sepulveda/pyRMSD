@@ -1,6 +1,6 @@
 #include "Statistics.h"
-#include <python2.7/Python.h>
-#include <python2.7/structmember.h>
+#include <Python.h>
+#include <structmember.h>
 #include <numpy/arrayobject.h>
 #include <cmath>
 #include <algorithm>
