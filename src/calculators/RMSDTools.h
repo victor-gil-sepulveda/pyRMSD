@@ -11,6 +11,9 @@ namespace RMSDTools{
 	void centerAllAtOrigin(unsigned int atomsPerConformation, unsigned int numberOfConformations,
 					double * const all_coords, double* const translations);
 
+	void centerAllAtOrigin(unsigned int atomsPerConformation, unsigned int numberOfConformations,
+						double * const all_coords);
+
 	void applyTranslationsToAll(unsigned int atomsPerConformation, unsigned int numberOfConformations,
 			double * const all_coords, double* const translations);
 

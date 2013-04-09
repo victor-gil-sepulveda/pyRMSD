@@ -44,7 +44,7 @@ void QCPOmpKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
 
 	int coordinates_per_conformation = atomsPerConformation * 3;
 
-//	#pragma omp parallel for shared(rmsd)
+	#pragma omp parallel for shared(rmsd)
 	for (int second_conformation_id = reference_conformation_number + 1;
 					second_conformation_id < numberOfConformations; ++second_conformation_id){
 		double* second_conformation_coords = &(allCoordinates[second_conformation_id*coordinates_per_conformation]);
