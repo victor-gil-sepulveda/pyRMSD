@@ -107,34 +107,21 @@ class QCPCUDAKernel: public KernelFunctions{
 					int atomsPerRMSDConformation,
 					double *allRMSDCoordinates);
 
-		double innerProduct(double* A, double* first_conformation_coords, double* second_conformation_coords, int number_of_atoms);
-
-		double calcRMSDForTwoConformationsWithTheobaldMethod(double *A, double E0, int number_of_atoms, double* rot_matrix = NULL);
-
 		int threads_per_block;
 		int blocks_per_grid;
 
 	private:
 
-		QCPCUDAKernel(){
-			threads_per_block = blocks_per_grid = 0;
-			tmpHostCoords = tmpHostRMSDs = tmpHostReference =
-			tmpCalcHostCoords = tmpCalcHostReference = NULL;
-
-			deviceCoords =  deviceRMSDs = deviceReference =
-			deviceCalcCoords = deviceCalcReference = NULL;
-		}
+		QCPCUDAKernel(){}
 
 		float* tmpHostCoords;
 		float* tmpHostRMSDs;
-		float* tmpHostReference;
 
 		floating_point_type* deviceCoords;
 		floating_point_type* deviceRMSDs;
 		floating_point_type* deviceReference;
 
 		float* tmpCalcHostCoords;
-		float* tmpCalcHostReference;
 
 		floating_point_type* deviceCalcCoords;
 		floating_point_type* deviceCalcReference;

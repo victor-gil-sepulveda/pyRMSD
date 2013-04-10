@@ -42,17 +42,14 @@ class RMSDCalculator{
 		virtual void _one_vs_following_fit_differs_calc_coords_rotating_coordinates(double* fitReference,
 				double* calcReference, int reference_conformation_number, double *rmsd);
 
-		// Coordinates info
 		int numberOfConformations;
-
 		int atomsPerFittingConformation;
 		int coordinatesPerFittingConformation;
 		double* allFittingCoordinates; // Coordinates for fitting and RMSD (if allRMSDCoordinates == NULL)
-
 		int atomsPerCalculationConformation;
 		int coordinatesPerCalculationConformation;
-		double* allCalculationCoordinates; // If is different from NULL, then this are the coordinates
-									 // to calculate the RMSD.
+		double* allCalculationCoordinates; 	 // If is different from NULL, then this are the coordinates
+									 	 	 // to calculate the RMSD.
 
 		bool rotateFittingCoordinates;
 
