@@ -7,7 +7,7 @@ import pyRMSD.RMSDCalculator
 import time
 from pyRMSD.utils.proteinReading import Reader
 import numpy
-import sys
+import sys 
 
 if __name__ == '__main__':
     using_cuda = "QCP_CUDA_CALCULATOR" in pyRMSD.RMSDCalculator.availableCalculators()
@@ -29,7 +29,8 @@ if __name__ == '__main__':
         times = []
         for i in range(1):
             calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_CUDA_CALCULATOR")
-            calculator.setCUDAKernelThreadsPerBlock(128, 64)
+            #calculator.setCUDAKernelThreadsPerBlock(128, 64)
+            calculator.setCUDAKernelThreadsPerBlock(256, 256)
             t1 = time.time()
             rmsd = calculator.pairwiseRMSDMatrix()
             t2 = time.time()
