@@ -8,7 +8,8 @@ import time
 from pyRMSD.utils.proteinReading import Reader
 import numpy
 import sys 
-
+#With CUDA and  amber_5k.pdb  it took:  18.7449800968
+#With CUDA and  amber_5k.pdb  it took:  1.81559896469 [ 0.0 ]
 if __name__ == '__main__':
     using_cuda = "QCP_CUDA_CALCULATOR" in pyRMSD.RMSDCalculator.availableCalculators()
     
