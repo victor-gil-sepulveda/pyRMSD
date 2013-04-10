@@ -118,26 +118,26 @@ class QCPCUDAKernel: public KernelFunctions{
 
 		QCPCUDAKernel(){
 			threads_per_block = blocks_per_grid = 0;
+			tmpHostCoords = tmpHostRMSDs = tmpHostReference =
+			tmpCalcHostCoords = tmpCalcHostReference = NULL;
 
-			tmpHostCoords = deviceCoords =
-			tmpHostRMSDs = deviceRMSDs =
-			tmpHostReference = deviceReference =
-			tmpCalcHostCoords = deviceCalcCoords =
-			tmpCalcHostReference = deviceCalcReference = NULL;
+			deviceCoords =  deviceRMSDs = deviceReference =
+			deviceCalcCoords = deviceCalcReference = NULL;
 		}
 
-		floating_point_type* tmpHostCoords;
-		floating_point_type* tmpHostRMSDs;
-		floating_point_type* tmpHostReference;
+		float* tmpHostCoords;
+		float* tmpHostRMSDs;
+		float* tmpHostReference;
 
 		floating_point_type* deviceCoords;
 		floating_point_type* deviceRMSDs;
 		floating_point_type* deviceReference;
 
-		floating_point_type* tmpCalcHostCoords;
-		floating_point_type* tmpCalcHostReference;
+		float* tmpCalcHostCoords;
+		float* tmpCalcHostReference;
 
 		floating_point_type* deviceCalcCoords;
 		floating_point_type* deviceCalcReference;
+
 };
 #endif

@@ -48,32 +48,17 @@ QCPCUDAKernel::QCPCUDAKernel(
 				int blocks_per_grid)
 {
 	
-//	Now I'm  not using streams anymore as it didn't give me any speedup
-//	int device;
-//	cudaDeviceProp props;
-//	
-//	checkCudaError("cudaGetDevice",
-//			cudaGetDevice(
-//					&device));
-//	
-//	checkCudaError("cudaGetDeviceProperties",
-//			cudaGetDeviceProperties(
-//					&props, 
-//					device));
-//
-//	if(!props.deviceOverlap){
-//		cout<<"There are no multiple streams, so this implementation may not work properly :S"<<endl;
-//	}
+	//	Note: I'm  not using streams anymore as it didn't give me any speedup
 
 	this->threads_per_block = threads_per_block;
 	this->blocks_per_grid = blocks_per_grid;
-
-	tmpHostCoords = deviceCoords =
-	tmpHostRMSDs = deviceRMSDs =
-	tmpHostReference = deviceReference =
-	tmpCalcHostCoords = deviceCalcCoords =
-	tmpCalcHostReference = deviceCalcReference = NULL;
 	
+	tmpHostCoords = tmpHostRMSDs = tmpHostReference =
+	tmpCalcHostCoords = tmpCalcHostReference = NULL;
+	
+	deviceCoords =  deviceRMSDs = deviceReference =
+	deviceCalcCoords = deviceCalcReference = NULL;
+
 	int totalNumberOfCoordinates = coordinatesPerConformation*numberOfConformations;
 
 	#ifdef CUDA_PRECISION_SINGLE

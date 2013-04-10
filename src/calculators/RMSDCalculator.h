@@ -45,13 +45,13 @@ class RMSDCalculator{
 		// Coordinates info
 		int numberOfConformations;
 
-		int atomsPerConformation;
-		int coordinatesPerConformation;
-		double* allCoordinates; // Coordinates for fitting and RMSD (if allRMSDCoordinates == NULL)
+		int atomsPerFittingConformation;
+		int coordinatesPerFittingConformation;
+		double* allFittingCoordinates; // Coordinates for fitting and RMSD (if allRMSDCoordinates == NULL)
 
-		int atomsPerRMSDConformation;
-		int coordinatesPerRMSDConformation;
-		double* allRMSDCoordinates; // If is different from NULL, then this are the coordinates
+		int atomsPerCalculationConformation;
+		int coordinatesPerCalculationConformation;
+		double* allCalculationCoordinates; // If is different from NULL, then this are the coordinates
 									 // to calculate the RMSD.
 
 		bool rotateFittingCoordinates;
