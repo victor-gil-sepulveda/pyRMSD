@@ -25,7 +25,7 @@ if __name__ == '__main__':
     print "\tUncompressing..."
     open("tmp_amber_long.pdb","w").write(bz2.BZ2File("data/amber_long.pdb.tar.bz2").read())
     print "\tLoading..."
-    reader = Reader("PRODY_READER").readThisFile('tmp_amber_long.pdb').gettingOnlyCAs()
+    reader = Reader().readThisFile('tmp_amber_long.pdb').gettingOnlyCAs()
     coordsets = reader.read() 
     number_of_atoms = reader.numberOfAtoms
     number_of_conformations = reader.numberOfFrames
@@ -34,15 +34,15 @@ if __name__ == '__main__':
     t2 = time.time()
     print 'Loading took %0.3f s' % (t2-t1)
     
-    for number_of_threads in range(1,13):
-        calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_OMP_CALCULATOR")
-        calculator.setNumberOfOpenMPThreads(number_of_threads)
-        t1 = time.time()
-        rmsd = calculator.pairwiseRMSDMatrix()
-        t2 = time.time()
-        del rmsd
-        print 'OpenMP calculation took %0.3fs with number of threads %d' % (t2-t1, number_of_threads)
-         
+#    for number_of_threads in range(1,13):
+#        calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_OMP_CALCULATOR")
+#        calculator.setNumberOfOpenMPThreads(number_of_threads)
+#        t1 = time.time()
+#        rmsd = calculator.pairwiseRMSDMatrix()
+#        t2 = time.time()
+#        del rmsd
+#        print 'OpenMP calculation took %0.3fs with number of threads %d' % (t2-t1, number_of_threads)
+#         
     # Generate test parameters
     max_n_threads = 512
     max_n_blocks = 512 

@@ -8,7 +8,7 @@ import time
 from pyRMSD.utils.proteinReading import Reader
 import numpy
 import sys
-
+#With OpenMP and amber_5k.pdb  it took:  2.5554060936 [ 0.0 ]
 if __name__ == '__main__':
 
     files = ["amber_5k.pdb","amber_10k.pdb","amber_15k.pdb","amber_20k.pdb","amber_25k.pdb","amber_30k.pdb","amber_35k.pdb"]  
@@ -16,13 +16,13 @@ if __name__ == '__main__':
     for pdb_file in files:
         print "Reading file ", "data/"+pdb_file
         sys.stdout.flush()
-        reader = Reader("LITE_READER").readThisFile("data/"+pdb_file).gettingOnlyCAs()
+        reader = Reader().readThisFile("data/"+pdb_file).gettingOnlyCAs()
         coordsets = reader.read() 
         number_of_atoms = reader.numberOfAtoms
         number_of_conformations = reader.numberOfFrames
         
         times = []
-        for i in range(20):
+        for i in range(1):
             calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_OMP_CALCULATOR")
             calculator.setNumberOfOpenMPThreads(6)
             t1 = time.time()

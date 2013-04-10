@@ -1,7 +1,7 @@
 #!/bin/bash	
 	# @ wall_clock_limit = 10:00:00
-	# @ cpus_per_task = 6
+	# @ cpus_per_task = 1
 	# @ tasks_per_node = 1
 	# @ gpus_per_node = 1
-
-	/home/bsc72/bsc72476/bin/python2.7 BenchmarckSerial.py
+	# @ output = serial.out
+	~/Python/bin/python2.7 BenchmarkSerial.py

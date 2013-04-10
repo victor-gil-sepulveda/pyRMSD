@@ -8,10 +8,10 @@ import time
 from pyRMSD.utils.proteinReading import Reader
 import numpy
 import sys
-
+#With Serial and  amber_5k.pdb  it took:  7.08920001984 [ 0.0 ]
 if __name__ == '__main__':
 
-    files = ["amber_5k.pdb","amber_10k.pdb","amber_15k.pdb"]#,"amber_20k.pdb","amber_25k.pdb","amber_30k.pdb","amber_35k.pdb"]  
+    files = ["amber_5k.pdb","amber_10k.pdb","amber_15k.pdb","amber_20k.pdb","amber_25k.pdb","amber_30k.pdb","amber_35k.pdb"]  
     
     for pdb_file in files:
         print "Reading file ", "data/"+pdb_file
