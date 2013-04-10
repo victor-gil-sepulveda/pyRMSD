@@ -5,6 +5,21 @@
 #include "../RMSDTools.h"
 using namespace std;
 
+//
+//	    0   0.0%   0.0%    31771  88.1% __libc_start_main
+//      0   0.0%   0.0%    31199  86.5% calculateRMSDCondensedMatrix
+//      3   0.0%   0.0%    31124  86.3% RMSDCalculator::calculateRMSDCondensedMatrix
+//      1   0.0%   0.0%    30960  85.8% RMSDCalculator::_one_vs_following_fit_equals_calc_coords
+//   8589  23.8%  23.8%    22851  63.3% cuMemGetAttribute_v2
+//      4   0.0%  23.8%    21019  58.3% cudaGetExportTable
+//      2   0.0%  23.8%    20993  58.2% cudaMemcpy
+//      2   0.0%  23.8%    15926  44.2% QCPCUDAKernel::oneVsFollowingFitEqualCalcWithoutConfRotation
+//   9864  27.3%  51.2%    15895  44.1% QCPCUDAKernel::updateDeviceCoordinates
+//     73   0.2%  51.4%    15034  41.7% QCPCUDAKernel::updateHostRMSDs
+//      0   0.0%  51.4%    14960  41.5% cuMemcpyDtoH_v2
+//      1   0.0%  51.4%     6023  16.7% cuMemcpyHtoD_v2
+
+
 ///////////////////////////////////////////////////////////////
 /// \remarks
 ///	Convenience function for CUDA error handling. It captures the error, writes a user-based message,
@@ -75,12 +90,6 @@ void QCPCUDAKernel::init(
 			cudaMalloc(
 					(void **) &deviceRMSDs, 
 					numberOfConformations * sizeof(floating_point_type)));
-
-//	Coordinates come centered
-//	centerCoordsOfAllConformations<<<this->blocks_per_grid, this->threads_per_block>>>(
-//			numberOfConformations,
-//			atomsPerConformation,
-//			deviceCoords);
 }
 
 QCPCUDAKernel::~QCPCUDAKernel(){

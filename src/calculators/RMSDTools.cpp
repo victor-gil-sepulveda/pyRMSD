@@ -29,6 +29,24 @@ void RMSDTools::centerAllAtOrigin(
 	}
 }
 
+/*
+ * Centers all the conformations to origin and stores the movement vectors.
+ *
+ */
+void RMSDTools::centerAllAtOrigin(
+		unsigned int atomsPerConformation,
+		unsigned int numberOfConformations,
+		double * const all_coords){
+
+	unsigned int coordsPerConformation = atomsPerConformation * 3;
+	double center [] = {0,0,0};
+	for (unsigned int i = 0; i < numberOfConformations; ++i){
+		double* coords = &(all_coords[coordsPerConformation*i]);
+		RMSDTools::geometricCenter(atomsPerConformation, coords, center);
+		RMSDTools::shift3D(atomsPerConformation, coords, center, -1.);
+	}
+}
+
 void RMSDTools::applyTranslationsToAll(unsigned int atomsPerConformation, unsigned int numberOfConformations, double * const all_coords, double* const translations){
 	unsigned int coordsPerConformation = atomsPerConformation * 3;
 

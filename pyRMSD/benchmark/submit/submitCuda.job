@@ -4,5 +4,6 @@
 	# @ cpus_per_task = 6
 	# @ tasks_per_node = 1
 	# @ gpus_per_node = 1
-
-	/home/bsc72/bsc72476/bin/python2.7 BenchmarckCuda.py
+	# @ output = cuda_single.out
+	~/Python/bin/python2.7 BenchmarkCuda.py
+	

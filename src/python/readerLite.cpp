@@ -1,4 +1,4 @@
-#include <python2.7/Python.h>
+#include <Python.h>
 #include <numpy/arrayobject.h>
 #include <vector>
 #include <iostream>

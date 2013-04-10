@@ -1,10 +1,9 @@
 import numpy
-import sysconfig
-import os.path
 from build_utils import compile_a_file_collection, Link
 import optparse
 import collections
-
+import distutils.sysconfig
+import os
 
 ##############################################
 #####                                  #######
@@ -18,8 +17,8 @@ CUDA_ARCHITECHTURE = "sm_11"                         # CUDA architecture of your
 CUDA_LIBRARY = "cudart"
 PYTHON_EXTENSION_OPTIONS = "-pthread -g -fno-strict-aliasing -fmessage-length=0 -O3 -Wall \
 -D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -fPIC"
-PYTHON_INCLUDE_FOLDER = os.path.dirname(sysconfig.get_paths()['include'])
-PYTHON_LIBRARY_FOLDER = os.path.dirname(sysconfig.get_paths()['stdlib'])
+PYTHON_INCLUDE_FOLDER = distutils.sysconfig.get_python_inc()
+PYTHON_LIBRARY_FOLDER = distutils.sysconfig.get_python_lib()
 PYTHON_LIBRARY = "python2.7"
 OPENMP_OPTION = "-fopenmp"
 ###############################################

@@ -5,7 +5,7 @@ Created on 25/02/2013
 '''
 from distutils.core import setup, Extension
 import numpy
-from distutils import sysconfig
+import distutils.sysconfig
 
 setup(name='pyRMSD',
       version='3.0',
@@ -16,9 +16,8 @@ setup(name='pyRMSD',
       packages=['pyRMSD','pyRMSD.utils'],
       package_dir={'pyRMSD':'./pyRMSD'},
       py_modules=['pyRMSD.availableCalculators', 'pyRMSD.matrixHandler', 'pyRMSD.RMSDCalculator', 'pyRMSD.utils.proteinReading'],
-      include_dirs = [
-                      numpy.get_include(),
-                      sysconfig.get_python_inc()],
+      include_dirs = [numpy.get_include(),
+                      distutils.sysconfig.get_python_inc()],
       ext_modules=[
                    Extension('pyRMSD.pdbReader',[
                                           'src/pdbreaderlite/PDBReader.cpp',
