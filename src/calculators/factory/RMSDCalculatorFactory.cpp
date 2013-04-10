@@ -78,8 +78,12 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 
 		case QCP_CUDA_CALCULATOR:
 					kernelFunctions = new QCPCUDAKernel(
-							threads_per_block,
-							blocks_per_grid);
+											allFittingCoordinates,
+											atomsPerFittingConformation,
+											atomsPerFittingConformation*3,
+											numberOfConformations,
+											threads_per_block,
+											blocks_per_grid);
 					break;
 #endif
 

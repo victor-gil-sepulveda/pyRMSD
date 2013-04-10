@@ -5,8 +5,10 @@
 #include <vector>
 using namespace std;
 
-RMSDCalculator::RMSDCalculator(int numberOfConformations, int atomsPerConformation,
-								   double* allCoordinates, KernelFunctions* kernelFunctions){
+RMSDCalculator::RMSDCalculator(	int numberOfConformations,
+								int atomsPerConformation,
+								double* allCoordinates,
+								KernelFunctions* kernelFunctions){
 	this->numberOfConformations = numberOfConformations;
 	this->atomsPerConformation = atomsPerConformation;
 	this->allCoordinates = allCoordinates;
@@ -16,11 +18,6 @@ RMSDCalculator::RMSDCalculator(int numberOfConformations, int atomsPerConformati
 	this->atomsPerRMSDConformation = 0;
 	this->rotateFittingCoordinates = false;
 	this->kernelFunctions = kernelFunctions;
-	this->kernelFunctions->init(
-			this->allCoordinates,
-			this->atomsPerConformation,
-			this->coordinatesPerConformation,
-			this->numberOfConformations);
 }
 
 RMSDCalculator::~RMSDCalculator(){
@@ -159,7 +156,7 @@ void RMSDCalculator::_one_vs_following_fit_equals_calc_coords(
 			atomsPerConformation,
 			allCoordinates);
 
-	// Move then again to their places to avoid coordinate modification
+	// Move then again to their places
 	RMSDTools::applyTranslationsToAll(
 			this->atomsPerConformation,
 			(numberOfConformations-reference_conformation_number),

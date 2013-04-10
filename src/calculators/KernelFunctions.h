@@ -13,12 +13,6 @@ class KernelFunctions{
 		KernelFunctions(){}
 		virtual ~KernelFunctions(){}
 
-		virtual void init(
-						double* coordinates,
-						int atomsPerConformation,
-						int coordinatesPerConformation,
-						int numberOfConformations){}
-
 		virtual void changeCalculationCoords(
 				double* calcCoords,
 				int number_of_atoms,

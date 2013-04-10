@@ -27,24 +27,14 @@
 class QCPCUDAKernel: public KernelFunctions{
 
 	public:
-		QCPCUDAKernel(int threads_per_block, int blocks_per_grid){
-			this->threads_per_block = threads_per_block;
-			this->blocks_per_grid = blocks_per_grid;
-
-			tmpHostCoords = deviceCoords =
-			tmpHostRMSDs = deviceRMSDs =
-			tmpHostReference = deviceReference =
-			tmpCalcHostCoords = deviceCalcCoords =
-			tmpCalcHostReference = deviceCalcReference = NULL;
-		}
-
-		virtual ~QCPCUDAKernel();
-
-		virtual void init(
-				double* coordinates,
+		QCPCUDAKernel(double* coordinates,
 				int atomsPerConformation,
 				int coordinatesPerConformation,
-				int numberOfConformations);
+				int numberOfConformations,
+				int threads_per_block,
+				int blocks_per_grid);
+
+		virtual ~QCPCUDAKernel();
 
 		virtual void changeCalculationCoords(
 				double* calcCoords,
