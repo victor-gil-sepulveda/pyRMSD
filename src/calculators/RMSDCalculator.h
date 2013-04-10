@@ -5,6 +5,11 @@
 #include "KernelFunctions.h"
 #include <cstddef>
 
+
+/*
+ * This is the base class for an RMSD Calculator, and holds almost all its logic (different calculators are
+ * indeed different versions of the kernels).
+ */
 class RMSDCalculator{
 
 	public:
@@ -20,21 +25,21 @@ class RMSDCalculator{
 		void superposition_with_external_reference_and_fit_equals_calc(double*, double*);
 		void superposition_with_external_reference_and_fit_differs_calc(double*);
 
-		inline void setCoordinatesModificationTo(bool this_val){
-			this->modifyFittingCoordinates =  this_val;
+		inline void setCoordinatesRotationTo(bool this_val){
+			this->rotateFittingCoordinates =  this_val;
 		}
 
 	protected:
 		virtual void _one_vs_following_fit_equals_calc_coords(double* reference,
-				int reference_conformation_number, double *rmsd, bool center = true);
-
-		virtual void _one_vs_following_fit_differs_calc_coords(double* fitReference,
-				double* calcReference, int reference_conformation_number, double *rmsd, bool center = true);
-
-		virtual void _one_vs_following_fit_equals_calc_coords_changing_coordinates(double* reference,
 				int reference_conformation_number, double *rmsd);
 
-		virtual void _one_vs_following_fit_differs_calc_coords_changing_coordinates(double* fitReference,
+		virtual void _one_vs_following_fit_differs_calc_coords(double* fitReference,
+				double* calcReference, int reference_conformation_number, double *rmsd);
+
+		virtual void _one_vs_following_fit_equals_calc_coords_rotating_coordinates(double* reference,
+				int reference_conformation_number, double *rmsd);
+
+		virtual void _one_vs_following_fit_differs_calc_coords_rotating_coordinates(double* fitReference,
 				double* calcReference, int reference_conformation_number, double *rmsd);
 
 		// Coordinates info
@@ -49,7 +54,7 @@ class RMSDCalculator{
 		double* allRMSDCoordinates; // If is different from NULL, then this are the coordinates
 									 // to calculate the RMSD.
 
-		bool modifyFittingCoordinates;
+		bool rotateFittingCoordinates;
 
 		KernelFunctions* kernelFunctions;
 

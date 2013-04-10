@@ -30,7 +30,7 @@ void KABSCHOmpKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
 			int atomsPerConformation,
 			double *allCoordinates){
 
-
+	#pragma omp parallel for shared(rmsd)
 	for (int second_conformation_id = reference_conformation_number + 1;
 					second_conformation_id < numberOfConformations; ++second_conformation_id){
 		double* second_conformation_coords = &(allCoordinates[second_conformation_id*coordinatesPerConformation]);
@@ -52,7 +52,7 @@ void KABSCHOmpKernel::oneVsFollowingFitEqualCalcWithConfRotation(
 			int atomsPerConformation,
 			double *allCoordinates){
 
-
+		#pragma omp parallel for shared(rmsd)
 		for (int second_conformation_id = reference_conformation_number + 1;
 				second_conformation_id < numberOfConformations; ++second_conformation_id){
 
@@ -72,7 +72,6 @@ void KABSCHOmpKernel::oneVsFollowingFitEqualCalcWithConfRotation(
 			}
 
 			RMSDTools::rotate3D(atomsPerConformation, second_conformation_coords, rot_matrix);
-			//cout<<rot_matrix[0][0]<<endl;
 		}
 }
 
@@ -92,6 +91,7 @@ void KABSCHOmpKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
 	int coordinates_per_fit_conformation = atomsPerConformation * 3;
 	int coordinates_per_calc_conformation = atomsPerRMSDConformation * 3;
 
+	#pragma omp parallel for shared(rmsd)
 	for (int second_conformation_id = reference_conformation_number + 1;
 			second_conformation_id < numberOfConformations; ++second_conformation_id){
 
@@ -133,6 +133,7 @@ void KABSCHOmpKernel::oneVsFollowingFitDiffersCalcWithConfRotation(
 	int coordinates_per_fit_conformation = atomsPerConformation * 3;
 	int coordinates_per_calc_conformation = atomsPerRMSDConformation * 3;
 
+	#pragma omp parallel for shared(rmsd)
 	for (int second_conformation_id = reference_conformation_number + 1;
 			second_conformation_id < numberOfConformations; ++second_conformation_id){
 

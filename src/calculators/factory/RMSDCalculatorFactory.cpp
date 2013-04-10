@@ -96,7 +96,7 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 	}
 
 	if(modify_coordinates){
-		calculator->setCoordinatesModificationTo(true);
+		calculator->setCoordinatesRotationTo(true);
 	}
 
 	return calculator;

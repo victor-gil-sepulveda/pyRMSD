@@ -451,7 +451,7 @@ void QCPCUDAKernel::oneVsFollowingFitDiffersCalcWithConfRotation(
 				deviceCalcCoords,
 				tmpCalcHostCoords,
 				numberOfConformations,
-				coordinatesPerConformation);
+				coordinatesPerRMSDConformation);
 	
 }
 
