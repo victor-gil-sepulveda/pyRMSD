@@ -231,7 +231,7 @@ class RMSDCalculator(object):
     def iterativeSuperposition(self):
         """
         Calculates an iterative superposition of a set of conformations. When using this function,
-        the coordinates of the 
+        the input coordinates are changed.
         
         @return: The iteratively superposed cooordinates. 
         

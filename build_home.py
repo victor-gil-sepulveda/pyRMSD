@@ -13,7 +13,7 @@ import os
 CUDA_BASE = "/usr/local/cuda-5.0"           # Base dir for CUDA installation
 CUDA_INCLUDE_FOLDER = CUDA_BASE+"/include"         # CUDA headers path
 CUDA_LIBRARIES_FOLDER = CUDA_BASE+"/lib64"            # CUDA libs path ( /lib if you're running it in a 32b machine)
-CUDA_ARCHITECHTURE = "sm_11"                         # CUDA architecture of your card.
+CUDA_ARCHITECHTURE = "sm_21"                         # CUDA architecture of your card.
 CUDA_LIBRARY = "cudart"
 PYTHON_EXTENSION_OPTIONS = "-pthread -g -fno-strict-aliasing -fmessage-length=0 -O3 -Wall \
 -D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -fPIC"

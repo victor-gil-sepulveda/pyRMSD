@@ -4,4 +4,5 @@
 	# @ tasks_per_node = 1
 	# @ gpus_per_node = 1
 	# @ output = serial.out
+	
 	~/Python/bin/python2.7 BenchmarkSerial.py
