@@ -61,6 +61,60 @@ class KernelFunctions{
 				int coordinatesPerRMSDConformation,
 				int atomsPerRMSDConformation,
 				double *allRMSDCoordinates) = 0;
+
+		virtual void matrixInit(
+				double* allFittingCoordinates,
+				int coordinatesPerFittingConformation,
+				double* allCalculationCoordinates,
+				int coordinatesPerCalculationConformation,
+				int numberOfConformations){
+
+		}
+
+		virtual void matrixOneVsFollowingFitEqualCalcWithoutConfRotation(
+													double* reference,
+													int reference_conformation_number,
+													double* rmsd,
+													int numberOfConformations,
+													int coordinatesPerConformation,
+													int atomsPerConformation,
+													double *allCoordinates){
+
+			oneVsFollowingFitEqualCalcWithoutConfRotation(
+									reference,
+									reference_conformation_number,
+									rmsd,
+									numberOfConformations,
+									coordinatesPerConformation,
+									atomsPerConformation,
+									allCoordinates);
+		}
+
+		virtual void matrixOneVsFollowingFitDiffersCalcWithoutConfRotation(
+														double* fitReference,
+														double* calcReference,
+														int reference_conformation_number,
+														double* rmsd,
+														int numberOfConformations,
+														int coordinatesPerConformation,
+														int atomsPerConformation,
+														double *allCoordinates,
+														int coordinatesPerRMSDConformation,
+														int atomsPerRMSDConformation,
+														double *allRMSDCoordinates){
+			oneVsFollowingFitDiffersCalcWithoutConfRotation(
+												fitReference,
+												calcReference,
+												reference_conformation_number,
+												rmsd,
+												numberOfConformations,
+												coordinatesPerConformation,
+												atomsPerConformation,
+												allCoordinates,
+												coordinatesPerRMSDConformation,
+												atomsPerRMSDConformation,
+												allRMSDCoordinates);
+		}
 };
 
 

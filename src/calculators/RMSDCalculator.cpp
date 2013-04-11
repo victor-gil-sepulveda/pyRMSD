@@ -100,12 +100,19 @@ void RMSDCalculator::calculateRMSDCondensedMatrix(std::vector<double>& rmsd){
 		calc_centers = new double[numberOfConformations*3];
 		RMSDTools::centerAllAtOrigin(atomsPerCalculationConformation, numberOfConformations, allCalculationCoordinates, calc_centers);
 	}
+
+	this->kernelFunctions->matrixInit(allFittingCoordinates,
+										atomsPerFittingConformation*3,
+										allCalculationCoordinates,
+										atomsPerCalculationConformation*3,
+										numberOfConformations);
+
 	for(int conformation_number = 0;conformation_number<numberOfConformations;++conformation_number){
 		int offset = conformation_number*(numberOfConformations-1)- (((conformation_number-1)*conformation_number)/2) ;
 		double* fit_reference_conformation = &(allFittingCoordinates[conformation_number*coordinatesPerFittingConformation]);
 
 		if(this->allCalculationCoordinates == NULL){
-			this->kernelFunctions->oneVsFollowingFitEqualCalcWithoutConfRotation(
+			this->kernelFunctions->matrixOneVsFollowingFitEqualCalcWithoutConfRotation(
 																fit_reference_conformation,
 																conformation_number,
 																&(rmsd_tmp[offset]),
@@ -116,7 +123,7 @@ void RMSDCalculator::calculateRMSDCondensedMatrix(std::vector<double>& rmsd){
 		}
 		else{
 			double* calc_reference_conformation = &(allCalculationCoordinates[conformation_number*coordinatesPerCalculationConformation]);
-			this->kernelFunctions->oneVsFollowingFitDiffersCalcWithoutConfRotation(
+			this->kernelFunctions->matrixOneVsFollowingFitDiffersCalcWithoutConfRotation(
 																fit_reference_conformation,
 																calc_reference_conformation,
 																conformation_number,

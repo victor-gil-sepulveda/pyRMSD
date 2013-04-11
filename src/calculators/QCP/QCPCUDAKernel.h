@@ -107,6 +107,34 @@ class QCPCUDAKernel: public KernelFunctions{
 					int atomsPerRMSDConformation,
 					double *allRMSDCoordinates);
 
+		void matrixInit(
+				double* allFittingCoordinates,
+				int coordinatesPerFittingConformation,
+				double* allCalculationCoordinates,
+				int coordinatesPerCalculationConformation,
+				int numberOfConformations);
+
+		virtual void matrixOneVsFollowingFitEqualCalcWithoutConfRotation(
+													double* reference,
+													int reference_conformation_number,
+													double* rmsd,
+													int numberOfConformations,
+													int coordinatesPerConformation,
+													int atomsPerConformation,
+													double *allCoordinates);
+
+		virtual void matrixOneVsFollowingFitDiffersCalcWithoutConfRotation(
+														double* fitReference,
+														double* calcReference,
+														int reference_conformation_number,
+														double* rmsd,
+														int numberOfConformations,
+														int coordinatesPerConformation,
+														int atomsPerConformation,
+														double *allCoordinates,
+														int coordinatesPerRMSDConformation,
+														int atomsPerRMSDConformation,
+														double *allRMSDCoordinates);
 		int threads_per_block;
 		int blocks_per_grid;
 
@@ -127,4 +155,6 @@ class QCPCUDAKernel: public KernelFunctions{
 		floating_point_type* deviceCalcReference;
 
 };
+
+
 #endif
