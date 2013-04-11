@@ -45,7 +45,7 @@ if __name__ == '__main__':
     t2 = time.time()
     print "With CUDA and size %d it took: %fs"%(coordsets.shape[1]*3,t2-t1)
     
-    for times in range(7):
+    for times in range(10):
         coordsets = add_coordsets_copy(coordsets, original_size)
         calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_CUDA_CALCULATOR")
         calculator.setCUDAKernelThreadsPerBlock(2, 16)
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     coordsets = reader.read() 
     number_of_atoms = reader.numberOfAtoms
     os.system("rm tmp_amber_long.pdb")
-    for times in range(7):
+    for times in range(10):
         calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_OMP_CALCULATOR")
         calculator.setNumberOfOpenMPThreads(6)
         t1 = time.time()

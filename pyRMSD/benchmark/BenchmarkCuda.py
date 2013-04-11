@@ -17,7 +17,7 @@ if __name__ == '__main__':
         print "Build it using --cuda."
         exit()
     
-    files = ["amber_5k.pdb","amber_10k.pdb","amber_15k.pdb"]#,"amber_20k.pdb","amber_25k.pdb","amber_30k.pdb","amber_35k.pdb"]  
+    files = ["amber_5k.pdb","amber_10k.pdb","amber_15k.pdb","amber_20k.pdb","amber_25k.pdb","amber_30k.pdb","amber_35k.pdb"]  
     for pdb_file in files:
         print "Reading file data/"+pdb_file
         sys.stdout.flush()
@@ -28,10 +28,11 @@ if __name__ == '__main__':
         number_of_conformations = reader.numberOfFrames
         
         times = []
-        for i in range(1):
+        for i in range(20):
             calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_CUDA_CALCULATOR")
-            #calculator.setCUDAKernelThreadsPerBlock(128, 64)
-            calculator.setCUDAKernelThreadsPerBlock(256, 256)
+#             calculator.setCUDAKernelThreadsPerBlock(2, 16)
+            calculator.setCUDAKernelThreadsPerBlock(128, 64)
+#             calculator.setCUDAKernelThreadsPerBlock(256, 256)
             t1 = time.time()
             rmsd = calculator.pairwiseRMSDMatrix()
             t2 = time.time()

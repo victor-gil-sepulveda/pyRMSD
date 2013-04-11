@@ -19,7 +19,8 @@ if __name__ == '__main__':
 	number_of_atoms = reader.numberOfAtoms
 	number_of_conformations = reader.numberOfFrames
 
-	for calculator_type in ["QCP_SERIAL_CALCULATOR","QTRFIT_SERIAL_CALCULATOR","KABSCH_SERIAL_CALCULATOR"]:
+	for calculator_type in ["QCP_SERIAL_CALCULATOR","QTRFIT_SERIAL_CALCULATOR","KABSCH_SERIAL_CALCULATOR",
+						"QCP_OMP_CALCULATOR","QTRFIT_OMP_CALCULATOR","KABSCH_OMP_CALCULATOR"]:
 		times = []
 		for i in range(20):
 			calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, calculator_type)

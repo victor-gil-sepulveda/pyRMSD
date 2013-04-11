@@ -10,6 +10,8 @@ import bz2
 from pyRMSD.utils.proteinReading import Reader
 import numpy
 
+NUMBER_OF_THREADS = 4
+
 if __name__ == '__main__':
     # Reading coords
     print "Loading file..."
@@ -17,22 +19,28 @@ if __name__ == '__main__':
     print "\tUncompressing..."
     open("tmp_amber_long.pdb","w").write(bz2.BZ2File("data/amber_long.pdb.tar.bz2").read())
     print "\tLoading..."
-    reader = Reader("PRODY_READER").readThisFile('tmp_amber_long.pdb').gettingOnlyCAs()
+    reader = Reader().readThisFile('tmp_amber_long.pdb').gettingOnlyCAs()
     coordsets = reader.read() 
     number_of_atoms = reader.numberOfAtoms
     number_of_conformations = reader.numberOfFrames
 
     rmsds = {}
     #---------------#
-    rmsds["KABSCH"] = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "KABSCH_PYTHON_CALCULATOR").oneVsFollowing(0)
+    calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "KABSCH_OMP_CALCULATOR")
+    calculator.setNumberOfOpenMPThreads(NUMBER_OF_THREADS)
+    rmsds["KABSCH"] = calculator.oneVsFollowing(0)
     #---------------# 
     calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QTRFIT_OMP_CALCULATOR")
-    calculator.setNumberOfOpenMPThreads(4)
+    calculator.setNumberOfOpenMPThreads(NUMBER_OF_THREADS)
     rmsds["QTRFIT"] = calculator.oneVsFollowing(0)
     #---------------#
     calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_OMP_CALCULATOR")
-    calculator.setNumberOfOpenMPThreads(4)
+    calculator.setNumberOfOpenMPThreads(NUMBER_OF_THREADS)
     rmsds["QCP"] = calculator.oneVsFollowing(0)
+    #---------------#
+    calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_CUDA_CALCULATOR")
+    calculator.setCUDAKernelThreadsPerBlock(2,16)
+    rmsds["QCP CUDA"] = calculator.oneVsFollowing(0)
     #---------------#
     mean_diffs = {}
     std_diffs = {}
@@ -42,7 +50,7 @@ if __name__ == '__main__':
         mean_diffs[calculator_name_i] = {}
         std_diffs[calculator_name_i] = {}
         for calculator_name_j in calculator_names:
-            print "\tj ",calculator_name_j
+            print "\t ",calculator_name_j
             rmsd_diff = abs(rmsds[calculator_name_i] - rmsds[calculator_name_j]) 
             mean_diffs[calculator_name_i][calculator_name_j] = numpy.mean(rmsd_diff, dtype=numpy.float64)
             std_diffs[calculator_name_i][calculator_name_j] = numpy.std(rmsd_diff, dtype=numpy.float64)
