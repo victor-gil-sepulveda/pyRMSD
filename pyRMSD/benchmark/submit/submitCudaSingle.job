@@ -1,5 +1,4 @@
 #!/bin/bash	
-	# @ class = debug
 	# @ wall_clock_limit = 01:00:00
 	# @ cpus_per_task = 6
 	# @ tasks_per_node = 1

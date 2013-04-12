@@ -1,9 +1,8 @@
 #!/bin/bash	
-	# @ class = debug
 	# @ wall_clock_limit = 04:00:00
 	# @ cpus_per_task = 6
 	# @ tasks_per_node = 1
 	# @ gpus_per_node = 1
-	# @ output = cuda_single.out
+	# @ output = openmp.out
 	
 	~/Python/bin/python2.7 BenchmarkOpenMP.py

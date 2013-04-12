@@ -7,7 +7,9 @@ import pyRMSD.RMSDCalculator
 import time
 from pyRMSD.utils.proteinReading import Reader
 import numpy
-import sys 
+import sys
+import prody
+
 #With CUDA and  amber_5k.pdb  it took:  18.7449800968
 #With CUDA and  amber_5k.pdb  it took:  1.81559896469 [ 0.0 ]
 if __name__ == '__main__':
@@ -22,10 +24,14 @@ if __name__ == '__main__':
         print "Reading file data/"+pdb_file
         sys.stdout.flush()
         
-        reader = Reader().readThisFile("data/"+pdb_file).gettingOnlyCAs()
-        coordsets = reader.read() 
-        number_of_atoms = reader.numberOfAtoms
-        number_of_conformations = reader.numberOfFrames
+#         reader = Reader().readThisFile("data/"+pdb_file).gettingOnlyCAs()
+#         coordsets = reader.read() 
+#         number_of_atoms = reader.numberOfAtoms
+#         number_of_conformations = reader.numberOfFrames
+        pdb = prody.parsePDB("data/"+pdb_file, subset='calpha')
+        coordsets = pdb.getCoordsets()
+        number_of_conformations = coordsets.shape[0]
+        number_of_atoms = coordsets.shape[1]
         
         times = []
         for i in range(20):

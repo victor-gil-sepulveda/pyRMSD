@@ -41,6 +41,8 @@ void PDBReader::check_atoms(int expected, int now){
 void PDBReader::read(const char* path, const char* name_filter_c){
 	string line;
 	ifstream stream;
+	number_of_models=  number_of_atoms = 0;
+	all_coordinates.clear();
 
 	int atoms_counter = 0;
 	this->all_coordinates.clear();
@@ -114,7 +116,6 @@ void PDBReader::processMODEL(){
 ///////////////////////////////////////////////////////////////
 void PDBReader::processATOM(string& line, string& name_filter, int& atoms_counter){
 		 string name = line.substr(12,4);
-		 //cout<<name<<" "<<name_filter<<endl;
 		 if (name_filter == "" || (name_filter!= "" && name == name_filter)){
 			 double x = fromString<double>(line.substr(30,8));
 			 all_coordinates.push_back(x);
@@ -122,7 +123,6 @@ void PDBReader::processATOM(string& line, string& name_filter, int& atoms_counte
 			 all_coordinates.push_back(y);
 			 double z = fromString<double>(line.substr(46,8));
 			 all_coordinates.push_back(z);
-
 			 atoms_counter++;
 		 }
 }

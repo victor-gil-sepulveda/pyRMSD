@@ -49,6 +49,14 @@ if __name__ == '__main__':
 			del rmsd
 			times.append(t2-t1)
 		print "Iterative superposition using",calculator_type, "with",filename, "and modifying coordinates it took: ",numpy.mean(times),"[", numpy.std(times), "]"
+		for i in range(20):
+			calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, calculator_type, modifyCoordinates=True)
+			t1 = time.time()
+			rmsd = calculator.pairwiseRMSDMatrix()
+			t2 = time.time()
+			del rmsd
+			times.append(t2-t1)
+		print "Matrix using",calculator_type, "with",filename,"took", numpy.mean(times),"[", numpy.std(times), "]"
 
 
 

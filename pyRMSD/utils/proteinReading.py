@@ -83,6 +83,8 @@ class Reader(object):
             if verbose: print "PDB parsed (",path,")"
             
             coordinates = numpy.append(coordinates, coordsets, axis=0)
+            del coordsets
+        
         coordinates.shape = (self.numberOfFrames, self.numberOfAtoms, 3)
         return coordinates
         
