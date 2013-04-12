@@ -68,12 +68,12 @@ class Reader(object):
         @date: 30/11/2012
         """
         coordinates = numpy.array([])
-        
         for path in self.filesToRead:
+            reader = pyRMSD.pdbReader.PDBReader()
             if self.onlyCA:
-                coordsets, num_frames, atoms_in_this_trajectory = pyRMSD.pdbReader.readPDB(path," CA ")
+                coordsets, num_frames, atoms_in_this_trajectory = reader.read(path," CA ")
             else:
-                coordsets, num_frames, atoms_in_this_trajectory = pyRMSD.pdbReader.readPDB(path)
+                coordsets, num_frames, atoms_in_this_trajectory = reader.read(path)
             
             self.numberOfFrames += num_frames
             
@@ -84,6 +84,7 @@ class Reader(object):
             
             coordinates = numpy.append(coordinates, coordsets, axis=0)
             del coordsets
+            del reader
         
         coordinates.shape = (self.numberOfFrames, self.numberOfAtoms, 3)
         return coordinates

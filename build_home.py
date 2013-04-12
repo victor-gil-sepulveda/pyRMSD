@@ -70,9 +70,10 @@ if __name__ == '__main__':
                                  "src/calculators/QTRFIT":["QTRFITSerialKernel.cpp"],
                                  "src/calculators/QCP":["QCPSerialKernel.cpp"],
                                  "src/matrix":["Matrix.cpp","Statistics.cpp"],
-                                 "src/python":["pyRMSD.cpp","readerLite.cpp"],
-                                 "src/pdbreaderlite":["PDBReader.cpp"],
+                                 "src/python":["pyRMSD.cpp"],
+                                 "src/pdbreaderlite":["PDBReader.cpp","PDReaderObject.cpp"],
                                  "src/calculators/test":["main.cpp","test_tools.cpp","tests.cpp"],
+                                 "src/calculators/test/memory_check":["check_mem.cpp"],
     }
     
     files_to_compile_with_gcc_and_openmp = {
@@ -107,15 +108,14 @@ if __name__ == '__main__':
     
     linkDSL = Link().\
                     using("g++").\
-                    with_options([PYTHON_EXTENSION_LINKING_OPTIONS]).\
+                    with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
                     using_libs([PYTHON_LIBRARY]).\
                     using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
-                    this_object_files([files_to_link["PDBReader"],files_to_link["readerLite"]]).\
+                    this_object_files([files_to_link["PDReaderObject"],files_to_link["PDBReader"]]).\
                     to_produce("pdbReader.so")
     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            
     os.system( linkDSL.getLinkingCommand())
-    
     
     calculator_obj_files = [
                             files_to_link["RMSDTools"],
@@ -159,6 +159,18 @@ if __name__ == '__main__':
                     using_lib_locations(calculator_library_locations).\
                     this_object_files(test_obj_files).\
                     to_produce("test_rmsdtools_main")
+    os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
+    os.system(linkDSL.getLinkingCommand())
+    
+    test_obj_files.remove(files_to_link["main"])
+    test_obj_files.extend([files_to_link["check_mem"]])
+    linkDSL = Link().\
+                    using("g++").\
+                    with_options([OPENMP_OPTION]).\
+                    using_libs(calculator_libraries).\
+                    using_lib_locations(calculator_library_locations).\
+                    this_object_files(test_obj_files).\
+                    to_produce("check_memory")
                     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
     os.system(linkDSL.getLinkingCommand())
@@ -167,6 +179,7 @@ if __name__ == '__main__':
     os.system("mv condensedMatrix.so pyRMSD/")
     os.system("mv pdbReader.so pyRMSD/")
     os.system("mv test_rmsdtools_main src/calculators/test")
+    os.system("mv check_memory src/calculators/test")
     
     ##Calculators
     if options.use_cuda:

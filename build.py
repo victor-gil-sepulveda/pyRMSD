@@ -15,7 +15,7 @@ CUDA_INCLUDE_FOLDER = CUDA_BASE+"/include"  # CUDA headers path
 CUDA_LIBRARIES_FOLDER = CUDA_BASE+"/lib64"  # CUDA libs path ( /lib if you're running it in a 32b machine)
 CUDA_ARCHITECHTURE = "sm_11"                # CUDA architecture of your card.
 CUDA_LIBRARY = "cudart"
-PYTHON_EXTENSION_OPTIONS = "-pthread -g -fno-strict-aliasing -fmessage-length=0 -O0 -Wall \
+PYTHON_EXTENSION_OPTIONS = "-pthread -g -fno-strict-aliasing -fmessage-length=0 -O3 -Wall \
 -D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -fPIC"
 PYTHON_INCLUDE_FOLDER = distutils.sysconfig.get_python_inc()
 PYTHON_LIBRARY_FOLDER = distutils.sysconfig.get_python_lib()
@@ -70,7 +70,7 @@ if __name__ == '__main__':
                                  "src/calculators/QTRFIT":["QTRFITSerialKernel.cpp"],
                                  "src/calculators/QCP":["QCPSerialKernel.cpp"],
                                  "src/matrix":["Matrix.cpp","Statistics.cpp"],
-                                 "src/python":["pyRMSD.cpp","readerLite.cpp"],
+                                 "src/python":["pyRMSD.cpp"],
                                  "src/pdbreaderlite":["PDBReader.cpp","PDReaderObject.cpp"],
                                  "src/calculators/test":["main.cpp","test_tools.cpp","tests.cpp"],
                                  "src/calculators/test/memory_check":["check_mem.cpp"],
@@ -108,15 +108,14 @@ if __name__ == '__main__':
     
     linkDSL = Link().\
                     using("g++").\
-                    with_options([PYTHON_EXTENSION_LINKING_OPTIONS]).\
+                    with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
                     using_libs([PYTHON_LIBRARY]).\
                     using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
-                    this_object_files([files_to_link["PDBReader"],files_to_link["readerLite"]]).\
+                    this_object_files([files_to_link["PDReaderObject"],files_to_link["PDBReader"]]).\
                     to_produce("pdbReader.so")
     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            
     os.system( linkDSL.getLinkingCommand())
-    
     
     calculator_obj_files = [
                             files_to_link["RMSDTools"],
