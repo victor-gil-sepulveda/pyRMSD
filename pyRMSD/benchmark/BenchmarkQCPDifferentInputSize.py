@@ -17,7 +17,7 @@ if __name__ == '__main__':
     print "\tUncompressing..."
     open("tmp_amber_long.pdb","w").write(bz2.BZ2File("data/amber_long.pdb.tar.bz2").read())
     print "\tLoading..."
-    reader = Reader("PRODY_READER").readThisFile('tmp_amber_long.pdb').gettingOnlyCAs()
+    reader = Reader().readThisFile('tmp_amber_long.pdb').gettingOnlyCAs()
     coordsets = reader.read() 
     number_of_atoms = reader.numberOfAtoms
     
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     #------------------
     #Best in Minotauro (NVIDIA M2090): 6 threads
     #Best with Quadro FX 580: 4 threads
-    reader = Reader("PRODY_READER").readThisFile('tmp_amber_long.pdb').gettingOnlyCAs()
+    reader = Reader().readThisFile('tmp_amber_long.pdb').gettingOnlyCAs()
     coordsets = reader.read() 
     number_of_atoms = reader.numberOfAtoms
     os.system("rm tmp_amber_long.pdb")

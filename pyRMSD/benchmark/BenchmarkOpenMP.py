@@ -5,7 +5,6 @@ Created on 14/11/2012
 '''
 import pyRMSD.RMSDCalculator
 import time
-from pyRMSD.utils.proteinReading import Reader
 import numpy
 import sys
 #With OpenMP and amber_5k.pdb  it took:  2.5554060936 [ 0.0 ]
@@ -22,12 +21,12 @@ if __name__ == '__main__':
              ]  
 
     for pdb_file in files:
-        print "Reading file ", "data/"+pdb_file
+        print "Reading file ", "data/"+pdb_file,"...",
         sys.stdout.flush()
-        reader = Reader().readThisFile("data/"+pdb_file).gettingOnlyCAs()
-        coordsets = reader.read() 
-        number_of_atoms = reader.numberOfAtoms
-        number_of_conformations = reader.numberOfFrames
+        coordsets = numpy.load("data/%s.npy"%pdb_file.split(".")[0])
+        print "OK"
+        number_of_conformations = coordsets.shape[0]
+        number_of_atoms = coordsets.shape[1]
         
         times = []
         for i in range(1):
@@ -39,5 +38,5 @@ if __name__ == '__main__':
             del rmsd
             times.append(t2-t1)
         print "With OpenMP and",pdb_file, " it took: ",numpy.mean(times),"[", numpy.std(times), "]"
-
+        sys.stdout.flush()
 

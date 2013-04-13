@@ -21,7 +21,7 @@ if __name__ == '__main__':
     print "\tUncompressing..."
     open("tmp_amber_long.pdb","w").write(bz2.BZ2File("data/amber_long.pdb.tar.bz2").read())
     print "\tLoading..."
-    reader = Reader("PRODY_READER").readThisFile('tmp_amber_long.pdb').gettingOnlyCAs()
+    reader = Reader().readThisFile('tmp_amber_long.pdb').gettingOnlyCAs()
     coordsets = reader.read() 
     number_of_atoms = reader.numberOfAtoms
     number_of_conformations = reader.numberOfFrames
@@ -46,21 +46,20 @@ if __name__ == '__main__':
     golden = "QTRFIT_OMP_CALCULATOR"
     
     for CALC_TYPE in types:
-        if not "PYTHON" in CALC_TYPE:
-            print "Calculating RMSD with ", CALC_TYPE
-            t1 = time.time()
-            pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, CALC_TYPE)
-            rmsds[CALC_TYPE] = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, CALC_TYPE).pairwiseRMSDMatrix()
-            t2 = time.time()
-            times[CALC_TYPE] = t2-t1
-            print "\tRmsd array generated. ", len(rmsds[CALC_TYPE]), " elements."
-            print '\tMatrix generation with %s took %0.3fs' %(CALC_TYPE, t2-t1)
+        print "Calculating RMSD with ", CALC_TYPE
+        t1 = time.time()
+        pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, CALC_TYPE)
+        rmsds[CALC_TYPE] = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, CALC_TYPE).pairwiseRMSDMatrix()
+        t2 = time.time()
+        times[CALC_TYPE] = t2-t1
+        print "\tRmsd array generated. ", len(rmsds[CALC_TYPE]), " elements."
+        print '\tMatrix generation with %s took %0.3fs' %(CALC_TYPE, t2-t1)
     
     ######################
     # VALIDATION
     #####################
     for CALC_TYPE in types:
-        if CALC_TYPE != golden and not "PYTHON" in CALC_TYPE:
+        if CALC_TYPE != golden:
             print "Comparing results (%s vs %s)..."%(golden, CALC_TYPE)
             t1 = time.time()
             numpy.testing.assert_array_almost_equal(rmsds[golden], rmsds[CALC_TYPE],precissions[CALC_TYPE])
