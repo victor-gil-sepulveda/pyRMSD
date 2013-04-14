@@ -107,7 +107,7 @@ class QCPCUDAKernel: public KernelFunctions{
 					int atomsPerRMSDConformation,
 					double *allRMSDCoordinates);
 
-		void matrixInit(
+		virtual void matrixInit(
 				double* allFittingCoordinates,
 				int coordinatesPerFittingConformation,
 				double* allCalculationCoordinates,
@@ -139,9 +139,9 @@ class QCPCUDAKernel: public KernelFunctions{
 		int blocks_per_grid;
 
 	private:
-
 		QCPCUDAKernel(){}
 
+	protected:
 		float* tmpHostCoords;
 		float* tmpHostRMSDs;
 

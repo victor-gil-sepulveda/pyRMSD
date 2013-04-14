@@ -138,9 +138,7 @@ void RMSDCalculator::calculateRMSDCondensedMatrix(std::vector<double>& rmsd){
 		}
 	}
 
-	for (int i = 0; i < num_of_rmsds; ++i){
-		rmsd.push_back(rmsd_tmp[i]);
-	}
+	this->kernelFunctions->matrixEnd(rmsd_tmp, num_of_rmsds, rmsd);
 	delete [] rmsd_tmp;
 
 	RMSDTools::applyTranslationsToAll(atomsPerFittingConformation, numberOfConformations, allFittingCoordinates, fit_centers);

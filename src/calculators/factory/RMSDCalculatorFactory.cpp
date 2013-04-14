@@ -17,6 +17,7 @@
 
 #ifdef USE_CUDA
 	#include "../QCP/QCPCUDAKernel.h"
+	#include "../QCP/QCPCUDAMemKernel.h"
 #endif
 
 #include <iostream>
@@ -78,6 +79,15 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 
 		case QCP_CUDA_CALCULATOR:
 					kernelFunctions = new QCPCUDAKernel(
+											allFittingCoordinates,
+											atomsPerFittingConformation,
+											atomsPerFittingConformation*3,
+											numberOfConformations,
+											threads_per_block,
+											blocks_per_grid);
+					break;
+		case QCP_CUDA_MEM_CALCULATOR:
+					kernelFunctions = new QCPCUDAMemKernel(
 											allFittingCoordinates,
 											atomsPerFittingConformation,
 											atomsPerFittingConformation*3,

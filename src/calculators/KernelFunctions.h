@@ -8,6 +8,8 @@
 #ifndef KERNELFUNCTIONS_H_
 #define KERNELFUNCTIONS_H_
 
+#include <vector>
+
 class KernelFunctions{
 	public:
 		KernelFunctions(){}
@@ -69,6 +71,12 @@ class KernelFunctions{
 				int coordinatesPerCalculationConformation,
 				int numberOfConformations){
 
+		}
+
+		virtual void matrixEnd(double* rmsds_tmp, int rmsds_tmp_len, std::vector<double>& rmsds){
+			for (int i = 0; i < rmsds_tmp_len; ++i){
+				rmsds.push_back(rmsds_tmp[i]);
+			}
 		}
 
 		virtual void matrixOneVsFollowingFitEqualCalcWithoutConfRotation(
