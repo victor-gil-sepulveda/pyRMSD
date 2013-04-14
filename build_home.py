@@ -60,7 +60,7 @@ if __name__ == '__main__':
     ### Files we are going to use
     ######################################
     files_to_compile_with_nvcc = {
-                                  "src/calculators/QCP":["QCPCUDAKernel.cu","kernel_functions_cuda.cu"]
+                                  "src/calculators/QCP":["QCPCUDAKernel.cu","QCPCUDAMemKernel.cu","kernel_functions_cuda.cu"]
     }
     
     files_to_compile_with_gcc = {
@@ -130,7 +130,7 @@ if __name__ == '__main__':
                             files_to_link["pyRMSD"]
     ]
     if options.use_cuda:
-        calculator_obj_files.extend([files_to_link["QCPCUDAKernel"],files_to_link["kernel_functions_cuda"]])
+        calculator_obj_files.extend([files_to_link["QCPCUDAKernel"],files_to_link["QCPCUDAMemKernel"],files_to_link["kernel_functions_cuda"]])
         calculator_libraries = [PYTHON_LIBRARY,CUDA_LIBRARY]
         calculator_library_locations  = [PYTHON_LIBRARY_FOLDER, CUDA_LIBRARIES_FOLDER]
         
@@ -194,7 +194,8 @@ def availableCalculators():
             #"QTRFIT_CUDA_CALCULATOR":5,
             "QCP_SERIAL_CALCULATOR":6,
             "QCP_OMP_CALCULATOR":7,
-            "QCP_CUDA_CALCULATOR":8
+            "QCP_CUDA_CALCULATOR":8,
+            "QCP_CUDA_MEM_CALCULATOR":9
     }
 """
     else:
@@ -209,7 +210,8 @@ def availableCalculators():
             #"QTRFIT_CUDA_CALCULATOR":5,
             "QCP_SERIAL_CALCULATOR":6,
             "QCP_OMP_CALCULATOR":7,
-            #"QCP_CUDA_CALCULATOR":8
+            #"QCP_CUDA_CALCULATOR":8,
+            #"QCP_CUDA_MEM_CALCULATOR":9
     }
 """
     os.system('echo "\033[33mWriting available calculators...\033[0m"')

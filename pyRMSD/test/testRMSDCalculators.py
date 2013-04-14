@@ -131,6 +131,16 @@ class TestRMSDCalculators(unittest.TestCase):
             calculator = pyRMSD.RMSDCalculator.RMSDCalculator(self.coordsets, "QCP_CUDA_CALCULATOR")
             rmsd = calculator.oneVsFollowing(conf_num)
             numpy.testing.assert_array_almost_equal(rmsd, self.expected_rmsd[conf_num],4)
+    
+    @unittest.skipIf(not "QCP_CUDA_MEM_CALCULATOR" in pyRMSD.RMSDCalculator.availableCalculators(),"CUDA calculator not available")
+    def test_theobald_experimental_CUDA(self):
+        """
+        Calculates the whole pairwise matrix by calculating each of the rows of the matrix.
+        """
+        for conf_num in self.expected_rmsd:
+            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(self.coordsets, "QCP_CUDA_MEM_CALCULATOR")
+            rmsd = calculator.oneVsFollowing(conf_num)
+            numpy.testing.assert_array_almost_equal(rmsd, self.expected_rmsd[conf_num],4)
             
     def test_serial_matrix_generation(self):
         """
@@ -170,6 +180,15 @@ class TestRMSDCalculators(unittest.TestCase):
         Calculates the whole matrix.
         """
         calculator = pyRMSD.RMSDCalculator.RMSDCalculator(self.coordsets, "QCP_CUDA_CALCULATOR")
+        rmsd = calculator.pairwiseRMSDMatrix()
+        numpy.testing.assert_array_almost_equal(rmsd, self.expected_serial_matrix, 4)
+    
+    @unittest.skipIf(not "QCP_CUDA_MEM_CALCULATOR" in pyRMSD.RMSDCalculator.availableCalculators(),"CUDA calculator not available")
+    def test_theobald_cuda_experimental_matrix_generation(self):
+        """
+        Calculates the whole matrix.
+        """
+        calculator = pyRMSD.RMSDCalculator.RMSDCalculator(self.coordsets, "QCP_CUDA_MEM_CALCULATOR")
         rmsd = calculator.pairwiseRMSDMatrix()
         numpy.testing.assert_array_almost_equal(rmsd, self.expected_serial_matrix, 4)
     
