@@ -10,9 +10,16 @@ import sys
 #With Serial and  amber_5k.pdb  it took:  7.08920001984 [ 0.0 ]
 if __name__ == '__main__':
 
-    files = ["amber_5k.pdb","amber_10k.pdb","amber_15k.pdb","amber_20k.pdb","amber_25k.pdb","amber_30k.pdb","amber_35k.pdb"]  
+    files = [
+            ("amber_5k.pdb",10),
+            ("amber_10k.pdb",10),
+            ("amber_15k.pdb",10),
+            ("amber_20k.pdb",8),
+            ("amber_25k.pdb",7),
+            ("amber_30k.pdb",5),
+            ("amber_35k.pdb",3)]
     
-    for pdb_file in files:
+    for pdb_file, tries in files:
         print "Reading file ", "data/"+pdb_file,"...",
         sys.stdout.flush()
         coordsets = numpy.load("data/%s.npy"%pdb_file.split(".")[0])
@@ -22,7 +29,7 @@ if __name__ == '__main__':
         number_of_atoms = coordsets.shape[1]
         
         times = []
-        for i in range(10):
+        for i in range(tries):
             calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_SERIAL_CALCULATOR")
             t1 = time.time()
             rmsd = calculator.pairwiseRMSDMatrix()

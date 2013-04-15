@@ -211,6 +211,7 @@ class RMSDCalculator(object):
         """
 #        np_coords = numpy.copy(numpy.reshape(self.fitting_coordinates,self.number_of_conformations*self.number_of_fitting_atoms*3))
         np_coords = numpy.reshape(self.fitting_coordinates,self.number_of_conformations*self.number_of_fitting_atoms*3)
+#         self.fitting_coordinates.shape = (self.number_of_conformations*self.number_of_fitting_atoms*3)
         if (self.calculation_coordinates is None):
             return pyRMSD.calculators.calculateRMSDCondensedMatrix(
                                                                    availableCalculators()[self.calculatorType], 

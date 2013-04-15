@@ -11,25 +11,25 @@ import sys
 if __name__ == '__main__':
 
     files = [
-            "amber_5k.pdb",
-            "amber_10k.pdb",
-            "amber_15k.pdb",
-            "amber_20k.pdb",
-            "amber_25k.pdb",
-            "amber_30k.pdb",
-            "amber_35k.pdb"
+            ("amber_5k.pdb",20),
+            ("amber_10k.pdb",20),
+            ("amber_15k.pdb",20),
+            ("amber_20k.pdb",20),
+            ("amber_25k.pdb",20),
+            ("amber_30k.pdb",10),
+            ("amber_35k.pdb",5)
              ]  
 
-    for pdb_file in files:
+    for pdb_file, tries in files:
         print "Reading file ", "data/"+pdb_file,"...",
         sys.stdout.flush()
-        coordsets = numpy.load("data/%s.npy"%pdb_file.split(".")[0])
+        coordsets = numpy.load("data/%s.npy"%(pdb_file.split(".")[0]))
         print "OK"
         number_of_conformations = coordsets.shape[0]
         number_of_atoms = coordsets.shape[1]
         
         times = []
-        for i in range(1):
+        for i in range(tries):
             calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_OMP_CALCULATOR")
             calculator.setNumberOfOpenMPThreads(6)
             t1 = time.time()

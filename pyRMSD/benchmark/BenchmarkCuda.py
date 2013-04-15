@@ -28,7 +28,7 @@ if __name__ == '__main__':
         
         times = []
         for i in range(20):
-            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_CUDA_MEM_CALCULATOR")
+            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_CUDA_CALCULATOR")
 #             calculator.setCUDAKernelThreadsPerBlock(2, 16)
             calculator.setCUDAKernelThreadsPerBlock(128, 64)
 #            calculator.setCUDAKernelThreadsPerBlock(256, 256)
@@ -37,6 +37,8 @@ if __name__ == '__main__':
             t2 = time.time()
             del rmsd
             times.append(t2-t1)
+            print t2-t1
+            sys.stdout.flush()
         print "With CUDA and ",pdb_file, " it took: ",numpy.mean(times),"[", numpy.std(times), "]"
         sys.stdout.flush()
 
