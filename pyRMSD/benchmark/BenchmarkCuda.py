@@ -27,7 +27,7 @@ if __name__ == '__main__':
         number_of_atoms = coordsets.shape[1]
         
         times = []
-        for i in range(1):
+        for i in range(20):
             calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_CUDA_MEM_CALCULATOR")
 #             calculator.setCUDAKernelThreadsPerBlock(2, 16)
             calculator.setCUDAKernelThreadsPerBlock(128, 64)

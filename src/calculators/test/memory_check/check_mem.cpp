@@ -40,7 +40,8 @@ int main(int argc, char **argv){
 			QCP_SERIAL_CALCULATOR,
 			KABSCH_OMP_CALCULATOR,
 			QTRFIT_OMP_CALCULATOR,
-			QCP_OMP_CALCULATOR
+			QCP_OMP_CALCULATOR,
+			QCP_CUDA_CALCULATOR
 	};
 
 	for(int i = 0; i< 6;++i) {
