@@ -1,0 +1,14 @@
+Reading file  data/amber_5k.pdb ... OK
+With OpenMP and amber_5k.pdb  it took:  1.82895092964 [ 0.00739572960917 ]
+Reading file  data/amber_10k.pdb ... OK
+With OpenMP and amber_10k.pdb  it took:  7.25075776577 [ 0.032743101744 ]
+Reading file  data/amber_15k.pdb ... OK
+With OpenMP and amber_15k.pdb  it took:  16.5463962913 [ 0.0281399330677 ]
+Reading file  data/amber_20k.pdb ... OK
+With OpenMP and amber_20k.pdb  it took:  30.0600930929 [ 0.0694855850762 ]
+Reading file  data/amber_25k.pdb ... OK
+With OpenMP and amber_25k.pdb  it took:  48.1614434958 [ 0.0940547205789 ]
+Reading file  data/amber_30k.pdb ... OK
+With OpenMP and amber_30k.pdb  it took:  69.4035097122 [ 0.537531644224 ]
+Reading file  data/amber_35k.pdb ... OK
+With OpenMP and amber_35k.pdb  it took:  96.8133462429 [ 0.461652049045 ]

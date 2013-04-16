@@ -5,70 +5,63 @@ Created on 22/02/2013
 '''
 import pyRMSD.RMSDCalculator
 import time
-import bz2
-from pyRMSD.utils.proteinReading import Reader
 import numpy
-import os
+import sys
 
+
+def grow_coordsets(coordsets, times):
+    new_coordsets = []
+    for coordset in coordsets:
+        new_coordsets.append(coordset*times)
+    return numpy.array(new_coordsets)
+
+def add_coordsets_copy(coordsets,original_size):
+    new_coordsets = []
+    for coordset in coordsets:
+        new_coordsets.append(numpy.append(coordset,coordset[:original_size], axis = 0))
+    return numpy.array(new_coordsets)
 if __name__ == '__main__':
-    # Reading coords
-    print "Loading file..."
-    t1 = time.time()
-    print "\tUncompressing..."
-    open("tmp_amber_long.pdb","w").write(bz2.BZ2File("data/amber_long.pdb.tar.bz2").read())
-    print "\tLoading..."
-    reader = Reader().readThisFile('tmp_amber_long.pdb').gettingOnlyCAs()
-    coordsets = reader.read() 
-    number_of_atoms = reader.numberOfAtoms
     
-    def grow_coordsets(coordsets, times):
-        new_coordsets = []
-        for coordset in coordsets:
-            new_coordsets.append(coordset*times)
-        return numpy.array(new_coordsets)
     
-    def add_coordsets_copy(coordsets,original_size):
-        new_coordsets = []
-        for coordset in coordsets:
-            new_coordsets.append(numpy.append(coordset,coordset[:original_size], axis = 0))
-        return numpy.array(new_coordsets)
     #------------------
     # CUDA
     #------------------
     #Best in Minotauro (NVIDIA M2090): 128, 64
     #Best with Quadro FX 580: 2, 16
-    calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_CUDA_CALCULATOR")
+    coordsets = numpy.load("data/tmp_amber_long.npy")
+    number_of_atoms = coordsets.shape[1]
+    number_of_conformations = coordsets.shape[0]
+    print "Coordinates read (%d models, %d atoms)"%(number_of_conformations, number_of_atoms)
+    sys.stdout.flush()
     original_size = coordsets.shape[1]
-    calculator.setCUDAKernelThreadsPerBlock(2, 16)
-    t1 = time.time()
-    rmsd = calculator.pairwiseRMSDMatrix()
-    t2 = time.time()
-    print "With CUDA and size %d it took: %fs"%(coordsets.shape[1]*3,t2-t1)
-    
     for times in range(10):
-        coordsets = add_coordsets_copy(coordsets, original_size)
         calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_CUDA_CALCULATOR")
         calculator.setCUDAKernelThreadsPerBlock(2, 16)
         t1 = time.time()
         rmsd = calculator.pairwiseRMSDMatrix()
         t2 = time.time()
         del rmsd
-        print "With CUDA and size %d it took: %fs"%(coordsets.shape[1]*3,t2-t1)
-
+        print "With CUDA and num. atoms %d it took: %fs"%(coordsets.shape[1],t2-t1)
+        sys.stdout.flush()
+        coordsets = add_coordsets_copy(coordsets, original_size)
     #------------------
     # OpenMP
     #------------------
     #Best in Minotauro (NVIDIA M2090): 6 threads
     #Best with Quadro FX 580: 4 threads
-    reader = Reader().readThisFile('tmp_amber_long.pdb').gettingOnlyCAs()
-    coordsets = reader.read() 
-    number_of_atoms = reader.numberOfAtoms
-    os.system("rm tmp_amber_long.pdb")
+    coordsets = numpy.load("data/tmp_amber_long.npy")
+    number_of_atoms = coordsets.shape[1]
+    number_of_conformations = coordsets.shape[0]
+    original_size = coordsets.shape[1]
+    print "Coordinates read (%d models, %d atoms)"%(number_of_conformations, number_of_atoms)
+    sys.stdout.flush()
     for times in range(10):
         calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_OMP_CALCULATOR")
-        calculator.setNumberOfOpenMPThreads(6)
+        calculator.setNumberOfOpenMPThreads(4)
         t1 = time.time()
         rmsd = calculator.pairwiseRMSDMatrix()
         t2 = time.time()
         del rmsd
-        print "With OpenMP and size %d it took: %fs"%(coordsets.shape[1]*3,t2-t1)
+        print "With OpenMP and num. atoms %d it took: %fs"%(coordsets.shape[1],t2-t1)
+        sys.stdout.flush()
+        coordsets = add_coordsets_copy(coordsets, original_size)

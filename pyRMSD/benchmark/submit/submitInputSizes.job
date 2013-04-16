@@ -1,0 +1,8 @@
+#!/bin/bash	
+	# @ wall_clock_limit = 02:00:00
+	# @ cpus_per_task = 6
+	# @ tasks_per_node = 1
+	# @ gpus_per_node = 1
+	# @ output = input_sizes.out
+
+	~/Python/bin/python2.7 BenchmarkQCPDifferentInputSize.py

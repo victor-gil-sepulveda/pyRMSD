@@ -21,7 +21,6 @@ if __name__ == '__main__':
     rmsds = {}
     calculators = {"KABSCH":'KABSCH_OMP_CALCULATOR',
                    "QTRFIT":"QTRFIT_OMP_CALCULATOR",
-                   "QTRFIT":"QCP_OMP_CALCULATOR",
                    "QCP":"QCP_OMP_CALCULATOR",
                    "QCP CUDA":"QCP_CUDA_CALCULATOR"}
     

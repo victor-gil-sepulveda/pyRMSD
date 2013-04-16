@@ -1,0 +1,8 @@
+#!/bin/bash	
+	# @ wall_clock_limit = 05:00:00
+	# @ cpus_per_task = 6
+	# @ tasks_per_node = 1
+	# @ gpus_per_node = 1
+	# @ output = openmp_scalability.out
+	
+	~/Python/bin/python2.7 BenchmarkOpenMPScalability.py

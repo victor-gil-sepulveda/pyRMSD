@@ -1,0 +1,14 @@
+Reading file data/amber_5k.pdb ... OK
+With CUDA and  amber_5k.pdb  it took:  1.26415469646 [ 0.0893841410129 ]
+Reading file data/amber_10k.pdb ... OK
+With CUDA and  amber_10k.pdb  it took:  4.75796555281 [ 0.0152543876394 ]
+Reading file data/amber_15k.pdb ... OK
+With CUDA and  amber_15k.pdb  it took:  10.2869906425 [ 0.0299408960311 ]
+Reading file data/amber_20k.pdb ... OK
+With CUDA and  amber_20k.pdb  it took:  18.3584528685 [ 0.0501122095184 ]
+Reading file data/amber_25k.pdb ... OK
+With CUDA and  amber_25k.pdb  it took:  29.0273298144 [ 0.0878030955028 ]
+Reading file data/amber_30k.pdb ... OK
+With CUDA and  amber_30k.pdb  it took:  40.559161675 [ 0.10137611418 ]
+Reading file data/amber_35k.pdb ... OK
+With CUDA and  amber_35k.pdb  it took:  56.2923569679 [ 0.20114061384 ]
