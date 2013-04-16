@@ -1,8 +1,27 @@
 # pyRMSD
 pyRMSD goal is the fast (and easy!) calculation of rmsd collective operations, specially matrices of large ensembles of protein conformations. It also offers a symmetric distance matrix implementation with improved access speed and memory efficiency.
-
 pyRMSD distributed under MIT license, and it is currently on its version 3.0 .
 
+- [1 - Features](#1---features)  
+- [2 - Usage](#2---usage)  
+	- [Getting coordinates](#getting-coordinates)  
+	- [Calculating the RMSD matrix](#calculating-the-rmsd-matrix)  
+	- [Matrix handlers](#matrix-handlers)  
+	- [Accessing the RMSD matrix](#accessing-the-rmsd-matrix)
+	- [Matrix statistics](#matrix-statistics)  
+- [3 - Building & Installation](#3---building--installation)  
+	- [Before installation](#before-installation)  
+	- [Linux and MacOs](#linux-and-macos)  
+	- [Windows](#windows)  
+- [4 - The custom building script](#4---the-custom-building-script)  
+	- [Unix-based systems](#unix-based-systems)  
+	- [Windows systems](#windows-systems)  
+		- [Modifying system variables](#modifying-system-variables)  
+- [5 - Testing (Developers)](#5---testing-developers)  
+- [6 - Benchmarks (Developers)](#6---benchmarks-developers)  
+- [Future improvements](#future-improvements)  
+- [Credits](#credits)  
+    
 ##1 - Features  
 pyRMSD currently has 5 basic operations:  
 
@@ -195,4 +214,7 @@ If you have used this package and you feel something is missing/incorrect or wha
 
 - QCP superposition method code was adapted from the code [here](http://theobald.brandeis.edu/qcp/)
 
+- KABSCH code is based on the work of [Bosco Ho](http://boscoh.com/).
+
 - The statistics function code was adapted from the work of jjhaag@dreamincode.net (available [here](http://www.dreamincode.net/code/snippet1447.htm) ).
+
