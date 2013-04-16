@@ -1,0 +1,22 @@
+Coordinates read (10001 models, 76 atoms)
+With CUDA and num. atoms 76 it took: 5.906012s
+With CUDA and num. atoms 152 it took: 8.826926s
+With CUDA and num. atoms 228 it took: 12.520295s
+With CUDA and num. atoms 304 it took: 16.342223s
+With CUDA and num. atoms 380 it took: 20.122703s
+With CUDA and num. atoms 456 it took: 23.749494s
+With CUDA and num. atoms 532 it took: 27.674945s
+With CUDA and num. atoms 608 it took: 31.730446s
+With CUDA and num. atoms 684 it took: 35.580218s
+With CUDA and num. atoms 760 it took: 39.019252s
+Coordinates read (10001 models, 76 atoms)
+With OpenMP and num. atoms 76 it took: 11.349687s
+With OpenMP and num. atoms 152 it took: 20.608720s
+With OpenMP and num. atoms 228 it took: 30.141014s
+With OpenMP and num. atoms 304 it took: 39.491416s
+With OpenMP and num. atoms 380 it took: 48.698280s
+With OpenMP and num. atoms 456 it took: 57.807609s
+With OpenMP and num. atoms 532 it took: 67.211817s
+With OpenMP and num. atoms 608 it took: 76.021356s
+With OpenMP and num. atoms 684 it took: 85.079103s
+With OpenMP and num. atoms 760 it took: 95.281138s

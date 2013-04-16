@@ -90,13 +90,14 @@ void QCPCUDAMemKernel::matrixEnd(double* rmsds_tmp,
 }
 
 int calculate_offset_for(int conformation_number, int number_of_conformations){
-	int offset = 0;
+	/*int offset = 0;
 	
 	for(int i = 0; i < conformation_number; ++i){
 		offset += (number_of_conformations-i-1);
 	}
 	
-	return offset;
+	return offset;*/
+	return ((number_of_conformations-1)* conformation_number) - (conformation_number*(conformation_number-1))/2;
 }
 
 void QCPCUDAMemKernel::matrixOneVsFollowingFitEqualCalcWithoutConfRotation(
