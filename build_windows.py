@@ -56,7 +56,7 @@ if __name__ == '__main__':
                                  "src/calculators/QCP":["QCPSerialKernel.cpp"],
                                  "src/matrix":["Matrix.cpp","Statistics.cpp"],
                                  "src/python":["pyRMSD.cpp"],
-                                 "src/pdbreaderlite":["PDBReader.cpp","PDReaderObject.cpp"],
+                                 "src/pdbreaderlite":["PDBReader.cpp","PDBReaderObject.cpp"],
                                  "src/calculators/test":["main.cpp","test_tools.cpp","tests.cpp"],
                                  "src/calculators/test/memory_check":["check_mem.cpp"],
     }
@@ -86,7 +86,7 @@ if __name__ == '__main__':
                     using_libs([PYTHON_LIBRARY]).\
                     using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
                     this_object_files([files_to_link["Matrix"],files_to_link["Statistics"]]).\
-                    to_produce("condensedMatrix.so")
+                    to_produce("condensedMatrix.pyd")
     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            
     os.system( linkDSL.getLinkingCommand())
@@ -96,8 +96,8 @@ if __name__ == '__main__':
                     with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
                     using_libs([PYTHON_LIBRARY]).\
                     using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
-                    this_object_files([files_to_link["PDReaderObject"],files_to_link["PDBReader"]]).\
-                    to_produce("pdbReader.so")
+                    this_object_files([files_to_link["PDBReaderObject"],files_to_link["PDBReader"]]).\
+                    to_produce("pdbReader.pyd")
     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            
     os.system( linkDSL.getLinkingCommand())
@@ -129,42 +129,14 @@ if __name__ == '__main__':
                     using_libs(calculator_libraries).\
                     using_lib_locations(calculator_library_locations).\
                     this_object_files(calculator_obj_files).\
-                    to_produce("calculators.so")
+                    to_produce("calculators.pyd")
     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
     os.system(linkDSL.getLinkingCommand())
-    
-    test_obj_files = list(calculator_obj_files)
-    test_obj_files.remove(files_to_link["pyRMSD"])
-    test_obj_files.extend([files_to_link["main"], files_to_link["test_tools"], files_to_link["tests"]])
-    linkDSL = Link().\
-                    using("g++").\
-                    with_options([OPENMP_OPTION]).\
-                    using_libs(calculator_libraries).\
-                    using_lib_locations(calculator_library_locations).\
-                    this_object_files(test_obj_files).\
-                    to_produce("test_rmsdtools_main")
-    os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
-    os.system(linkDSL.getLinkingCommand())
-    
-    test_obj_files.remove(files_to_link["main"])
-    test_obj_files.extend([files_to_link["check_mem"]])
-    linkDSL = Link().\
-                    using("g++").\
-                    with_options([OPENMP_OPTION]).\
-                    using_libs(calculator_libraries).\
-                    using_lib_locations(calculator_library_locations).\
-                    this_object_files(test_obj_files).\
-                    to_produce("check_memory")
-                    
-    os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
-    os.system(linkDSL.getLinkingCommand())
-    
-    os.system("mv calculators.so pyRMSD/")
-    os.system("mv condensedMatrix.so pyRMSD/")
-    os.system("mv pdbReader.so pyRMSD/")
-    os.system("mv test_rmsdtools_main src/calculators/test")
-    os.system("mv check_memory src/calculators/test")
+
+    os.system("move calculators.pyd pyRMSD\\")
+    os.system("move condensedMatrix.pyd pyRMSD\\")
+    os.system("move pdbReader.pyd pyRMSD\\")
     
     ##Calculators
     if options.use_cuda:
@@ -203,5 +175,5 @@ def availableCalculators():
     os.system('echo "\033[32mCleaning...\033[0m"')
     for produced_file in  files_to_link:
         if files_to_link[produced_file] != "":
-            os.system("rm "+files_to_link[produced_file])
-
+            print "del "+files_to_link[produced_file].replace('/','\\')
+            os.system("del "+files_to_link[produced_file].replace('/','\\'))

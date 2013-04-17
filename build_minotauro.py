@@ -71,7 +71,7 @@ if __name__ == '__main__':
                                  "src/calculators/QCP":["QCPSerialKernel.cpp"],
                                  "src/matrix":["Matrix.cpp","Statistics.cpp"],
                                  "src/python":["pyRMSD.cpp"],
-                                 "src/pdbreaderlite":["PDBReader.cpp","PDReaderObject.cpp"],
+                                 "src/pdbreaderlite":["PDBReader.cpp","PDBReaderObject.cpp"],
                                  "src/calculators/test":["main.cpp","test_tools.cpp","tests.cpp"],
                                  "src/calculators/test/memory_check":["check_mem.cpp"],
     }
@@ -111,7 +111,7 @@ if __name__ == '__main__':
                     with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
                     using_libs([PYTHON_LIBRARY]).\
                     using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
-                    this_object_files([files_to_link["PDReaderObject"],files_to_link["PDBReader"]]).\
+                    this_object_files([files_to_link["PDBReaderObject"],files_to_link["PDBReader"]]).\
                     to_produce("pdbReader.so")
     
     os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            

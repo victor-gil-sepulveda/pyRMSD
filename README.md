@@ -1,5 +1,6 @@
 # pyRMSD
 pyRMSD goal is the fast (and easy!) calculation of rmsd collective operations, specially matrices of large ensembles of protein conformations. It also offers a symmetric distance matrix implementation with improved access speed and memory efficiency.
+
 pyRMSD distributed under MIT license, and it is currently on its version 3.0 .
 
 - [1 - Features](#1---features)  
@@ -24,14 +25,13 @@ pyRMSD distributed under MIT license, and it is currently on its version 3.0 .
     
 ##1 - Features  
 pyRMSD currently has 5 basic operations:  
-
 1 - Pairwise RMSD calculation  
 2 - One vs. following (in a sequence of conformers).  
 3 - One vs. all the other conformations (in a sequence of conformers).  
-4 - Pairwise RMSD matrix
+4 - Pairwise RMSD matrix  
 5 - Iterative superposition of a sequence.  
 
-All methods will allow to use the same coordinates for fitting and RMSD calculation, or to use a different set of coordinates for fitting (superposing) and calculating RMSD.
+All methods can use the same coordinates for fitting and RMSD calculation, or a different set of coordinates for fitting (superposing) and calculating RMSD.
 
 In addition, methods 1, 2 and 3 can be used to modify the input coordinates (the input coordinates will be superposed). The iterative superposition method will always have this behaviour as it would be senseless otherwise. 
   
@@ -85,6 +85,8 @@ The calculator type can be one of these:
 * QCP_CUDA_CALCULATOR (in CUDA capable machines)
 * QCP_CUDA_MEM_CALCULATOR (in CUDA capable machines)
 
+Which implement Kabsch's superposition algorithm, QTRFIT, and Theobald's QCP.
+
 Programatically, available calculators can be seen with:  
     
     from pyRMSD.availableCalculators import availableCalculators
@@ -120,7 +122,7 @@ The CondensedMatrix class also offers an efficient way to ask for the most commo
 
 ##3 - Building & Installation
 ###Before installation
-**Users** only need to install Python version 2.6/2.7 (pyRMSD has only been tested with those, however it may work with another versions of the Python 2.X family). Numpy is also required. Surely you already have it installed in your machine, but in the case you didn't it can be found [here](http://sourceforge.net/projects/numpy/files/) where you will be able to find installers for almost all the combinations of platforms and Python versions you can think about.
+**Users** only need to install Python version 2.6/2.7 (pyRMSD has only been tested with those, however it may work with another versions of the Python 2.X family). Numpy is also required. Surely you already have it installed in your machine, but in the case you didn't it can be found [here](http://sourceforge.net/projects/numpy/files/), where you will be able to find installers for almost all the combinations of platforms and Python versions you can think about.
 
 **Developers** may remember that header files of Python and Numpy may be accessible, and your Python installation must contain the python shared library. This usually means that you have to compile it using ./configure --enable-shared before building Python (usually 2.7 distributions already come with this library). Prody is not a dependency, but I encourage its use to handle coordinates, as it is well-tested and powerful tool.
 
@@ -142,7 +144,7 @@ or
   
     > python build.py --cuda single/double  
   
-The build.py script is the most versatile way to compile pyRMSD and will work in almost all situations. With this script one can build x86 and x64 distributions with enabled CUDA calculators if the --cuda flag is used. There is more information about the build.py script [here](#build_linux). 
+The build.py script is the most versatile way to compile pyRMSD and will work in almost all situations. With this script one can build x86 and x64 distributions with enabled CUDA calculators if the --cuda flag is used (followed by **single** or **double** depending on the precission of the floating point operations you want to use / your GPU allows). There is more information about the build.py script [here](#build_linux). 
 
 ###Windows  
   
@@ -188,7 +190,7 @@ Once installed you can run the tests in *pyRMSD/test* using:
     > python -m unittest discover
   
 Currently only the *test_create_with_reader* test will fail if all the dependencies are fullfilled (it's unwritten yet). 
-If you didn't build pyRMSD with CUDA support, 3 tests will be skipped.
+If you didn't build pyRMSD with CUDA support, 5 tests will be skipped.
 
 If you compiled the package using the build script, an extra test suite will be available in the src/calculators/test folder with pure C tests.  
 
@@ -214,7 +216,4 @@ If you have used this package and you feel something is missing/incorrect or wha
 
 - QCP superposition method code was adapted from the code [here](http://theobald.brandeis.edu/qcp/)
 
-- KABSCH code is based on the work of [Bosco Ho](http://boscoh.com/).
-
 - The statistics function code was adapted from the work of jjhaag@dreamincode.net (available [here](http://www.dreamincode.net/code/snippet1447.htm) ).
-

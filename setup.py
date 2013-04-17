@@ -21,7 +21,7 @@ setup(name='pyRMSD',
       ext_modules=[
                    Extension('pyRMSD.pdbReader',[
                                           'src/pdbreaderlite/PDBReader.cpp',
-                                          'src/python/readerLite.cpp'
+                                          'src/pdbreaderlite/PDBReaderObject.cpp'
                    ]),
                    Extension('pyRMSD.condensedMatrix', [
                                                  'src/matrix/Matrix.cpp',

@@ -7,6 +7,7 @@
 
 #include "QCPCUDAMemKernel.h"
 #include "kernel_functions_cuda.h"
+
 inline void checkCudaError(char* message, cudaError error_code){
 	if (error_code != 0){
 		std::cout<<"Error in "<<message<<". Error code: "<<error_code<<". Exiting..."<<std::flush<<std::endl;
