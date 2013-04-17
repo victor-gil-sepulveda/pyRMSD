@@ -150,7 +150,7 @@ The build.py script is the most versatile way to compile pyRMSD and will work in
   
 Windows users have the following choices:  
   
-**1)** Using a precompiled windows installer. There are two available ([x86](https://github.com/victor-gil-sepulveda/pyRMSD/tree/master/prebuilt_packages/v1/Win/32) and [x64]()). Those are used as any other regular Windows Installer (double click the executable and follow instructions).  
+**1)** Using a precompiled windows installer (in 'wininst/pyRMSD-3.0.win32-py2.7.msi'). Those are used as any other regular Windows Installer (double click the executable and follow instructions).  
   
 **2)** Using the custom build.py script in pyRMSD main folder with:  
   
