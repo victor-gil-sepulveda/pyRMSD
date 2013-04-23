@@ -7,6 +7,7 @@ pyRMSD distributed under MIT license, and it is currently on its version 3.0 .
 - [2 - Usage](#2---usage)  
 	- [Getting coordinates](#getting-coordinates)  
 	- [Calculating the RMSD matrix](#calculating-the-rmsd-matrix)  
+	- [Available calculators](#available-calculators)  
 	- [Matrix handlers](#matrix-handlers)  
 	- [Accessing the RMSD matrix](#accessing-the-rmsd-matrix)
 	- [Matrix statistics](#matrix-statistics)  
@@ -74,6 +75,7 @@ Calculating the matrix using directly the RMSDCalculator is a little bit more ve
 
 As the resulting matrix is symmetric and its diagonal is 0, the rmsd_matrix object will store only the upper diagonal triangle (condensed matrix), in the same way [scipy.spatial.distance.pdist](http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html)
 does.  
+###Available calculators
 The calculator type can be one of these:  
 
 * KABSCH_SERIAL_CALCULATOR
@@ -82,8 +84,8 @@ The calculator type can be one of these:
 * QTRFIT_OMP_CALCULATOR
 * QCP_SERIAL_CALCULATOR
 * QCP_OMP_CALCULATOR
-* QCP_CUDA_CALCULATOR (in CUDA capable machines)
-* QCP_CUDA_MEM_CALCULATOR (in CUDA capable machines)
+* QCP_CUDA_CALCULATOR (in CUDA capable machines *)
+* QCP_CUDA_MEM_CALCULATOR (in CUDA capable machines *)
 
 Which implement Kabsch's superposition algorithm, QTRFIT, and Theobald's QCP.
 
@@ -91,6 +93,8 @@ Programatically, available calculators can be seen with:
     
     from pyRMSD.availableCalculators import availableCalculators
     print availableCalculators()
+  
+\* Computing capability of the GPU must be equal or higher than 1.1 (>1.2 if built with double precision support).
 
 ###Matrix handlers
 A **MatrixHandler** object will help you to create the matrix and will also help you saving and loading matrix data to disk.   
@@ -144,7 +148,7 @@ or
   
     > python build.py --cuda single/double  
   
-The build.py script is the most versatile way to compile pyRMSD and will work in almost all situations. With this script one can build x86 and x64 distributions with enabled CUDA calculators if the --cuda flag is used (followed by **single** or **double** depending on the precission of the floating point operations you want to use / your GPU allows). There is more information about the build.py script [here](#build_linux). 
+The build.py script is the most versatile way to compile pyRMSD and will work in almost all situations. With this script one can build x86 and x64 distributions with enabled CUDA calculators if the --cuda flag is used (followed by **single** or **double** depending on the precision of the floating point operations you want to use / your GPU allows). There is more information about the build.py script [here](#build_linux). 
 
 ###Windows  
   
