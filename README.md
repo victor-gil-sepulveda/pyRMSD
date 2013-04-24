@@ -216,8 +216,11 @@ If you have used this package and you feel something is missing/incorrect or wha
 ##Credits
 - Some Numpy helper functions were first seen in  http://www.scipy.org/Cookbook/C_Extensions/NumPy_arrays, by Lou Pecora (if I'm not wrong).
 
-- The Python implementation of superposition was extracted from Prody source code (by [Ahmet Bakan](http://www.csb.pitt.edu/People/abakan/)) and modified, with the only goal of providing a python example to compare performance and stability.
+- The initial Python implementation of superposition was extracted from Prody source code (by [Ahmet Bakan](http://www.csb.pitt.edu/People/abakan/)) and modified, with the only goal of providing a python example to compare performance and stability. The iterative superposition algorithm is a direct translation of his iterpose algorithm.
 
 - QCP superposition method code was adapted from the code [here](http://theobald.brandeis.edu/qcp/)
 
 - The statistics function code was adapted from the work of jjhaag@dreamincode.net (available [here](http://www.dreamincode.net/code/snippet1447.htm) ).
+
+- Kabsch algorithm code was adapted from the work of [Dr. Bosco K. Ho](http://boscoh.com/)  
+- 
