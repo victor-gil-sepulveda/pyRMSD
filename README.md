@@ -223,4 +223,4 @@ If you have used this package and you feel something is missing/incorrect or wha
 - The statistics function code was adapted from the work of jjhaag@dreamincode.net (available [here](http://www.dreamincode.net/code/snippet1447.htm) ).
 
 - Kabsch algorithm code was adapted from the work of [Dr. Bosco K. Ho](http://boscoh.com/)  
-- 
+ 
