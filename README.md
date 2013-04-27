@@ -7,6 +7,7 @@ pyRMSD distributed under MIT license, and it is currently on its version 3.0 .
 - [2 - Usage](#2---usage)  
 	- [Getting coordinates](#getting-coordinates)  
 	- [Calculating the RMSD matrix](#calculating-the-rmsd-matrix)  
+	- [Available calculators](#available-calculators)  
 	- [Matrix handlers](#matrix-handlers)  
 	- [Accessing the RMSD matrix](#accessing-the-rmsd-matrix)
 	- [Matrix statistics](#matrix-statistics)  
@@ -74,6 +75,7 @@ Calculating the matrix using directly the RMSDCalculator is a little bit more ve
 
 As the resulting matrix is symmetric and its diagonal is 0, the rmsd_matrix object will store only the upper diagonal triangle (condensed matrix), in the same way [scipy.spatial.distance.pdist](http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html)
 does.  
+###Available calculators
 The calculator type can be one of these:  
 
 * KABSCH_SERIAL_CALCULATOR
@@ -82,8 +84,8 @@ The calculator type can be one of these:
 * QTRFIT_OMP_CALCULATOR
 * QCP_SERIAL_CALCULATOR
 * QCP_OMP_CALCULATOR
-* QCP_CUDA_CALCULATOR (in CUDA capable machines)
-* QCP_CUDA_MEM_CALCULATOR (in CUDA capable machines)
+* QCP_CUDA_CALCULATOR (in CUDA capable machines *)
+* QCP_CUDA_MEM_CALCULATOR (in CUDA capable machines *)
 
 Which implement Kabsch's superposition algorithm, QTRFIT, and Theobald's QCP.
 
@@ -91,6 +93,8 @@ Programatically, available calculators can be seen with:
     
     from pyRMSD.availableCalculators import availableCalculators
     print availableCalculators()
+  
+\* Computing capability of the GPU must be equal or higher than 1.1 (>1.2 if built with double precision support).
 
 ###Matrix handlers
 A **MatrixHandler** object will help you to create the matrix and will also help you saving and loading matrix data to disk.   
@@ -144,7 +148,7 @@ or
   
     > python build.py --cuda single/double  
   
-The build.py script is the most versatile way to compile pyRMSD and will work in almost all situations. With this script one can build x86 and x64 distributions with enabled CUDA calculators if the --cuda flag is used (followed by **single** or **double** depending on the precission of the floating point operations you want to use / your GPU allows). There is more information about the build.py script [here](#build_linux). 
+The build.py script is the most versatile way to compile pyRMSD and will work in almost all situations. With this script one can build x86 and x64 distributions with enabled CUDA calculators if the --cuda flag is used (followed by **single** or **double** depending on the precision of the floating point operations you want to use / your GPU allows). There is more information about the build.py script [here](#build_linux). 
 
 ###Windows  
   
@@ -212,8 +216,11 @@ If you have used this package and you feel something is missing/incorrect or wha
 ##Credits
 - Some Numpy helper functions were first seen in  http://www.scipy.org/Cookbook/C_Extensions/NumPy_arrays, by Lou Pecora (if I'm not wrong).
 
-- The Python implementation of superposition was extracted from Prody source code (by [Ahmet Bakan](http://www.csb.pitt.edu/People/abakan/)) and modified, with the only goal of providing a python example to compare performance and stability.
+- The initial Python implementation of superposition was extracted from Prody source code (by [Ahmet Bakan](http://www.csb.pitt.edu/People/abakan/)) and modified, with the only goal of providing a python example to compare performance and stability. The iterative superposition algorithm is a direct translation of his iterpose algorithm.
 
 - QCP superposition method code was adapted from the code [here](http://theobald.brandeis.edu/qcp/)
 
 - The statistics function code was adapted from the work of jjhaag@dreamincode.net (available [here](http://www.dreamincode.net/code/snippet1447.htm) ).
+
+- Kabsch algorithm code was adapted from the work of [Dr. Bosco K. Ho](http://boscoh.com/)  
+ 
