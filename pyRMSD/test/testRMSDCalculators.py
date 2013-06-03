@@ -7,7 +7,6 @@ import unittest
 import pyRMSD.utils.proteinReading
 import pyRMSD.RMSDCalculator
 import numpy
-from prody import *
 
 class TestRMSDCalculators(unittest.TestCase):
     

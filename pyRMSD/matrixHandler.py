@@ -5,6 +5,7 @@ Created on 19/09/2012
 '''
 import json
 import numpy
+import os.path
 import pyRMSD.RMSDCalculator
 from pyRMSD.condensedMatrix import CondensedMatrix #@UnresolvedImport
 
@@ -82,7 +83,8 @@ class MatrixHandler(object):
     @classmethod
     def load_matrix(cls, matrix_file_without_extension):
         """
-        Loads a condensed matrix from disk.
+        Loads a condensed matrix from disk. <ATT> Without the cast to list, the matrix 
+        is not loaded properly.</ATT>
         
         @param matrix_file_without_extension: Is the matrix file name without any 
         extension ('.bin' will be added).
@@ -99,7 +101,7 @@ class MatrixHandler(object):
         @param statistics_folder: Folder where the file 'statistics.json' will be stored.
         @param distance_matrix: The distance matrix from which the statistics are calculated.
         """
-        if statistics_folder!=None:
+        if statistics_folder is not None:
             stats_dic = {}
             stats_dic["Minimum"] =  distance_matrix.calculateMin() 
             stats_dic["Maximum"] =  distance_matrix.calculateMax()
@@ -107,4 +109,6 @@ class MatrixHandler(object):
             stats_dic["Std. Dev."] =distance_matrix.calculateVariance()
             stats_dic["Skewness"] = distance_matrix.calculateSkewness()
             stats_dic["Kurtosis"] = distance_matrix.calculateKurtosis()
-            open( statistics_folder+"/"+"statistics.json","w").write(json.dumps(stats_dic,indent=4, separators=(',', ': ')))
+            open( os.path.join(statistics_folder,"statistics.json"),"w").write(json.dumps(stats_dic,indent=4, separators=(',', ': ')))
+            return os.path.join(statistics_folder,"statistics.json")
+        return None
