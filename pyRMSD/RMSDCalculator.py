@@ -33,6 +33,9 @@ class RMSDCalculator(object):
             
             This coordinates will be used for both structural superposition and RMSD calculation if the 'calculation 
             coordinates' parameter is not defined.
+            
+            The array type is constrained to be a numpy.array object with dtype = numpy.float64  (dtype will not be always double
+            by default).
         
         @param calculatorType: One of the calculators returned by 'availableCalculators()'. i.e. OMP_CALCULATOR
          
@@ -213,6 +216,7 @@ class RMSDCalculator(object):
         np_coords = numpy.reshape(self.fitting_coordinates,self.number_of_conformations*self.number_of_fitting_atoms*3)
 #         self.fitting_coordinates.shape = (self.number_of_conformations*self.number_of_fitting_atoms*3)
         if (self.calculation_coordinates is None):
+            print self.number_of_fitting_atoms, self.number_of_conformations
             return pyRMSD.calculators.calculateRMSDCondensedMatrix(
                                                                    availableCalculators()[self.calculatorType], 
                                                                    np_coords, self.number_of_fitting_atoms, 

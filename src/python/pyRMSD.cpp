@@ -84,7 +84,6 @@ void parse_params_for_condensed_matrix(
     if (coords_list_obj->descr->type_num != NPY_DOUBLE || coords_list_obj->nd != 1){
     	PyErr_SetString(PyExc_RuntimeError, "First parameters must be a double array.");
     }
-
     // Get the data pointer
     coords_list = (double *) (coords_list_obj->data);
     if(number_of_calc_atoms != 0){
@@ -93,7 +92,7 @@ void parse_params_for_condensed_matrix(
 	else{
 		calc_coords_list = NULL;
 	}
-
+    coords_list = (double *) (coords_list_obj->data);
     // Length of the vector
     int coords_list_len = coords_list_obj->dimensions[0];
 

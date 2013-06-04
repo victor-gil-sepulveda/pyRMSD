@@ -4,7 +4,6 @@ Created on 16/11/2012
 @author: victor
 '''
 import unittest
-import pyRMSD.utils.proteinReading
 import pyRMSD.RMSDCalculator
 import numpy
 
