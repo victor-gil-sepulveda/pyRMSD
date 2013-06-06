@@ -35,7 +35,9 @@ pyRMSD currently has 5 basic operations:
 All methods can use the same coordinates for fitting and RMSD calculation, or a different set of coordinates for fitting (superposing) and calculating RMSD.
 
 In addition, methods 1, 2 and 3 can be used to modify the input coordinates (the input coordinates will be superposed). The iterative superposition method will always have this behaviour as it would be senseless otherwise. 
-  
+
+If you think you need new features to be added click [here](#contatct_features).
+ 
 ##2 - Usage  
 Some code snippets and explanations about them will be shown below. Note that as the code changes rapidly, this snippets can be outdated. I will put all our effort for this not to happen, but if you detect that anything is not actually working, please contact me.
   
@@ -52,7 +54,7 @@ In order to do this there's a convenience class function in *pyRMSD/utils/protei
     reader = Reader().readThisFile("my_trajectory.pdb").gettingOnlyCAs()
     coordinates = reader.read()
     num_of_atoms = reader.numberOfAtoms
-    num_of_framesreader.numberOfFrames
+    num_of_frames = reader.numberOfFrames
 
 See 'pyRMSD/pyRMSD/test/testPdbReader.py for a simple usage example.
 ###Calculating the RMSD matrix
@@ -208,10 +210,14 @@ If you have used this package and you feel something is missing/incorrect or wha
 * Adding number of threads option for any OpenMP calculator.  **DONE**  
 * Adding  number of blocks and threads per block option in CUDA calculator.  **DONE**  
 * Create an installer using Python distutils (difficult because of the use of CUDA).  
-* C code needs more comments and to encapsulate funtion arguments.  
+* C code needs more comments and to encapsulate function arguments (an absolutely needed major refactoring).  
 * Add more tests.  
 * Add more comments...  
-* and improving this README!!  
+* and of course improving this README!!
+<a id="contact_features"></a>
+If you want to add new features (for instance mass weighting or symmetry treatment) do not hesitate to contact me at: victor.gil.sepulveda at gmail.com.
+Of course, you can fork the repository and add as many features and improvements as you want.
+
 
 ##Credits
 - Some Numpy helper functions were first seen in  http://www.scipy.org/Cookbook/C_Extensions/NumPy_arrays, by Lou Pecora (if I'm not wrong).
@@ -222,5 +228,9 @@ If you have used this package and you feel something is missing/incorrect or wha
 
 - The statistics function code was adapted from the work of jjhaag@dreamincode.net (available [here](http://www.dreamincode.net/code/snippet1447.htm) ).
 
-- Kabsch algorithm code was adapted from the work of [Dr. Bosco K. Ho](http://boscoh.com/)  
+- Kabsch algorithm code was adapted from the work of [Dr. Bosco K. Ho](http://boscoh.com/). I would like to give him special tanks for his help.
+
+- As far as I know the first CUDA implementation of QCP is from [Yutong Zhao](http://proteneer.com/blog/). He went a step further trying to improve memory coalescence by changing the coordinates overlay. Pitifully his code is not open source.
+
+
  
