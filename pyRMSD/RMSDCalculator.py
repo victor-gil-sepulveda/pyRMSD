@@ -150,10 +150,10 @@ class RMSDCalculator(object):
             rearranged_calculation_coords_list = [self.calculation_coordinates[conformation_number]]
     
             for coords in previous_coords:
-                rearranged_coords_list.append(coords)
+                rearranged_calculation_coords_list.append(coords)
             
             for coords in following_coords:
-                rearranged_coords_list.append(coords)
+                rearranged_calculation_coords_list.append(coords)
             
             rearranged_calculation_coords = numpy.array(rearranged_calculation_coords_list)
         
