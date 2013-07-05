@@ -15,7 +15,7 @@ namespace RMSDTools{
 						double * const all_coords);
 
 	void applyTranslationsToAll(unsigned int atomsPerConformation, unsigned int numberOfConformations,
-			double * const all_coords, double* const translations);
+			double * const all_coords, double* const translations, int sign = 1);
 
 	void applyTranslationToAll(unsigned int atomsPerConformation, unsigned int numberOfConformations,
 			double * const all_coords, double* const translation_vector);

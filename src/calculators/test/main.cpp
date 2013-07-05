@@ -48,9 +48,15 @@ int main(int argc, char **argv){
 	test_superposition_with_coordinates_change(QTRFIT_SERIAL_CALCULATOR);
 	test_superposition_with_coordinates_change(QTRFIT_OMP_CALCULATOR);
 
+	test_superposition_with_different_fit_and_calc_coordsets(QTRFIT_SERIAL_CALCULATOR, 1e-12);
+
+	test_iterative_superposition_with_different_calc_and_fit_sets(QTRFIT_SERIAL_CALCULATOR, 1e-6);
 	// Do those for all the others
-	for(unsigned int i = 0; i < available_calculators.size();++i){
+/*	for(unsigned int i = 0; i < available_calculators.size();++i){
 		double precision;
+
+		test_superposition_with_very_different_calc_and_fit_sets(available_calculators[i], 1e-6);
+
 		set_precision_if(
 				available_calculators[i],
 				1e-4,
@@ -72,7 +78,7 @@ int main(int argc, char **argv){
 					1e-6,
 					precision);
 		test_iterative_superposition_with_different_calc_and_fit_sets(available_calculators[i], precision);
-	}
+	}*/
 
 	return 0;
 }

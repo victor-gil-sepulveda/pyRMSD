@@ -211,7 +211,9 @@ If you have used this package and you feel something is missing/incorrect or wha
 * Adding  number of blocks and threads per block option in CUDA calculator.  **DONE**  
 * Create an installer using Python distutils (difficult because of the use of CUDA).  
 * C code needs more comments and to encapsulate function arguments (an absolutely needed major refactoring).  
-* Add more tests.  
+* Names in C code must be more self-explanatory. 
+* C code must be revised and further simplified. 
+* Add more and better tests to increase coverage.  
 * Add more comments...  
 * and of course improving this README!!
 <a id="contact_features"></a>

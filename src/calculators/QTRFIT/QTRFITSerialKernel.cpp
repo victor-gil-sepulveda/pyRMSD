@@ -8,7 +8,8 @@
 #include "QTRFITSerialKernel.h"
 #include <cstddef>
 #include "../RMSDTools.h"
-
+#include <iostream>
+using namespace std;
 
 QTRFITSerialKernel::QTRFITSerialKernel() {}
 
@@ -70,6 +71,7 @@ void QTRFITSerialKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
 		int calcCoordsOffset = i * coordinatesPerRMSDConformation;
 		double* calc_conformation_coords =	&(allRMSDCoordinates[calcCoordsOffset]);
 		double* calc_conformation_coords_tmp = 	new double[coordinatesPerRMSDConformation];
+
 		RMSDTools::copyArrays(calc_conformation_coords_tmp, calc_conformation_coords, coordinatesPerRMSDConformation);
 
 		superpose(atomsPerConformation, fit_conformation_coords_tmp,
@@ -127,7 +129,7 @@ void QTRFITSerialKernel::superpose(unsigned int fit_n, double * const fit_coords
 	double quaternion[4];
 
 	// Get rotation matrix
-	superpositionQuatFit(fit_n,  fit_coords, fit_ref_coords,quaternion, rot_matrix);
+	superpositionQuatFit(fit_n,  fit_coords, fit_ref_coords, quaternion, rot_matrix);
 
 	// Rotate the calculation and fit coordinate sets by using rotation matrix u
 	RMSDTools::rotate3D(fit_n, fit_coords, rot_matrix);

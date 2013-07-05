@@ -47,18 +47,20 @@ void RMSDTools::centerAllAtOrigin(
 	}
 }
 
-void RMSDTools::applyTranslationsToAll(unsigned int atomsPerConformation, unsigned int numberOfConformations, double * const all_coords, double* const translations){
+void RMSDTools::applyTranslationsToAll(unsigned int atomsPerConformation, unsigned int numberOfConformations,
+											double * const all_coords, double* const translations, int sign){
 	unsigned int coordsPerConformation = atomsPerConformation * 3;
 
 	//#pragma omp parallel for
 	for (unsigned int i = 0; i < numberOfConformations; ++i){
 		double* translation_vector = &(translations[3*i]);
 		double* coords = &(all_coords[coordsPerConformation*i]);
-		RMSDTools::shift3D(atomsPerConformation, coords, translation_vector, 1.);
+		RMSDTools::shift3D(atomsPerConformation, coords, translation_vector, sign);
 	}
 }
 
-void RMSDTools::applyTranslationToAll(unsigned int atomsPerConformation, unsigned int numberOfConformations, double * const all_coords, double* const translation_vector){
+void RMSDTools::applyTranslationToAll(unsigned int atomsPerConformation, unsigned int numberOfConformations,
+										   double * const all_coords, double* const translation_vector){
 	unsigned int coordsPerConformation = atomsPerConformation * 3;
 
 	//#pragma omp parallel for

@@ -188,6 +188,7 @@ class RMSDCalculator(object):
             else:
                 return (rmsds, np_coords_fit)
         else:
+            print self.calculation_coordinates
             np_coords_calc = numpy.copy(numpy.reshape(self.calculation_coordinates,self.number_of_conformations*self.number_of_calculation_atoms*3))
             
             rmsds =  pyRMSD.calculators.oneVsFollowing(
@@ -197,7 +198,7 @@ class RMSDCalculator(object):
                              conformation_number, self.number_of_conformations,
                              self.__number_of_threads, self.__threads_per_block, self.__blocks_per_grid,
                              self.modify_coordinates)
-            
+            print numpy.reshape(np_coords_calc,(self.number_of_conformations,self.number_of_calculation_atoms,3))
             if (not self.modify_coordinates):
                 return rmsds
             else:
