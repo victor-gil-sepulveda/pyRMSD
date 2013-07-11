@@ -216,8 +216,8 @@ def availableCalculators():
     os.system('echo "\033[33mWriting available calculators...\033[0m"')
     open("pyRMSD/availableCalculators.py","w").write(calcs_str)
     
-    os.system('echo "\033[32mCleaning...\033[0m"')
-    for produced_file in  files_to_link:
-        if files_to_link[produced_file] != "":
-            os.system("rm "+files_to_link[produced_file])
+#     os.system('echo "\033[32mCleaning...\033[0m"')
+#     for produced_file in  files_to_link:
+#         if files_to_link[produced_file] != "":
+#             os.system("rm "+files_to_link[produced_file])
 

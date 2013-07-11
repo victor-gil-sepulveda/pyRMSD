@@ -328,8 +328,8 @@ void test_superposition_with_fit(	RMSDCalculatorType type,
 				not_superposed_fit_coordinates_shape[2],
 			precision_of_check);
 
-	save_pdb_coords(not_superposed_fit_coordinates,not_superposed_fit_coordinates_shape,"calculated.coords");
-	save_pdb_coords(expected_superposed_fit_coordinates,expected_superposed_fit_coordinates_shape,"expected.coords");
+	//save_pdb_coords(not_superposed_fit_coordinates,not_superposed_fit_coordinates_shape,"calculated.coords");
+	//save_pdb_coords(expected_superposed_fit_coordinates,expected_superposed_fit_coordinates_shape,"expected.coords");
 	delete calculator;
 }
 
@@ -393,8 +393,8 @@ void test_superposition_with_fit_and_calc(RMSDCalculatorType type,
 
 	calculator->oneVsFollowing(0, TODOUBLEP(calculated_rmsds));
 
-	//print_vector("expected RMSD: ", TODOUBLEP(expected_rmsds),expected_rmsds.size(),8);
-	//print_vector("calcted. RMSD: ", TODOUBLEP(calculated_rmsds), calculated_rmsds.size(),8);
+//	print_vector("expected RMSD: ", TODOUBLEP(expected_rmsds),expected_rmsds.size(),8);
+//	print_vector("calcted. RMSD: ", TODOUBLEP(calculated_rmsds), calculated_rmsds.size(),8);
 
 	// RMSDs must be the same
 	compareVectors("\tCalculated RMSDs coincide with golden: ",
