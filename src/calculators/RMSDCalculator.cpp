@@ -49,37 +49,21 @@ void RMSDCalculator::oneVsFollowing(int reference_conformation_number, double* r
 		if(this->allCalculationCoordinates == NULL){
 			double* reference_conformation = &(allFittingCoordinates[reference_conformation_number*coordinatesPerFittingConformation]);
 
-			if(!this->rotateFittingCoordinates){
-				this->_one_vs_following_fit_equals_calc_coords(
-						reference_conformation,
-						reference_conformation_number,
-						rmsd);
-			}
-			else{
-				this->_one_vs_following_fit_equals_calc_coords_rotating_coordinates(
-						reference_conformation,
-						reference_conformation_number,
-						rmsd);
-			}
+			this->_one_vs_following_fit_equals_calc_coords_rotating_coordinates(
+					reference_conformation,
+					reference_conformation_number,
+					rmsd);
 		}
 		else{
+
 			double* fit_reference_conformation = &(allFittingCoordinates[reference_conformation_number*coordinatesPerFittingConformation]);
 			double* calc_reference_conformation = &(allCalculationCoordinates[reference_conformation_number*coordinatesPerCalculationConformation]);
 
-			if(!this->rotateFittingCoordinates){
-				this->_one_vs_following_fit_differs_calc_coords(
-						fit_reference_conformation,
-						calc_reference_conformation,
-						reference_conformation_number,
-						rmsd);
-			}
-			else{
-				this->_one_vs_following_fit_differs_calc_coords_rotating_coordinates(
-						fit_reference_conformation,
-						calc_reference_conformation,
-						reference_conformation_number,
-						rmsd);
-			}
+			this->_one_vs_following_fit_differs_calc_coords_rotating_coordinates(
+					fit_reference_conformation,
+					calc_reference_conformation,
+					reference_conformation_number,
+					rmsd);
 		}
 	}
 }
@@ -159,33 +143,6 @@ void RMSDCalculator::_one_vs_following_fit_equals_calc_coords(
 		double* reference,
 		int reference_conformation_number,
 		double *rmsd){
-
-	double* centers = NULL;
-
-	centers = new double[(numberOfConformations-reference_conformation_number)*3]; // A bit of memory is wasted
-	RMSDTools::centerAllAtOrigin(
-			atomsPerFittingConformation,
-			(numberOfConformations-reference_conformation_number),
-			reference,
-			centers);
-
-	this->kernelFunctions->oneVsFollowingFitEqualCalcWithoutConfRotation(
-			reference,
-			reference_conformation_number,
-			rmsd,
-			numberOfConformations,
-			coordinatesPerFittingConformation,
-			atomsPerFittingConformation,
-			allFittingCoordinates);
-
-	// Move then again to their places
-	RMSDTools::applyTranslationsToAll(
-			this->atomsPerFittingConformation,
-			(numberOfConformations-reference_conformation_number),
-			reference,
-			centers);
-
-	delete [] centers;
 }
 
 /*
@@ -211,32 +168,6 @@ void RMSDCalculator::_one_vs_following_fit_differs_calc_coords(
 		int reference_conformation_number,
 		double *rmsd){
 
-	double* fitCenters = NULL;
-	double* calcCenters = NULL;
-
-	fitCenters = new double[numberOfConformations*3];
-
-	RMSDTools::centerAllAtOrigin(atomsPerFittingConformation, numberOfConformations, allFittingCoordinates, fitCenters);
-	// Move the calculation set towards the center but keeping its relative position with the fitting set
-	RMSDTools::applyTranslationsToAll(atomsPerCalculationConformation, numberOfConformations, allCalculationCoordinates, fitCenters, -1);
-	this->kernelFunctions->oneVsFollowingFitDiffersCalcWithoutConfRotation(
-			fitReference,
-			calcReference,
-			reference_conformation_number,
-			rmsd,
-			numberOfConformations,
-			coordinatesPerFittingConformation,
-			atomsPerFittingConformation,
-			allFittingCoordinates,
-			coordinatesPerCalculationConformation,
-			atomsPerCalculationConformation,
-			allCalculationCoordinates);
-
-	// Move then again to their places to avoid coordinate modification
-	RMSDTools::applyTranslationsToAll(this->atomsPerFittingConformation, this->numberOfConformations, this->allFittingCoordinates, fitCenters);
-	RMSDTools::applyTranslationsToAll(this->atomsPerCalculationConformation, this->numberOfConformations, this->allCalculationCoordinates, fitCenters);
-	delete [] fitCenters;
-	delete [] calcCenters;
 }
 
 void RMSDCalculator::_one_vs_following_fit_differs_calc_coords_rotating_coordinates(double* fitReference, double* calcReference, int reference_conformation_number, double *rmsd){

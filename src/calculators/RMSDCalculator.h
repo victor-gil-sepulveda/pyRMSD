@@ -5,6 +5,11 @@
 #include "KernelFunctions.h"
 #include <cstddef>
 
+struct RMSDCommandParameters{
+	int numberOfConformations;
+	int atomsPerConformation;
+	double* allCoordinates;
+};
 
 /*
  * This is the base class for an RMSD Calculator, and holds almost all its logic (different calculators are

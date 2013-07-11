@@ -23,11 +23,11 @@ int main(int argc, char **argv){
 
 	RMSDCalculatorType available_calculators_d [] =  {
 			KABSCH_SERIAL_CALCULATOR,
-			KABSCH_OMP_CALCULATOR,
-			QTRFIT_SERIAL_CALCULATOR,
-			QTRFIT_OMP_CALCULATOR,
-			QCP_SERIAL_CALCULATOR,
-			QCP_OMP_CALCULATOR,
+//			KABSCH_OMP_CALCULATOR,
+//			QTRFIT_SERIAL_CALCULATOR,
+//			QTRFIT_OMP_CALCULATOR,
+//			QCP_SERIAL_CALCULATOR,
+//			QCP_OMP_CALCULATOR,
 #ifdef USE_CUDA
 			QCP_CUDA_CALCULATOR
 #endif
@@ -37,48 +37,49 @@ int main(int argc, char **argv){
 			available_calculators_d + sizeof(available_calculators_d)/sizeof(RMSDCalculatorType));
 
 	test_initialize();
+
 	test_copy_array();
-	test_coordinates_mean();
+
+	test_mean_coordinates();
+
 	test_translations();
 
+	test_center_coordinates();
+
 	test_QCP_Kernel();
+
 	test_KABSCH_Kernel();
 
-	// This tests does not work with QCP and KABSCH
-	test_superposition_with_coordinates_change(QTRFIT_SERIAL_CALCULATOR);
-	test_superposition_with_coordinates_change(QTRFIT_OMP_CALCULATOR);
+	for(unsigned int i = 0; i < available_calculators.size();++i){
 
-	test_superposition_with_different_fit_and_calc_coordsets(QTRFIT_SERIAL_CALCULATOR, 1e-12);
+		test_superposition_with_fit(available_calculators[i],
+				"test_data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.CA.coords",
+				"test_data/Superpose_Fit_CA_similar/prot_plus_ligand_similar.aligned_CA.coords",
+				"test_data/Superpose_Fit_CA_similar/prot_plus_ligand_similar.aligned_CA.rmsd",
+				1e-12);
 
-	test_iterative_superposition_with_different_calc_and_fit_sets(QTRFIT_SERIAL_CALCULATOR, 1e-6);
-	// Do those for all the others
-/*	for(unsigned int i = 0; i < available_calculators.size();++i){
-		double precision;
+		test_superposition_with_fit(available_calculators[i],
+				"test_data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.CA.coords",
+				"test_data/Superpose_Fit_CA_very_diff/prot_plus_ligand.aligned_CA.coords",
+				"test_data/Superpose_Fit_CA_very_diff/prot_plus_ligand.aligned_CA.rmsd",
+				1e-12);
 
-		test_superposition_with_very_different_calc_and_fit_sets(available_calculators[i], 1e-6);
+		test_superposition_with_fit_and_calc(available_calculators[i],
+				"test_data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.CA.coords",
+				"test_data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_CA.coords",
+				"test_data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.ligand.coords",
+				"test_data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_BEN.coords",
+				"test_data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_BEN.rmsd",
+				1e-12);
 
-		set_precision_if(
-				available_calculators[i],
-				1e-4,
-				1e-6,
-				precision);
-
-		test_iterative_superposition_with_equal_calc_and_fit_sets(available_calculators[i], precision);
-
-		set_precision_if(
-					available_calculators[i],
-					1e-4,
-					1e-12,
-					precision);
-		test_superposition_with_different_fit_and_calc_coordsets(available_calculators[i], precision);
-
-		set_precision_if(
-					available_calculators[i],
-					1e-4,
-					1e-6,
-					precision);
-		test_iterative_superposition_with_different_calc_and_fit_sets(available_calculators[i], precision);
-	}*/
+		test_superposition_with_fit_and_calc(available_calculators[i],
+				"test_data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.CA.coords",
+				"test_data/Superpose_Fit_CA_Calc_BEN_very_different/prot_plus_ligand_similar.aligned_CA.coords",
+				"test_data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.ligand.coords",
+				"test_data/Superpose_Fit_CA_Calc_BEN_very_different/prot_plus_ligand_similar.aligned_BEN.coords",
+				"test_data/Superpose_Fit_CA_Calc_BEN_very_different/prot_plus_ligand_similar.aligned_BEN.rmsd",
+				1e-12);
+	}
 
 	return 0;
 }

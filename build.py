@@ -4,7 +4,6 @@ import optparse
 import collections
 import distutils.sysconfig
 import os
-
 ##############################################
 #####                                  #######
 #####     Compiling Options            #######

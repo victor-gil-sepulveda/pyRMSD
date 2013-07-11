@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <iomanip>
 using namespace std;
 
 
@@ -38,8 +39,8 @@ void RMSDTools::centerAllAtOrigin(
 		unsigned int numberOfConformations,
 		double * const all_coords){
 
-	unsigned int coordsPerConformation = atomsPerConformation * 3;
 	double center [] = {0,0,0};
+	unsigned int coordsPerConformation = atomsPerConformation * 3;
 	for (unsigned int i = 0; i < numberOfConformations; ++i){
 		double* coords = &(all_coords[coordsPerConformation*i]);
 		RMSDTools::geometricCenter(atomsPerConformation, coords, center);
@@ -51,7 +52,6 @@ void RMSDTools::applyTranslationsToAll(unsigned int atomsPerConformation, unsign
 											double * const all_coords, double* const translations, int sign){
 	unsigned int coordsPerConformation = atomsPerConformation * 3;
 
-	//#pragma omp parallel for
 	for (unsigned int i = 0; i < numberOfConformations; ++i){
 		double* translation_vector = &(translations[3*i]);
 		double* coords = &(all_coords[coordsPerConformation*i]);
@@ -78,8 +78,7 @@ void RMSDTools::geometricCenter(unsigned int n, const double * const x, double *
 	center[1] = 0.0;
 	center[2] = 0.0;
 
-	for(i=0; i<n; i++)
-	{
+	for(i=0; i < n; i++){
 		int offset = 3*i;
 		center[0] += x[offset];
 		center[1] += x[offset+1];
@@ -331,9 +330,9 @@ bool RMSDTools::diagonalize_symmetric(
 	double vec[4][4];
 
 	double tmp_matrix[4][4];
-	RMSDTools::initializeTo(tmp_matrix[0],0,16);
+	RMSDTools::initializeTo(tmp_matrix[0], 0, 16);
 
-	for(int i = 0; i <3; ++i){
+	for(int i = 0; i < 3; ++i){
 		for(int j = 0; j< 3;++j){
 			tmp_matrix[i][j] = matrix[i][j];
 		}

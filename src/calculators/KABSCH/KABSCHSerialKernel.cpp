@@ -219,11 +219,6 @@ bool KABSCHSerialKernel::calculate_rotation_matrix(
 	double sigma;
 
 	// build Rt, transpose of R
-//	for (i=0; i<3; i++){
-//		for (j=0; j<3; j++){
-//			Rt[i][j] = R[j][i];
-//		}
-//	}
 	RMSDTools::transposeMatrix(R,Rt);
 
 	// make symmetric RtR = Rt X R

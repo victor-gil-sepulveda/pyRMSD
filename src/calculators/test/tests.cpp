@@ -11,6 +11,8 @@
 
 using namespace std;
 
+#define TODOUBLEP(vec) (&(vec[0]))
+
 void test_initialize(){
 	print_test_tittle(__FUNCTION__);
 	double expected_initialized[] = {3,3,3,3,3,3,3,3,3,3};
@@ -42,7 +44,7 @@ void test_copy_array(){
 	compareVectors("\tTesting array copy: ", expected_array, uninitialized_array, 10, 1e-10);
 }
 
-void test_coordinates_mean(){
+void test_mean_coordinates(){
 	print_test_tittle(__FUNCTION__);
 	double mean_coordinates[9];
 	double coordinates[] = { 1,1,1,  2,2,2,  3,3,3,  // 1st conformation
@@ -98,186 +100,7 @@ void test_translations(){
 	compareVectors("\tTesting translated coordinates: ", expected_retranslated_coordinates, coordinates, 3*3*4, 1e-12);
 }
 
-void test_superposition_with_coordinates_change(RMSDCalculatorType type){
-	print_test_tittle(__FUNCTION__);
-	cout<<"- Using "<<calculatorTypeToString(type)<<":"<<endl;
 
-	double coordinates[] = { 1,1,0,  2,2,0,  3,3,0,  // 1st conformation
-							  6,6,0,  5,5,0,  4,4,0,  // 2nd conformation (upside down)
-							  7,7,0,  8,8,0,  9,9,0,  // 3rd conformation
-							  5,4,0,  5,5,0,  4,4,0}; // 4th conformation (upside down + one changed point
-													  // with dist d((6,6),(5,4))
-	double reference_coordinates[] = {4,4,0,  5,5,0,  6,6,0};
-	double rmsds[] = {0,0,0,0};
-	int number_of_atoms = 3;
-	int number_of_conformations = 4;
-
-	double expected_reference[] = {4,4,0,  5,5,0,  6,6,0};
-	double expected_rmsds[] = {0, 0, 0, 0.91376624};
-	double expected_coordinates[] = {4,4,0,  5,5,0,  6,6,0,
-									  4,4,0,  5,5,0,  6,6,0,
-			                          4,4,0,  5,5,0,  6,6,0,
-			                          4.5286,5,0,  5.2357,4.29289,0,  5.2357,5.70711,0};
-
-	double coordinates_copy [number_of_atoms*number_of_conformations*3];
-
-	RMSDTools::copyArrays(coordinates_copy,coordinates,number_of_atoms*number_of_conformations*3);
-	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
-			type,
-			number_of_conformations,
-			number_of_atoms,
-			coordinates_copy);
-
-	calculator->superposition_with_external_reference_and_fit_equals_calc(reference_coordinates, rmsds);
-
-	compareVectors("\tTesting RMSD: ", expected_rmsds, rmsds, number_of_conformations, 1e-8);
-	compareVectors("\tTesting coordinates: ", expected_coordinates, coordinates_copy,
-				number_of_atoms*3*number_of_conformations, 1e-5);
-	compareVectors("\tTesting reference: ", expected_reference, reference_coordinates, number_of_atoms*3, 1e-10);
-	delete calculator;
-}
-
-void test_iterative_superposition_with_equal_calc_and_fit_sets(RMSDCalculatorType type, double precision_of_check){
-	print_test_tittle(__FUNCTION__);
-	cout<<"- Using "<<calculatorTypeToString(type)<<" (prec. "<<precision_of_check<<"):"<<endl;
-
-	int number_of_coordsets = 5;
-	int number_of_atoms = 3239;
-
-	vector<double> not_aligned_coordinates;
-	vector<double> iterposed_coordinates;
-
-	load_vector(not_aligned_coordinates, "data/ligand_mini_all");
-	load_vector(iterposed_coordinates, "data/ligand_mini_iterposed_all");
-
-	test_vector_len(not_aligned_coordinates, number_of_atoms*number_of_coordsets*3, "all not aligned atoms");
-	test_vector_len(iterposed_coordinates, number_of_atoms*number_of_coordsets*3, "all iterposed atoms");
-
-	// Iterposition
-	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
-			type,
-			number_of_coordsets,
-			number_of_atoms,
-			&(not_aligned_coordinates[0]));
-
-
-	calculator->iterativeSuperposition();
-	compareVectors("\tTesting iterposed coordinates: ",
-			&(iterposed_coordinates[0]),
-			&(not_aligned_coordinates[0]),
-			not_aligned_coordinates.size(),
-			precision_of_check);
-	delete calculator;
-}
-
-void test_iterative_superposition_with_different_calc_and_fit_sets(RMSDCalculatorType type, double precision_check){
-	print_test_tittle(__FUNCTION__);
-	cout<<"- Using "<<calculatorTypeToString(type)<<" (prec. "<<precision_check<<"):"<<endl;
-
-	int number_of_coordsets = 5;
-	int number_of_atoms = 3239;
-	int number_of_CAs = 224;
-
-	vector<double> not_iterposed_coordinates;
-	vector<double> not_aligned_CA;
-	vector<double> iterposed_coordinates;
-
-	load_vector(not_aligned_CA, "data/ligand_mini_CAs");
-	load_vector(not_iterposed_coordinates, "data/ligand_mini_all");
-	load_vector(iterposed_coordinates, "data/ligand_mini_iterposed_with_cas_all_atom");
-
-	test_vector_len(not_aligned_CA, number_of_CAs*number_of_coordsets*3, "not aligned CAs");
-	test_vector_len(not_iterposed_coordinates, number_of_atoms*number_of_coordsets*3, "all not aligned atoms");
-	test_vector_len(iterposed_coordinates, number_of_atoms*number_of_coordsets*3, "all iterposed atoms");
-
-	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
-															type,
-															number_of_coordsets,
-															number_of_CAs,
-															&(not_aligned_CA[0]),
-															// "Calculation" coordinates
-															number_of_atoms,
-															&(not_iterposed_coordinates[0]));
-
-	//calculator->setCalculationCoordinates(number_of_atoms, &(not_iterposed_coordinates[0]));
-	calculator->iterativeSuperposition();
-	compareVectors("\tTesting iterposed coordinates: ", &(iterposed_coordinates[0]),&(not_iterposed_coordinates[0]), not_iterposed_coordinates.size(), precision_check);
-	//writeVector( not_iterposed_coordinates, "vector.out");
-	delete calculator;
-}
-
-void test_superposition_with_different_fit_and_calc_coordsets(RMSDCalculatorType type, double precision_check){
-	print_test_tittle(__FUNCTION__);
-	cout<<"- Using "<<calculatorTypeToString(type)<<" (prec. "<<precision_check<<"):"<<endl;
-
-	int number_of_coordsets = 5;
-	int number_of_atoms = 3239;
-	int number_of_CAs = 224;
-	// rmsds 1 vs others [ 0.        ,  1.86745533,  2.07960877,  3.60601759,  2.18942902]
-	vector<double> not_aligned_CA;
-	vector<double> not_aligned_coordinates;
-	vector<double> aligned_coordinates;
-	double not_aligned_CA_copy[number_of_CAs*number_of_coordsets*3];
-	double rmsds[5];
-	RMSDTools::initializeTo(rmsds, 0., 5);
-
-	load_vector(not_aligned_CA, "data/ligand_mini_CAs");
-	load_vector(not_aligned_coordinates, "data/ligand_mini_all");
-	load_vector(aligned_coordinates, "data/ligand_mini_all_aligned");
-
-	test_vector_len(not_aligned_CA, number_of_CAs*number_of_coordsets*3, "not aligned CAs");
-	test_vector_len(not_aligned_coordinates, number_of_atoms*number_of_coordsets*3, "all not aligned atoms");
-	test_vector_len(aligned_coordinates, number_of_atoms*number_of_coordsets*3, "all aligned atoms");
-
-	// RMSD of all atoms using CA for superposition
-	RMSDCalculator* calculator1 = RMSDCalculatorFactory::createCalculator(
-															type,
-															number_of_coordsets,
-															number_of_CAs,
-															&(not_aligned_CA[0]),
-															// Setting calculation coordinates
-															number_of_atoms,
-															&(not_aligned_coordinates[0]));
-
-	//calculator1->setCalculationCoordinates(number_of_atoms, &(not_aligned_coordinates[0]));
-	calculator1->oneVsFollowing(0, rmsds);
-	print_vector("rmsd:",rmsds, 5);
-	double expected_rmsds []= {1.864003731005552, 2.076760850428891, 3.596135117728627, 2.182685209336899, 0};
-	//Regression value, slightly different
-	///double expected_rmsds []= {1.8678526, 2.0800299, 3.6061329, 2.1896213, 0};
-
-	compareVectors("\tTesting RMSD 1: ", expected_rmsds, rmsds, number_of_coordsets, precision_check); // Only the fourth decimal, as it was obtained with cout without more precission:P
-	delete calculator1;
-
-	// RMSD of CA using CA for superposition (default behavior)
-	RMSDCalculator* calculator2 = RMSDCalculatorFactory::createCalculator(
-																type,
-																number_of_coordsets,
-																number_of_CAs,
-																&(not_aligned_CA[0]));
-	calculator2->oneVsFollowing(0, rmsds);
-	//	print_vector("rmsd:",rmsds, 5);
-	double expected_rmsds_2 []= {0.767947519172927, 0.8838644164683896, 0.4177715823462121, 0.3383320758562839, 0};
-	compareVectors("\tTesting RMSD 2: ", expected_rmsds_2, rmsds, number_of_coordsets, precision_check);
-	delete calculator2;
-
-	// RMSD  of CA using CA for superposition (using the same selection and RMSD subsets)
-	// Must give exactly the same result than the second test.
-	RMSDTools::copyArrays(not_aligned_CA_copy, &(not_aligned_CA[0]), not_aligned_CA.size());
-	RMSDCalculator* calculator3 = RMSDCalculatorFactory::createCalculator(
-																type,
-																number_of_coordsets,
-																number_of_CAs,
-																&(not_aligned_CA[0]),
-																// Setting calculation coordinates
-																number_of_CAs,
-																not_aligned_CA_copy);
-	//calculator3->setCalculationCoordinates(number_of_CAs, &(not_aligned_CA[0]));
-	calculator3->oneVsFollowing(0, rmsds);
-	print_vector("rmsd:",rmsds, 5);
-	compareVectors("\tTesting RMSD 3: ", expected_rmsds_2, rmsds, number_of_coordsets, precision_check);
-	delete calculator3;
-}
 
 // Fine grain test of qcp with data from the original files in http://theobald.brandeis.edu/qcp/
 void test_QCP_Kernel(){
@@ -337,6 +160,7 @@ void test_QCP_Kernel(){
 			atoms_len*3,
 			atoms_len,
 			frag_b_copy);
+
 	compareVectors("\tTesting rotated coordinates: ", expected_rotated_coordinates, frag_b_copy, atoms_len*3, 1e-14);
 }
 
@@ -398,42 +222,199 @@ void test_KABSCH_Kernel(){
 				atoms_len*3,
 				atoms_len,
 				frag_b_copy);
+
 		compareVectors("\tTesting rotated coordinates: ", expected_rotated_coordinates, frag_b_copy, atoms_len*3, 1e-14);
 }
 
-void test_superposition_with_very_different_calc_and_fit_sets(RMSDCalculatorType type, double precision_of_check){
+
+
+void test_center_coordinates(){
 	print_test_tittle(__FUNCTION__);
-	cout<<"- Using "<<calculatorTypeToString(type)<<" (prec. "<<precision_of_check<<"):"<<endl;
-	double rmsds[2];
-	double correct_rmsd[] = {1.3845806, 0.6316664}; // Prody's RMSD value
-	vector<double> not_superposed_CA;
-	vector<double> not_superposed_ligand;
-	vector<double> superposed_CA;
-	vector<double> superposed_ligand;
 
-	load_vector(not_superposed_CA, "data/CA_prot_lig.prot.coords");
-	load_vector(not_superposed_ligand, "data/CA_prot_lig.lig.coords");
-	load_vector(superposed_CA, "data/CA_prot_lig.super_prot.coords");
-	load_vector(superposed_ligand, "data/CA_prot_lig.super_lig.coords");
+	vector<double> coordinates, centered_coordinates;
+	vector<int> shape, centered_shape;
+	double calculated_centers[18];
+	double expected_centers [] = {
+			  14.3707713,   47.34880717,  25.46220179,
+			   7.3707713,    2.3488296,   31.46225112,
+			 -10.62925112,  -6.65117489,  30.46225112,
+			  15.37077578,  21.3488565,   46.46220179,
+			  -5.62919731,   3.34880269,  21.46222422,
+			   8.37079821,  96.34881166,  25.46223767};
 
-	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
-																	// Calculator type
-																	type,
-																	// Number of conformations
-																	3,
-																	// Fitting coordinates
-																	not_superposed_CA.size()/9,
-																	&(not_superposed_CA[0]),
-																	// Calculation coordinates
-																	9,
-																	&(not_superposed_ligand[0]));
-	calculator->setCoordinatesRotationTo(false);
-	calculator->oneVsFollowing(0, rmsds);
-	print_vector("expected RMSD: ", correct_rmsd, 2, 4);
-	print_vector("calculated RMSD: ", rmsds, 2, 4);
-	compareVectors("\tTesting RMSD: ", correct_rmsd, rmsds, 2, 1e-2);
-	compareVectors("\tTesting CA superposition: ", &(not_superposed_CA[0]), &(superposed_CA[0]),
-													not_superposed_CA.size(), 5e-2);
+	RMSDTools::initializeTo(calculated_centers, 0, 18);
+
+	// Not centered coordinates
+	load_pdb_coords(	coordinates,
+						shape,
+						"test_data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.CA.coords");
+
+	for (int i = 0; i < shape[0]; ++i){
+		RMSDTools::geometricCenter(shape[1], TODOUBLEP(coordinates)+(i*shape[1]*3) , calculated_centers+(i*3));
+	}
+
+	// Centers must be equal to the expected ones
+	compareVectors("\tGeometric centers are as expected: ",
+					expected_centers,
+					calculated_centers,
+					18,
+					1e-7);
+
+
+	// Load the coordinates centered with Python and center them
+	load_pdb_coords(centered_coordinates,
+						centered_shape,
+						"test_data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.CA.centered.coords");
+
+	RMSDTools::centerAllAtOrigin(shape[1],shape[0],TODOUBLEP(coordinates));
+
+	// Coordinates must coincide
+	compareVectors("\tCoordinates have been centered: ",
+			TODOUBLEP(centered_coordinates),
+			TODOUBLEP(coordinates),
+			shape[0]*shape[1]*shape[2],
+			1e-12);
+
 
 }
 
+void test_superposition_with_fit(	RMSDCalculatorType type,
+										const char* initial_coords_file,
+										const char* final_coords_file,
+										const char* rmsd_results_file,
+										double precision_of_check){
+	print_test_tittle(__FUNCTION__);
+	print_calculator_and_precission(type, precision_of_check);
+
+	vector<double> not_superposed_fit_coordinates,
+					expected_superposed_fit_coordinates,
+					calculated_rmsds, expected_rmsds;
+
+	vector<int> expected_superposed_fit_coordinates_shape,
+				not_superposed_fit_coordinates_shape;
+
+	load_vector(expected_rmsds, rmsd_results_file);
+
+	load_pdb_coords(not_superposed_fit_coordinates,
+						not_superposed_fit_coordinates_shape,
+						initial_coords_file);
+
+	// Prody's results are superposed but the centering has been canceled,
+	// it is necessary then to move then again to their original places
+	load_and_center_pdb_coords(expected_superposed_fit_coordinates,
+						expected_superposed_fit_coordinates_shape,
+						final_coords_file);
+
+	calculated_rmsds.resize(not_superposed_fit_coordinates_shape[0],0);
+	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
+									type,
+									not_superposed_fit_coordinates_shape[0],
+									not_superposed_fit_coordinates_shape[1],
+									TODOUBLEP(not_superposed_fit_coordinates));
+	calculator->oneVsFollowing(0, TODOUBLEP(calculated_rmsds));
+
+	// RMSDs must be the same
+	compareVectors("\tCalculated RMSDs coincide with golden: ",
+			&(expected_rmsds[1]),
+			TODOUBLEP(calculated_rmsds),
+			not_superposed_fit_coordinates_shape[0]-1, precision_of_check);
+
+	// Final centered coordinates must be the superposed coordinates
+	compareVectors("\tInitial coordinates have been superposed: ",
+			TODOUBLEP(expected_superposed_fit_coordinates),
+			TODOUBLEP(not_superposed_fit_coordinates),
+				not_superposed_fit_coordinates_shape[0] *
+				not_superposed_fit_coordinates_shape[1] *
+				not_superposed_fit_coordinates_shape[2],
+			precision_of_check);
+
+	save_pdb_coords(not_superposed_fit_coordinates,not_superposed_fit_coordinates_shape,"calculated.coords");
+	save_pdb_coords(expected_superposed_fit_coordinates,expected_superposed_fit_coordinates_shape,"expected.coords");
+	delete calculator;
+}
+
+
+void test_superposition_with_fit_and_calc(RMSDCalculatorType type,
+												const char* initial_prot_coords_file,
+												const char* final_prot_coords_file,
+												const char* initial_lig_coords_file,
+												const char* final_lig_coords_file,
+												const char* rmsd_results_file,
+												double precision_of_check){
+	print_test_tittle(__FUNCTION__);
+	print_calculator_and_precission(type, precision_of_check);
+
+	vector<double>     not_superposed_fit_coordinates,
+						expected_superposed_fit_coordinates,
+						not_superposed_calc_coordinates,
+						expected_superposed_calc_coordinates,
+						calculated_rmsds, expected_rmsds,
+						centers;
+
+	vector<int> expected_superposed_fit_coordinates_shape,
+				not_superposed_fit_coordinates_shape,
+				expected_superposed_calc_coordinates_shape,
+				not_superposed_calc_coordinates_shape;
+
+	load_vector(expected_rmsds, rmsd_results_file);
+
+	load_pdb_coords(not_superposed_fit_coordinates,
+						not_superposed_fit_coordinates_shape,
+						initial_prot_coords_file);
+
+	// Prody's results are superposed but the centering has been canceled,
+	// it is necessary then to move then again to their original places
+	load_and_center_pdb_coords(expected_superposed_fit_coordinates,
+						expected_superposed_fit_coordinates_shape,
+						final_prot_coords_file,
+						&centers);
+
+	load_pdb_coords(not_superposed_calc_coordinates,
+						not_superposed_calc_coordinates_shape,
+						initial_lig_coords_file);
+
+	// The case of a different non-centered calculation coordset is a little bit more tricky,
+	// to preserve the relative distance to the center, one has to move this coordinates using
+	// the same centers got for the fitting coordinates
+	load_and_move_pdb_coords(expected_superposed_calc_coordinates,
+						expected_superposed_calc_coordinates_shape,
+						final_lig_coords_file,
+						TODOUBLEP(centers));
+
+	calculated_rmsds.resize(not_superposed_fit_coordinates_shape[0],0);
+	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
+									type,
+									not_superposed_fit_coordinates_shape[0],
+									not_superposed_fit_coordinates_shape[1],
+									TODOUBLEP(not_superposed_fit_coordinates));
+	calculator->setCalculationCoordinates(
+			not_superposed_calc_coordinates_shape[1],
+			TODOUBLEP(not_superposed_calc_coordinates));
+
+	calculator->oneVsFollowing(0, TODOUBLEP(calculated_rmsds));
+
+	//print_vector("expected RMSD: ", TODOUBLEP(expected_rmsds),expected_rmsds.size(),8);
+	//print_vector("calcted. RMSD: ", TODOUBLEP(calculated_rmsds), calculated_rmsds.size(),8);
+
+	// RMSDs must be the same
+	compareVectors("\tCalculated RMSDs coincide with golden: ",
+			&(expected_rmsds[1]),
+			TODOUBLEP(calculated_rmsds),
+			not_superposed_fit_coordinates_shape[0]-1, precision_of_check);
+
+	compareVectors("\tInitial fitting coordinates have been superposed: ",
+			TODOUBLEP(expected_superposed_fit_coordinates),
+			TODOUBLEP(not_superposed_fit_coordinates),
+				not_superposed_fit_coordinates_shape[0] *
+				not_superposed_fit_coordinates_shape[1] *
+				not_superposed_fit_coordinates_shape[2],
+			precision_of_check);
+
+	compareVectors("\tAnd also calculation coordinates: ",
+			TODOUBLEP(expected_superposed_calc_coordinates),
+			TODOUBLEP(not_superposed_calc_coordinates),
+				not_superposed_calc_coordinates_shape[0] *
+				not_superposed_calc_coordinates_shape[1] *
+				not_superposed_calc_coordinates_shape[2],
+			precision_of_check);
+}
