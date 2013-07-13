@@ -214,6 +214,7 @@ If you have used this package and you feel something is missing/incorrect or wha
 * Names in C code must be more self-explanatory. 
 * C code must be revised and further simplified. 
 * Add more and better tests to increase coverage.  
+* Convert build.py in a Makefile generator.  
 * Add more comments...  
 * and of course improving this README!!
 <a id="contact_features"></a>

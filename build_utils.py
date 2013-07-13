@@ -91,37 +91,37 @@ class Link:
 
 # And a very helpful function
 def compile_a_file_collection(base_dir, file_collection, compiler, options, includes, product_extension, files_to_link):
+    modif_dict = {}
+    last_modif = {}
     for folder in file_collection:
         # Hack to avoid compilation of not modified files
         # First: load and update the dic with current mod. dates
         modif_file = ".modif_"+hex(hash(str(file_collection)))[4:9]
         if os.path.exists(os.path.join(folder,modif_file)):
             modif_dict = pickle.load(open(os.path.join(folder,modif_file),"r"))
-        else:
-            modif_dict = {}
         for f in file_collection[folder]:
             modif_dict[f] = os.path.getmtime(os.path.join(folder,f))
         # Then open the dic with last mod. dates
-        last_modif = {}
+        
         if os.path.exists(os.path.join(folder,modif_file)):
             last_modif = pickle.load(open(os.path.join(folder,modif_file),"r"))
         else:
             last_modif = modif_dict
         # Finally, do last = current for the next step
         pickle.dump(modif_dict, open(os.path.join(folder,modif_file),"w"))
-
-        # Start conditional compilation
-        os.chdir(folder)
         
+        # Start of conditional compilation
+        os.chdir(folder)
         for file_name in file_collection[folder]:
-#             print "1" , last_modif
-#             print "2" , modif_dict
             filewoext,extension = file_name.split(".") #@UnusedVariable
-            files_to_link[filewoext] = folder+"/"+filewoext+product_extension
-            if last_modif[file_name] != modif_dict[file_name]:
+            product = os.path.join(folder,filewoext)+product_extension
+            files_to_link[filewoext] = product
+            if last_modif[file_name] != modif_dict[file_name] or not os.path.exists(filewoext+product_extension):
                 comp = Compile().using(compiler).with_options(options).including_folders(includes).the_file(file_name)
                 os.system('echo "\\033[31m'+ comp.getCompilingCommand()+'\\033[0m"')
                 os.system(comp.getCompilingCommand())
+            else:
+                os.system('echo "\\033[31mNo need to compile '+file_name+'\\033[0m"')
         os.chdir(base_dir)
 
 def get_object_file(all_objects, file_id):
