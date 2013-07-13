@@ -418,3 +418,107 @@ void test_superposition_with_fit_and_calc(RMSDCalculatorType type,
 				not_superposed_calc_coordinates_shape[2],
 			precision_of_check);
 }
+
+void test_iterative_superposition_with_fit(RMSDCalculatorType type,
+				const char* initial_prot_coords_file,
+				const char* final_prot_coords_file,
+				const char* iteration_rmsd_results_file,
+				double precision_of_check){
+
+	print_test_tittle(__FUNCTION__);
+	print_calculator_and_precission(type, precision_of_check);
+
+	vector<double> 		not_iteratively_superposed_fit_coordinates,
+						expected_iteratively_superposed_fit_coordinates,
+						calculated_iteration_rmsds, expected_iteration_rmsds,
+						iterposition_step;
+
+	double* reference_coords = NULL;
+	double* mean_coords = NULL;
+
+	vector<int> expected_fit_coordinates_shape,
+				fit_coordinates_shape,
+				one_step_fit_size;
+
+	load_vector(expected_iteration_rmsds, iteration_rmsd_results_file);
+
+	load_pdb_coords(not_iteratively_superposed_fit_coordinates,
+						fit_coordinates_shape,
+						initial_prot_coords_file);
+
+	// Prody's results are superposed but the centering has been canceled,
+	// it is necessary then to move then again to their original places
+	load_and_center_pdb_coords(expected_iteratively_superposed_fit_coordinates,
+								expected_fit_coordinates_shape,
+								final_prot_coords_file);
+
+	// Step by step test
+	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
+									type,
+									fit_coordinates_shape[0],
+									fit_coordinates_shape[1],
+									TODOUBLEP(not_iteratively_superposed_fit_coordinates));
+
+	reference_coords = new double[fit_coordinates_shape[1]*3];
+	RMSDTools::initializeTo(reference_coords,0.,fit_coordinates_shape[1]*3);
+	mean_coords = new double[fit_coordinates_shape[1]*3];
+	RMSDTools::initializeTo(mean_coords,0.,fit_coordinates_shape[1]*3);
+
+	RMSDTools::copyArrays(reference_coords,
+			TODOUBLEP(not_iteratively_superposed_fit_coordinates),
+			fit_coordinates_shape[1]*3);
+
+	calculator->iterativeSuperpositionStep(reference_coords, mean_coords);
+	//sudo mousepad /usr/local/lib/python2.7/dist-packages/prody/ensemble/ensemble.py
+	load_and_center_pdb_coords(iterposition_step,
+							   one_step_fit_size,
+							   "test_data/Iterpose_Fit_CA_Rot_BEN/steps/stretching_trajectory_offset_ligand.iterposed_CA.1_step.coords");
+
+	compareVectors("\tFitting coordinates and golden are equal: ",
+					TODOUBLEP(iterposition_step),
+					TODOUBLEP(not_iteratively_superposed_fit_coordinates),
+						fit_coordinates_shape[0] *
+						fit_coordinates_shape[1] *
+						fit_coordinates_shape[2],
+					precision_of_check);
+
+	compareVectors("\tMean and reference is the same for step 0: ",
+						mean_coords,
+						reference_coords,
+							one_step_fit_size[1] *
+							one_step_fit_size[2],
+						precision_of_check);
+
+	load_and_center_pdb_coords(iterposition_step,
+								   one_step_fit_size,
+								   "test_data/Iterpose_Fit_CA_Rot_BEN/mean/mean_step0.coords");
+	compareVectors("\tMean is the correct mean and reference is the new mean for step 0: ",
+					TODOUBLEP(iterposition_step),
+					reference_coords,
+						one_step_fit_size[1] *
+						one_step_fit_size[2],
+					precision_of_check);
+	delete [] reference_coords;
+	delete [] mean_coords;
+
+//	calculated_iteration_rmsds.resize(200,0);
+//	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
+//									type,
+//									fit_coordinates_shape[0],
+//									fit_coordinates_shape[1],
+//									TODOUBLEP(not_iteratively_superposed_fit_coordinates));
+//
+//	calculator->iterativeSuperposition(1e-4, TODOUBLEP(calculated_iteration_rmsds));
+//
+//	print_vector("calculated RMSD: ", TODOUBLEP(calculated_iteration_rmsds), calculated_iteration_rmsds.size(),8);
+//	print_vector("expected RMSD: ", TODOUBLEP(expected_iteration_rmsds), expected_iteration_rmsds.size(),8);
+//
+//	compareVectors("\tFitting coordinates and golden are equal: ",
+//				TODOUBLEP(expected_iteratively_superposed_fit_coordinates),
+//				TODOUBLEP(not_iteratively_superposed_fit_coordinates),
+//					fit_coordinates_shape[0] *
+//					fit_coordinates_shape[1] *
+//					fit_coordinates_shape[2],
+//				precision_of_check);
+
+}

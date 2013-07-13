@@ -25,9 +25,10 @@ class RMSDCalculator{
 
 		virtual void oneVsFollowing(int conformation, double* rmsd);
 		virtual void calculateRMSDCondensedMatrix(std::vector<double>& rmsd);
-		void iterativeSuperposition(double rmsd_diff_to_stop = 1e-4);
+		void iterativeSuperposition(double rmsd_diff_to_stop = 1e-4, double* iteration_rmsd = NULL);
+		double iterativeSuperpositionStep(double* reference_coords, double* mean_coords);
 
-		void superposition_with_external_reference_and_fit_equals_calc(double*, double*);
+		void superposition_with_external_reference_and_fit_equals_calc(double*);
 		void superposition_with_external_reference_and_fit_differs_calc(double*);
 
 		inline void setCoordinatesRotationTo(bool this_val){

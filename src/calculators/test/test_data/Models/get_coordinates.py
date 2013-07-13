@@ -7,7 +7,6 @@ pdb_data = prody.parsePDB(sys.argv[1])
 pdb_trajectory = prody.PDBEnsemble("aligned_CA")
 pdb_name = os.path.splitext(sys.argv[1])[0]
 
-
 prot = pdb_data.select("name CA not resname CA")
 pdb_trajectory.setAtoms(prot)
 pdb_trajectory.addCoordset(prot.getCoordsets())

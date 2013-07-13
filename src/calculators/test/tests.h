@@ -31,5 +31,11 @@
 			const char* rmsd_results_file,
 			double precision_of_check);
 
+	void test_iterative_superposition_with_fit(RMSDCalculatorType type,
+				const char* initial_prot_coords_file,
+				const char* final_prot_coords_file,
+				const char* iteration_rmsd_results_file,
+				double precision_of_check);
+
 
 #endif /* TESTS_H_ */

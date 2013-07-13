@@ -79,6 +79,12 @@ int main(int argc, char **argv){
 				"test_data/Superpose_Fit_CA_Calc_BEN_very_different/prot_plus_ligand_similar.aligned_BEN.coords",
 				"test_data/Superpose_Fit_CA_Calc_BEN_very_different/prot_plus_ligand_similar.aligned_BEN.rmsd",
 				1e-12);
+
+		test_iterative_superposition_with_fit(available_calculators[i],
+						"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.not_iterposed_all.coords",
+						"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.iterposed_CA.coords",
+						"test_data/Iterpose_Fit_CA_Rot_BEN/iter_steps.rmsd",
+						1e-12);
 	}
 
 	return 0;

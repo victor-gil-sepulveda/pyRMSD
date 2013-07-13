@@ -110,10 +110,15 @@ void load_vector(vector<double> & vector, const char * dataPath){
 }
 
 void load_pdb_coords(vector<double> & coords, vector<int> & shape, const char * dataPath){
+
 	string line;
 	ifstream myfile (dataPath);
+
 	int numConfs, numAtoms, dim;
 	double x,y,z;
+
+	coords.clear();
+	shape.clear();
 
 	if (myfile.is_open()){
 		getline(myfile, line);

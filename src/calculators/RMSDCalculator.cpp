@@ -195,37 +195,24 @@ void RMSDCalculator::_one_vs_following_fit_differs_calc_coords_rotating_coordina
 
 }
 
-void RMSDCalculator::iterativeSuperposition(double rmsd_diff_to_stop){
+void RMSDCalculator::iterativeSuperposition(double rmsd_diff_to_stop, double* iteration_rmsd){
 	double MAX_ITERATIONS = 200;
 	double* reference_coords = new double[coordinatesPerFittingConformation];
 	double* mean_coords = new double[coordinatesPerFittingConformation];
 	double rmsd_difference = 0.0;
 	int current_iteration = 0;
 
+	RMSDTools::centerAllAtOrigin(atomsPerFittingConformation, numberOfConformations, allFittingCoordinates);
+
 	// In the first step, reference is the first conformation
 	// reference = coordinates[0]
-	RMSDTools::copyArrays(reference_coords, allFittingCoordinates, coordinatesPerFittingConformation);
+	//RMSDTools::copyArrays(reference_coords, allFittingCoordinates, coordinatesPerFittingConformation);
 	do{
-		// Superpose all conformations with the reference conformation
-		if(this->allCalculationCoordinates == NULL){
-			superposition_with_external_reference_and_fit_equals_calc(reference_coords, NULL);
+		double rmsd_difference = iterativeSuperpositionStep(reference_coords, mean_coords);
+
+		if (iteration_rmsd!=NULL){
+			iteration_rmsd[current_iteration] = rmsd_difference;
 		}
-		else{
-			// As we are only interested in coordinates change, we can set the calc_reference to NULL
-			// (we won't calculate the RMSD)
-			superposition_with_external_reference_and_fit_differs_calc(reference_coords);
-		}
-		// Calculate new mean coords, which will be the next reference
-		RMSDTools::calculateMeanCoordinates(mean_coords, allFittingCoordinates,
-											numberOfConformations, atomsPerFittingConformation);
-
-		// rmsd(reference,mean)
-		rmsd_difference = RMSDTools::calcRMS(reference_coords, mean_coords, atomsPerFittingConformation);
-
-		// reference = mean
-		RMSDTools::copyArrays(reference_coords, mean_coords, coordinatesPerFittingConformation);
-
-		//cout<<"step: "<< current_iteration<<" rmsd diff: "<<rmsd_difference<<endl;
 
 		current_iteration++;
 	}
@@ -234,18 +221,45 @@ void RMSDCalculator::iterativeSuperposition(double rmsd_diff_to_stop){
 	delete [] reference_coords;
 	delete [] mean_coords;
 }
+double RMSDCalculator::iterativeSuperpositionStep(double* reference_coords, double* mean_coords ){
+		double rmsd_difference = 0;
+
+		superposition_with_external_reference_and_fit_equals_calc(reference_coords);
+
+		// Calculate new mean coords, which will be the next reference
+		RMSDTools::calculateMeanCoordinates(mean_coords,
+											allFittingCoordinates,
+											numberOfConformations,
+											atomsPerFittingConformation);
+
+		// rmsd(reference,mean)
+		rmsd_difference = RMSDTools::calcRMS(reference_coords,
+												mean_coords,
+												atomsPerFittingConformation);
+
+		// reference = mean
+		RMSDTools::copyArrays(reference_coords, mean_coords, coordinatesPerFittingConformation);
+
+		return rmsd_difference;
+}
 
 // Reference coordinates is already a copy, in a different memory space than allCoordinates
 // In this case (used for iterative superposition) conformations are recentered over the reference conformation.
-void RMSDCalculator::superposition_with_external_reference_and_fit_equals_calc(double* reference, double* rmsds){
-	double reference_center[3];
+void RMSDCalculator::superposition_with_external_reference_and_fit_equals_calc(double* reference){
 
-	RMSDTools::centerAllAtOrigin(atomsPerFittingConformation, 1, reference, reference_center);
+	RMSDTools::centerAllAtOrigin(atomsPerFittingConformation, 1, reference);
 
-	_one_vs_following_fit_equals_calc_coords_rotating_coordinates(reference, -1, rmsds);
+	RMSDTools::centerAllAtOrigin(atomsPerFittingConformation, numberOfConformations, allFittingCoordinates);
 
-	RMSDTools::applyTranslationToAll(this->atomsPerFittingConformation, this->numberOfConformations, this->allFittingCoordinates, reference_center);
-	RMSDTools::applyTranslationsToAll(this->atomsPerFittingConformation, 1, reference, reference_center);
+	this->kernelFunctions->oneVsFollowingFitEqualCalcWithConfRotation(
+			reference,
+			-1,
+			NULL,
+			numberOfConformations,
+			coordinatesPerFittingConformation,
+			atomsPerFittingConformation,
+			allFittingCoordinates);
+
 }
 
 void RMSDCalculator::superposition_with_external_reference_and_fit_differs_calc(double* fit_reference){
