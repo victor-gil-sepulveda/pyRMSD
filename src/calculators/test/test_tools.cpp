@@ -76,15 +76,6 @@ bool expectedVectorEqualsCalculatedWithinPrecision(
     return equal;
 }
 
-void print_vector(const char*message, double*  rmsd_vec, int len, int precission){
-	cout<<message<<" ";
-	for(int i =0; i< len; ++i){
-		cout<<setprecision(precission)<<rmsd_vec[i]<<" ";
-	}
-	cout<<flush<<endl;
-}
-
-
 inline double toDouble(const std::string & s){
 	std::istringstream i(s);
 	double x;

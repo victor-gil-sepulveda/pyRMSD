@@ -11,7 +11,7 @@
 
 using namespace std;
 
-#define TODOUBLEP(vec) (&(vec[0]))
+#define TOPOINTER(vec) (&(vec[0]))
 
 void test_initialize(){
 	print_test_tittle(__FUNCTION__);
@@ -250,7 +250,7 @@ void test_center_coordinates(){
 						"test_data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.CA.coords");
 
 	for (int i = 0; i < shape[0]; ++i){
-		RMSDTools::geometricCenter(shape[1], TODOUBLEP(coordinates)+(i*shape[1]*3) , calculated_centers+(i*3));
+		RMSDTools::geometricCenter(shape[1], TOPOINTER(coordinates)+(i*shape[1]*3) , calculated_centers+(i*3));
 	}
 
 	// Centers must be equal to the expected ones
@@ -266,12 +266,12 @@ void test_center_coordinates(){
 						centered_shape,
 						"test_data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.CA.centered.coords");
 
-	RMSDTools::centerAllAtOrigin(shape[1],shape[0],TODOUBLEP(coordinates));
+	RMSDTools::centerAllAtOrigin(shape[1],shape[0],TOPOINTER(coordinates));
 
 	// Coordinates must coincide
 	compareVectors("\tCoordinates have been centered: ",
-			TODOUBLEP(centered_coordinates),
-			TODOUBLEP(coordinates),
+			TOPOINTER(centered_coordinates),
+			TOPOINTER(coordinates),
 			shape[0]*shape[1]*shape[2],
 			1e-12);
 
@@ -310,19 +310,19 @@ void test_superposition_with_fit(	RMSDCalculatorType type,
 									type,
 									not_superposed_fit_coordinates_shape[0],
 									not_superposed_fit_coordinates_shape[1],
-									TODOUBLEP(not_superposed_fit_coordinates));
-	calculator->oneVsFollowing(0, TODOUBLEP(calculated_rmsds));
+									TOPOINTER(not_superposed_fit_coordinates));
+	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
 
 	// RMSDs must be the same
 	compareVectors("\tCalculated RMSDs coincide with golden: ",
 			&(expected_rmsds[1]),
-			TODOUBLEP(calculated_rmsds),
+			TOPOINTER(calculated_rmsds),
 			not_superposed_fit_coordinates_shape[0]-1, precision_of_check);
 
 	// Final centered coordinates must be the superposed coordinates
 	compareVectors("\tInitial coordinates have been superposed: ",
-			TODOUBLEP(expected_superposed_fit_coordinates),
-			TODOUBLEP(not_superposed_fit_coordinates),
+			TOPOINTER(expected_superposed_fit_coordinates),
+			TOPOINTER(not_superposed_fit_coordinates),
 				not_superposed_fit_coordinates_shape[0] *
 				not_superposed_fit_coordinates_shape[1] *
 				not_superposed_fit_coordinates_shape[2],
@@ -379,19 +379,19 @@ void test_superposition_with_fit_and_calc(RMSDCalculatorType type,
 	load_and_move_pdb_coords(expected_superposed_calc_coordinates,
 						expected_superposed_calc_coordinates_shape,
 						final_lig_coords_file,
-						TODOUBLEP(centers));
+						TOPOINTER(centers));
 
 	calculated_rmsds.resize(not_superposed_fit_coordinates_shape[0],0);
 	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
 									type,
 									not_superposed_fit_coordinates_shape[0],
 									not_superposed_fit_coordinates_shape[1],
-									TODOUBLEP(not_superposed_fit_coordinates));
+									TOPOINTER(not_superposed_fit_coordinates));
 	calculator->setCalculationCoordinates(
 			not_superposed_calc_coordinates_shape[1],
-			TODOUBLEP(not_superposed_calc_coordinates));
+			TOPOINTER(not_superposed_calc_coordinates));
 
-	calculator->oneVsFollowing(0, TODOUBLEP(calculated_rmsds));
+	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
 
 //	print_vector("expected RMSD: ", TODOUBLEP(expected_rmsds),expected_rmsds.size(),8);
 //	print_vector("calcted. RMSD: ", TODOUBLEP(calculated_rmsds), calculated_rmsds.size(),8);
@@ -399,20 +399,20 @@ void test_superposition_with_fit_and_calc(RMSDCalculatorType type,
 	// RMSDs must be the same
 	compareVectors("\tCalculated RMSDs coincide with golden: ",
 			&(expected_rmsds[1]),
-			TODOUBLEP(calculated_rmsds),
+			TOPOINTER(calculated_rmsds),
 			not_superposed_fit_coordinates_shape[0]-1, precision_of_check);
 
 	compareVectors("\tInitial fitting coordinates have been superposed: ",
-			TODOUBLEP(expected_superposed_fit_coordinates),
-			TODOUBLEP(not_superposed_fit_coordinates),
+			TOPOINTER(expected_superposed_fit_coordinates),
+			TOPOINTER(not_superposed_fit_coordinates),
 				not_superposed_fit_coordinates_shape[0] *
 				not_superposed_fit_coordinates_shape[1] *
 				not_superposed_fit_coordinates_shape[2],
 			precision_of_check);
 
 	compareVectors("\tAnd also calculation coordinates: ",
-			TODOUBLEP(expected_superposed_calc_coordinates),
-			TODOUBLEP(not_superposed_calc_coordinates),
+			TOPOINTER(expected_superposed_calc_coordinates),
+			TOPOINTER(not_superposed_calc_coordinates),
 				not_superposed_calc_coordinates_shape[0] *
 				not_superposed_calc_coordinates_shape[1] *
 				not_superposed_calc_coordinates_shape[2],
@@ -461,12 +461,12 @@ void test_step_by_step_iterative_superposition_with_fit(RMSDCalculatorType type,
 									type,
 									initial_fit_coordinates_shape[0],
 									initial_fit_coordinates_shape[1],
-									TODOUBLEP(initial_fit_coordinates));
+									TOPOINTER(initial_fit_coordinates));
 
 	// Init temporary vectors
 	reference_coords = new double[initial_fit_coordinates_shape[1]*3];
 	RMSDTools::copyArrays(reference_coords,
-				TODOUBLEP(initial_fit_coordinates),
+				TOPOINTER(initial_fit_coordinates),
 				initial_fit_coordinates_shape[1]*3);
 	mean_coords = new double[initial_fit_coordinates_shape[1]*3];
 
@@ -485,7 +485,7 @@ void test_step_by_step_iterative_superposition_with_fit(RMSDCalculatorType type,
 
 		compareVectors((string("\tMean coordinates for this step (")+toString(i)+ string("): ")).c_str(),
 							mean_coords,
-							TODOUBLEP(expected_mean_coords_for_step),
+							TOPOINTER(expected_mean_coords_for_step),
 								one_step_shape[0] *
 								one_step_shape[1] *
 								one_step_shape[2],
@@ -493,7 +493,7 @@ void test_step_by_step_iterative_superposition_with_fit(RMSDCalculatorType type,
 
 		compareVectors((string("\tIteratively superposed until this step (")+toString(i)+ string("): ")).c_str(),
 						mean_coords,
-						TODOUBLEP(expected_mean_coords_for_step),
+						TOPOINTER(expected_mean_coords_for_step),
 							one_step_shape[0] *
 							one_step_shape[1] *
 							one_step_shape[2],
@@ -537,26 +537,101 @@ void test_iterative_superposition_with_fit(RMSDCalculatorType type,
 									type,
 									initial_fit_coordinates_shape[0],
 									initial_fit_coordinates_shape[1],
-									TODOUBLEP(initial_fit_coordinates));
+									TOPOINTER(initial_fit_coordinates));
 
-	calculator->iterativeSuperposition(1e-4, TODOUBLEP(calculated_by_step_rmsds));
+	calculator->iterativeSuperposition(1e-4, TOPOINTER(calculated_by_step_rmsds));
 
-	print_vector("calculated RMSD: ", TODOUBLEP(calculated_by_step_rmsds), calculated_by_step_rmsds.size(),12);
-	print_vector("expected RMSD: ", TODOUBLEP(expected_by_step_rmsds), expected_by_step_rmsds.size(),12);
+//	print_vector("calculated RMSD: ", TODOUBLEP(calculated_by_step_rmsds), calculated_by_step_rmsds.size(),12);
+//	print_vector("expected RMSD: ", TODOUBLEP(expected_by_step_rmsds), expected_by_step_rmsds.size(),12);
 
 	compareVectors("\tFinal iterposed coordinates are as expected: ",
-				TODOUBLEP(expected_final_fit_coordinates),
-				TODOUBLEP(initial_fit_coordinates),
+				TOPOINTER(expected_final_fit_coordinates),
+				TOPOINTER(initial_fit_coordinates),
 					expected_final_fit_coordinates_shape[0] *
 					expected_final_fit_coordinates_shape[1] *
 					expected_final_fit_coordinates_shape[2],
 				precision_of_check);
 
 	compareVectors("\tPer-step rmsd values are the same: ",
-					TODOUBLEP(expected_by_step_rmsds),
-					TODOUBLEP(calculated_by_step_rmsds),
+					TOPOINTER(expected_by_step_rmsds),
+					TOPOINTER(calculated_by_step_rmsds),
 					expected_number_of_iterations,
 					precision_of_check);
 
 	delete calculator;
+}
+
+
+void test_iterative_superposition_with_fit_and_calc_rotation(RMSDCalculatorType type,
+						const char* initial_prot_coords_file,
+						const char* initial_lig_coords_file,
+						const char* final_prot_coords_file,
+						const char* final_lig_coords_file,
+						const char* iteration_rmsd_results_file,
+						double precision_of_check,
+						int expected_number_of_iterations){
+
+	print_test_tittle(__FUNCTION__);
+		print_calculator_and_precission(type, precision_of_check);
+
+		vector<double> 		initial_fit_coordinates, initial_lig_coordinates,
+							expected_final_fit_coordinates, expected_final_lig_coordinates,
+							calculated_by_step_rmsds, expected_by_step_rmsds;
+
+		vector<int> expected_final_fit_coordinates_shape,expected_final_lig_coordinates_shape,
+					initial_fit_coordinates_shape,initial_lig_coordinates_shape;
+
+		load_vector(expected_by_step_rmsds, iteration_rmsd_results_file);
+
+		load_pdb_coords(initial_fit_coordinates,
+							initial_fit_coordinates_shape,
+							initial_prot_coords_file);
+
+		load_and_center_pdb_coords(expected_final_fit_coordinates,
+									expected_final_fit_coordinates_shape,
+									final_prot_coords_file);
+
+		load_pdb_coords(initial_lig_coordinates,
+						initial_lig_coordinates_shape,
+						initial_lig_coords_file);
+
+		load_and_center_pdb_coords(expected_final_lig_coordinates,
+									expected_final_lig_coordinates_shape,
+									final_lig_coords_file);
+
+
+		calculated_by_step_rmsds.resize(expected_number_of_iterations,0);
+		RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
+										type,
+										initial_fit_coordinates_shape[0],
+										initial_fit_coordinates_shape[1],
+										TOPOINTER(initial_fit_coordinates));
+
+		calculator->setCalculationCoordinates(initial_lig_coordinates_shape[1],
+										TOPOINTER(initial_lig_coordinates));
+
+		calculator->iterativeSuperposition(1e-4, TOPOINTER(calculated_by_step_rmsds));
+
+//		print_vector("calculated RMSD: ", TODOUBLEP(calculated_by_step_rmsds), calculated_by_step_rmsds.size(),12);
+//		print_vector("expected RMSD: ", TODOUBLEP(expected_by_step_rmsds), expected_by_step_rmsds.size(),12);
+		print_vector("initial_lig_coordinates_shape: ", TOPOINTER(initial_lig_coordinates_shape), initial_lig_coordinates_shape.size(),1);
+		print_vector("expected_final_lig_coordinates_shape: ", TOPOINTER(expected_final_lig_coordinates_shape), expected_final_lig_coordinates_shape.size(),1);
+		print_vector("initial_lig_coordinates_shape: ", TOPOINTER(initial_lig_coordinates_shape), initial_lig_coordinates_shape.size(),1);
+		print_vector("expected_final_lig_coordinates_shape: ", TOPOINTER(expected_final_lig_coordinates_shape), expected_final_lig_coordinates_shape.size(),1);
+
+		compareVectors("\tFinal iterposed coordinates are as expected: ",
+					TOPOINTER(expected_final_fit_coordinates),
+					TOPOINTER(initial_fit_coordinates),
+						expected_final_fit_coordinates_shape[0] *
+						expected_final_fit_coordinates_shape[1] *
+						expected_final_fit_coordinates_shape[2],
+					precision_of_check);
+
+		compareVectors("\tPer-step rmsd values are the same: ",
+						TOPOINTER(expected_by_step_rmsds),
+						TOPOINTER(calculated_by_step_rmsds),
+						expected_number_of_iterations,
+						precision_of_check);
+
+		delete calculator;
 }

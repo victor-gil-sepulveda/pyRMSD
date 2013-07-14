@@ -223,7 +223,7 @@ void RMSDCalculator::iterativeSuperposition(double rmsd_diff_to_stop, double* it
 	while(rmsd_difference > rmsd_diff_to_stop and current_iteration < MAX_ITERATIONS);
 
 	// One last superposition is performed, and the other rotation coordinates are moved here
-	superposition_with_external_reference_and_fit_equals_calc(reference_coords);
+	superposition_with_external_reference(reference_coords);
 
 	// Some cleaning
 	delete [] reference_coords;
@@ -233,7 +233,7 @@ void RMSDCalculator::iterativeSuperposition(double rmsd_diff_to_stop, double* it
 double RMSDCalculator::iterativeSuperpositionStep(double* reference_coords, double* mean_coords ){
 		double rmsd_difference = 0;
 
-		superposition_with_external_reference_and_fit_equals_calc(reference_coords);
+		superposition_with_external_reference(reference_coords);
 
 		// Calculate new mean coords, which will be the next reference
 		RMSDTools::calculateMeanCoordinates(mean_coords,
@@ -252,9 +252,19 @@ double RMSDCalculator::iterativeSuperpositionStep(double* reference_coords, doub
 		return rmsd_difference;
 }
 
+void RMSDCalculator::superposition_with_external_reference(double* reference_coords){
+	if (allCalculationCoordinates == NULL){
+		superposition_with_external_reference_without_calc_coords(reference_coords);
+	}
+	else{
+		superposition_with_external_reference_rotating_calc_coords(reference_coords);
+	}
+}
+
+
 // Reference coordinates is already a copy, in a different memory space than allCoordinates
 // In this case (used for iterative superposition) conformations are recentered over the reference conformation.
-void RMSDCalculator::superposition_with_external_reference_and_fit_equals_calc(double* reference){
+void RMSDCalculator::superposition_with_external_reference_without_calc_coords(double* reference){
 
 	// Recentering coordinates each step gives us am easier way of comparing with prody,
 	// and removes any translation artifact
@@ -271,26 +281,36 @@ void RMSDCalculator::superposition_with_external_reference_and_fit_equals_calc(d
 			allFittingCoordinates);
 }
 
-void RMSDCalculator::superposition_with_external_reference_and_fit_differs_calc(double* reference){
-	/*double fit_reference_center[3];
+void RMSDCalculator::superposition_with_external_reference_rotating_calc_coords(double* reference){
 
+	// Center fitting coordinates
+	double* fitCenters = new double[numberOfConformations*3];
 	RMSDTools::centerAllAtOrigin(atomsPerFittingConformation, 1, reference);
-	RMSDTools::centerAllAtOrigin(atomsPerFittingConformation, numberOfConformations, allFittingCoordinates);
+	RMSDTools::centerAllAtOrigin(atomsPerFittingConformation,
+									numberOfConformations,
+									allFittingCoordinates,
+									fitCenters);
 
-	RMSDTools::applyTranslationsToAll(atomsPerCalculationConformation, numberOfConformations, allCalculationCoordinates, fitCenters, -1);
+	// Apply a relative translation to center also the coordinates we want to rotate
+	// them with the fitting coordinates
+	RMSDTools::applyTranslationsToAll(atomsPerCalculationConformation,
+										numberOfConformations,
+										allCalculationCoordinates,
+										fitCenters,
+										-1);
 	delete [] fitCenters;
 
 	this->kernelFunctions->oneVsFollowingFitDiffersCalcWithConfRotation(
-			fitReference,
-			calcReference,
-			reference_conformation_number,
-			rmsd,
+			reference,
+			NULL,
+			-1,
+			NULL,
 			numberOfConformations,
 			coordinatesPerFittingConformation,
 			atomsPerFittingConformation,
 			allFittingCoordinates,
 			coordinatesPerCalculationConformation,
 			atomsPerCalculationConformation,
-			allCalculationCoordinates);*/
+			allCalculationCoordinates);
 
 }

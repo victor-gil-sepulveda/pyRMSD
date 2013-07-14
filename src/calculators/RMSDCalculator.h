@@ -28,14 +28,18 @@ class RMSDCalculator{
 		void iterativeSuperposition(double rmsd_diff_to_stop = 1e-4, double* iteration_rmsd = NULL);
 		double iterativeSuperpositionStep(double* reference_coords, double* mean_coords);
 
-		void superposition_with_external_reference_and_fit_equals_calc(double*);
-		void superposition_with_external_reference_and_fit_differs_calc(double*);
-
 		inline void setCoordinatesRotationTo(bool this_val){
 			this->rotateFittingCoordinates =  this_val;
 		}
 
 	protected:
+		void superposition_with_external_reference(double*);
+
+		void superposition_with_external_reference_without_calc_coords(double*);
+
+		void superposition_with_external_reference_rotating_calc_coords(double*);
+
+
 		virtual void _one_vs_following_fit_equals_calc_coords(double* reference,
 				int reference_conformation_number, double *rmsd);
 
