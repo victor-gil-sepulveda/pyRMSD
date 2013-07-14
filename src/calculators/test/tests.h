@@ -31,11 +31,19 @@
 			const char* rmsd_results_file,
 			double precision_of_check);
 
-	void test_iterative_superposition_with_fit(RMSDCalculatorType type,
+	void test_step_by_step_iterative_superposition_with_fit(RMSDCalculatorType type,
+				const char* step_directory,
+				const char* mean_directory,
 				const char* initial_prot_coords_file,
-				const char* final_prot_coords_file,
-				const char* iteration_rmsd_results_file,
-				double precision_of_check);
+				double precision_of_check,
+				int expected_number_of_iterations);
+
+	void test_iterative_superposition_with_fit(RMSDCalculatorType type,
+					const char* initial_prot_coords_file,
+					const char* final_prot_coords_file,
+					const char* iteration_rmsd_results_file,
+					double precision_of_check,
+					int expected_number_of_iterations);
 
 
 #endif /* TESTS_H_ */

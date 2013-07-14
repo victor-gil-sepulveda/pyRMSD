@@ -9,6 +9,7 @@
 #define TEST_TOOLS_H_
 #include <vector>
 #include <stdlib.h>
+#include <sstream>
 #include "../factory/RMSDCalculatorTypes.h"
 
 void print_test_tittle(const char* function_name);
@@ -32,4 +33,10 @@ void load_and_move_pdb_coords(std::vector<double> & coords,
 									double* centers);
 
 void save_pdb_coords(std::vector<double> & coords, std::vector<int> & shape, const char * file);
+
+template <class T>
+std::string toString(T data){
+	return static_cast<std::ostringstream*>( &(std::ostringstream() << data) )->str();
+}
+
 #endif /* TEST_TOOLS_H_ */
