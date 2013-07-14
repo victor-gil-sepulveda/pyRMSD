@@ -140,7 +140,9 @@ void load_and_center_pdb_coords(vector<double> & coords,
 		vector<int> & shape,
 		const char * dataPath,
 		vector<double>* centers){
+
 	load_pdb_coords(coords, shape, dataPath);
+
 	if (centers!= NULL){
 		centers->resize(shape[0]*3);
 		RMSDTools::centerAllAtOrigin(

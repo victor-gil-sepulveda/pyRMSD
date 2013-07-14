@@ -212,7 +212,7 @@ void RMSDCalculator::iterativeSuperposition(double rmsd_diff_to_stop, double* it
 
 	// Start iterative superposition
 	do{
-		rmsd_difference = iterativeSuperpositionStep(reference_coords, mean_coords);
+		rmsd_difference = iterative_superposition_step(reference_coords, mean_coords);
 
 		if (iteration_rmsd!=NULL){
 			iteration_rmsd[current_iteration] = rmsd_difference;
@@ -230,7 +230,7 @@ void RMSDCalculator::iterativeSuperposition(double rmsd_diff_to_stop, double* it
 	delete [] mean_coords;
 }
 
-double RMSDCalculator::iterativeSuperpositionStep(double* reference_coords, double* mean_coords ){
+double RMSDCalculator::iterative_superposition_step(double* reference_coords, double* mean_coords ){
 		double rmsd_difference = 0;
 
 		superposition_with_external_reference(reference_coords);
@@ -285,11 +285,17 @@ void RMSDCalculator::superposition_with_external_reference_rotating_calc_coords(
 
 	// Center fitting coordinates
 	double* fitCenters = new double[numberOfConformations*3];
-	RMSDTools::centerAllAtOrigin(atomsPerFittingConformation, 1, reference);
+	RMSDTools::centerAllAtOrigin(atomsPerFittingConformation,
+									1,
+									reference);
 	RMSDTools::centerAllAtOrigin(atomsPerFittingConformation,
 									numberOfConformations,
 									allFittingCoordinates,
 									fitCenters);
+	/****/
+	/*RMSDTools::centerAllAtOrigin(atomsPerCalculationConformation,
+			numberOfConformations,
+			allCalculationCoordinates);*/
 
 	// Apply a relative translation to center also the coordinates we want to rotate
 	// them with the fitting coordinates
@@ -298,6 +304,8 @@ void RMSDCalculator::superposition_with_external_reference_rotating_calc_coords(
 										allCalculationCoordinates,
 										fitCenters,
 										-1);
+	cout<<allFittingCoordinates[0]<<" "<<allFittingCoordinates[1]<<" "<<allFittingCoordinates[2]<<" "<<endl;
+	cout<<allCalculationCoordinates[0]<<" "<<allCalculationCoordinates[1]<<" "<<allCalculationCoordinates[2]<<" "<<endl;
 	delete [] fitCenters;
 
 	this->kernelFunctions->oneVsFollowingFitDiffersCalcWithConfRotation(
@@ -312,5 +320,13 @@ void RMSDCalculator::superposition_with_external_reference_rotating_calc_coords(
 			coordinatesPerCalculationConformation,
 			atomsPerCalculationConformation,
 			allCalculationCoordinates);
+
+	// Apply a relative translation to center also the coordinates we want to rotate
+	// them with the fitting coordinates
+	/*RMSDTools::applyTranslationsToAll(atomsPerCalculationConformation,
+										numberOfConformations,
+										allCalculationCoordinates,
+										fitCenters,
+										-1);*/
 
 }

@@ -26,7 +26,7 @@ void RMSDTools::centerAllAtOrigin(
 		double* center = &(translations[3*i]);
 		double* coords = &(all_coords[coordsPerConformation*i]);
 		RMSDTools::geometricCenter(atomsPerConformation, coords, center);
-		RMSDTools::shift3D(atomsPerConformation, coords, center, -1.);
+		RMSDTools::translate(atomsPerConformation, coords, center, -1.);
 	}
 }
 
@@ -44,7 +44,7 @@ void RMSDTools::centerAllAtOrigin(
 	for (unsigned int i = 0; i < numberOfConformations; ++i){
 		double* coords = &(all_coords[coordsPerConformation*i]);
 		RMSDTools::geometricCenter(atomsPerConformation, coords, center);
-		RMSDTools::shift3D(atomsPerConformation, coords, center, -1.);
+		RMSDTools::translate(atomsPerConformation, coords, center, -1.);
 	}
 }
 
@@ -55,7 +55,7 @@ void RMSDTools::applyTranslationsToAll(unsigned int atomsPerConformation, unsign
 	for (unsigned int i = 0; i < numberOfConformations; ++i){
 		double* translation_vector = &(translations[3*i]);
 		double* coords = &(all_coords[coordsPerConformation*i]);
-		RMSDTools::shift3D(atomsPerConformation, coords, translation_vector, sign);
+		RMSDTools::translate(atomsPerConformation, coords, translation_vector, sign);
 	}
 }
 
@@ -66,7 +66,7 @@ void RMSDTools::applyTranslationToAll(unsigned int atomsPerConformation, unsigne
 	//#pragma omp parallel for
 	for (unsigned int i = 0; i < numberOfConformations; ++i){
 		double* coords = &(all_coords[coordsPerConformation*i]);
-		RMSDTools::shift3D(atomsPerConformation, coords, translation_vector, 1.);
+		RMSDTools::translate(atomsPerConformation, coords, translation_vector, 1.);
 	}
 }
 
@@ -90,7 +90,7 @@ void RMSDTools::geometricCenter(unsigned int n, const double * const x, double *
 	center[2] /= n;
 }
 
-void RMSDTools::shift3D(unsigned int numberOfPoints, double * const x, double trans[3], double scalar){
+void RMSDTools::translate(unsigned int numberOfPoints, double * const x, double trans[3], double scalar){
 	double shiftVector[3];
 
 	shiftVector[0] = trans[0]*scalar;

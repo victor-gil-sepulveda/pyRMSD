@@ -81,27 +81,27 @@ int main(int argc, char **argv){
 				1e-12);
 
 		test_step_by_step_iterative_superposition_with_fit(available_calculators[i],
-						"test_data/Iterpose_Fit_CA/steps",
-						"test_data/Iterpose_Fit_CA/mean",
-						"test_data/Iterpose_Fit_CA/stretching_trajectory_offset_ligand.initial_CA.coords",
-						1e-12,
-						9);
+				"test_data/Iterpose_Fit_CA/steps",
+				"test_data/Iterpose_Fit_CA/mean",
+				"test_data/Iterpose_Fit_CA/stretching_trajectory_offset_ligand.initial_CA.coords",
+				1e-12,
+				9);
 
 		test_iterative_superposition_with_fit(available_calculators[i],
-						"test_data/Iterpose_Fit_CA/stretching_trajectory_offset_ligand.initial_CA.coords",
-						"test_data/Iterpose_Fit_CA/stretching_trajectory_offset_ligand.iterposed_CA.coords",//steps/iter_step_8.coords",
-						"test_data/Iterpose_Fit_CA/step_rmsd_diff.rmsd",
-						1e-12,
-						9);
+				"test_data/Iterpose_Fit_CA/stretching_trajectory_offset_ligand.initial_CA.coords",
+				"test_data/Iterpose_Fit_CA/stretching_trajectory_offset_ligand.iterposed_CA.coords",
+				"test_data/Iterpose_Fit_CA/step_rmsd_diff.rmsd",
+				1e-12,
+				9);
 
 		test_iterative_superposition_with_fit_and_calc_rotation(available_calculators[i],
-						"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_all.coords",
-						"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.iterposed_all.coords",
-						"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_BEN.coords",
-						"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.iterposed_BEN.coords",
-						"test_data/Iterpose_Fit_CA_Rot_BEN/step_rmsd_diff.rmsd",
-						1e-12,
-						10);
+				"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_all.coords",
+				"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_BEN.coords",
+				"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.iterposed_all.coords",
+				"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.iterposed_BEN.coords",
+				"test_data/Iterpose_Fit_CA_Rot_BEN/step_rmsd_diff.rmsd",
+				1e-12,
+				10);
 	}
 
 	return 0;

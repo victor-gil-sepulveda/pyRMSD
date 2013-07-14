@@ -22,7 +22,7 @@ namespace RMSDTools{
 
 	void geometricCenter(unsigned int n, const double * const x, double * const center);
 	
-	void shift3D(unsigned int numberOfPoints, double * const x, double trans[3], double scalar);
+	void translate(unsigned int numberOfPoints, double * const x, double trans[3], double scalar);
 	
 	void superpositionQuatFit(unsigned int n, const double * const x, const double * const y, double q[4], double u[3][3]);
 	

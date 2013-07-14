@@ -480,7 +480,7 @@ void test_step_by_step_iterative_superposition_with_fit(RMSDCalculatorType type,
 											one_step_shape,
 											mean_step_file.c_str());
 
-		double rmsd_diff = calculator->iterativeSuperpositionStep(reference_coords, mean_coords);
+		double rmsd_diff = calculator->iterative_superposition_step(reference_coords, mean_coords);
 		cout<<"RMSD diff "<<rmsd_diff<<endl;
 
 		compareVectors((string("\tMean coordinates for this step (")+toString(i)+ string("): ")).c_str(),
@@ -580,6 +580,7 @@ void test_iterative_superposition_with_fit_and_calc_rotation(RMSDCalculatorType 
 
 		vector<int> expected_final_fit_coordinates_shape,expected_final_lig_coordinates_shape,
 					initial_fit_coordinates_shape,initial_lig_coordinates_shape;
+		vector<double> centers;
 
 		load_vector(expected_by_step_rmsds, iteration_rmsd_results_file);
 
@@ -589,16 +590,20 @@ void test_iterative_superposition_with_fit_and_calc_rotation(RMSDCalculatorType 
 
 		load_and_center_pdb_coords(expected_final_fit_coordinates,
 									expected_final_fit_coordinates_shape,
-									final_prot_coords_file);
+									final_prot_coords_file,
+									&centers);
 
 		load_pdb_coords(initial_lig_coordinates,
 						initial_lig_coordinates_shape,
 						initial_lig_coords_file);
 
-		load_and_center_pdb_coords(expected_final_lig_coordinates,
+		load_and_move_pdb_coords(expected_final_lig_coordinates,
 									expected_final_lig_coordinates_shape,
-									final_lig_coords_file);
+									final_lig_coords_file,
+									TOPOINTER(centers));
 
+		cout<<"*"<<expected_final_fit_coordinates[0]<<" "<<expected_final_fit_coordinates[1]<<" "<<expected_final_fit_coordinates[2]<<" "<<endl;
+		cout<<"*"<<expected_final_lig_coordinates[0]<<" "<<expected_final_lig_coordinates[1]<<" "<<expected_final_lig_coordinates[2]<<" "<<endl;
 
 		calculated_by_step_rmsds.resize(expected_number_of_iterations,0);
 		RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
@@ -610,12 +615,13 @@ void test_iterative_superposition_with_fit_and_calc_rotation(RMSDCalculatorType 
 		calculator->setCalculationCoordinates(initial_lig_coordinates_shape[1],
 										TOPOINTER(initial_lig_coordinates));
 
-		calculator->iterativeSuperposition(1e-4, TOPOINTER(calculated_by_step_rmsds));
+		calculator->iterativeSuperposition(1e-4,
+				TOPOINTER(calculated_by_step_rmsds));
 
 //		print_vector("calculated RMSD: ", TODOUBLEP(calculated_by_step_rmsds), calculated_by_step_rmsds.size(),12);
 //		print_vector("expected RMSD: ", TODOUBLEP(expected_by_step_rmsds), expected_by_step_rmsds.size(),12);
-		print_vector("initial_lig_coordinates_shape: ", TOPOINTER(initial_lig_coordinates_shape), initial_lig_coordinates_shape.size(),1);
-		print_vector("expected_final_lig_coordinates_shape: ", TOPOINTER(expected_final_lig_coordinates_shape), expected_final_lig_coordinates_shape.size(),1);
+		print_vector("initial_pfit_coordinates_shape: ", TOPOINTER(initial_fit_coordinates_shape), initial_fit_coordinates_shape.size(),1);
+		print_vector("expected_final_fit_coordinates_shape: ", TOPOINTER(expected_final_fit_coordinates_shape), expected_final_fit_coordinates_shape.size(),1);
 		print_vector("initial_lig_coordinates_shape: ", TOPOINTER(initial_lig_coordinates_shape), initial_lig_coordinates_shape.size(),1);
 		print_vector("expected_final_lig_coordinates_shape: ", TOPOINTER(expected_final_lig_coordinates_shape), expected_final_lig_coordinates_shape.size(),1);
 
@@ -626,6 +632,14 @@ void test_iterative_superposition_with_fit_and_calc_rotation(RMSDCalculatorType 
 						expected_final_fit_coordinates_shape[1] *
 						expected_final_fit_coordinates_shape[2],
 					precision_of_check);
+
+		compareVectors("\tAnd ligands have been moved to its correct positions : ",
+							TOPOINTER(expected_final_lig_coordinates),
+							TOPOINTER(initial_lig_coordinates),
+								expected_final_lig_coordinates_shape[0] *
+								expected_final_lig_coordinates_shape[1] *
+								expected_final_lig_coordinates_shape[2],
+							precision_of_check);
 
 		compareVectors("\tPer-step rmsd values are the same: ",
 						TOPOINTER(expected_by_step_rmsds),

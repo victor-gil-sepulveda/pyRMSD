@@ -21,16 +21,16 @@ pdb_trajectory.addCoordset(pdb_data.getCoordsets())
 pdb_trajectory.setAtoms(all)
 pdb_trajectory.iterpose()
 
-prody.writePDB("stretching_trajectory_offset_ligand.iterposed_all.pdb", all)
+prody.writePDB("stretching_trajectory_offset_ligand.iterposed_all.pdb", pdb_trajectory)
 with file("stretching_trajectory_offset_ligand.iterposed_all.coords", 'w') as outfile:
-    outfile.write("%d %d %d\n"%all.getCoordsets().shape)
-    for coordset in all.getCoordsets():
+    outfile.write("%d %d %d\n"%pdb_trajectory.getCoordsets().shape)
+    for coordset in pdb_trajectory.getCoordsets():
         numpy.savetxt(outfile, coordset)
 
 pdb_trajectory.setAtoms(lig) 
 with file("stretching_trajectory_offset_ligand.iterposed_BEN.coords", 'w') as outfile:
-    outfile.write("%d %d %d\n"%lig.getCoordsets().shape)
-    for coordset in lig.getCoordsets():
+    outfile.write("%d %d %d\n"%pdb_trajectory.getCoordsets().shape)
+    for coordset in pdb_trajectory.getCoordsets():
         numpy.savetxt(outfile, coordset)
         
 rmsds =  pdb_trajectory.getRMSDs()
