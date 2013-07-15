@@ -1,7 +1,7 @@
 #include "RMSDCalculator.h"
 #include "RMSDTools.h"
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 #include <vector>
 #include "RMSDCalculationData.h"
 using namespace std;
@@ -53,7 +53,7 @@ void RMSDCalculator::oneVsFollowing(int reference_conformation_index, double* rm
 	else{
 		if(!this->rmsdData->hasCalculationCoordinatesSet()){
 			double* reference_conformation = this->rmsdData->getFittingConformationAt(reference_conformation_index);
-			this->_one_vs_following_fit_equals_calc_coords_rotating_coordinates(
+			this->_one_vs_following_fit_equals_calc_coords(
 					reference_conformation,
 					reference_conformation_index,
 					rmsd);
@@ -63,7 +63,7 @@ void RMSDCalculator::oneVsFollowing(int reference_conformation_index, double* rm
 			double* fit_reference_conformation = this->rmsdData->getFittingConformationAt(reference_conformation_index);
 			double* calc_reference_conformation = this->rmsdData->getCalculationConformationAt(reference_conformation_index);
 
-			this->_one_vs_following_fit_differs_calc_coords_rotating_coordinates(
+			this->_one_vs_following_fit_differs_calc_coords(
 					fit_reference_conformation,
 					calc_reference_conformation,
 					reference_conformation_index,
@@ -87,10 +87,10 @@ void RMSDCalculator::calculateRMSDCondensedMatrix(std::vector<double>& rmsd){
 	rmsd.resize(num_of_rmsds);
 
 	if(! this->rmsdData->hasCalculationCoordinatesSet()){
-		calculateRMSDCondensedMatrixWithFittingCoordinates(rmsd);
+		calculate_rmsd_condensed_matrix_with_fitting_coordinates(rmsd);
 	}
 	else{
-		calculateRMSDCondensedMatrixWithFittingAndCalculationCoordinates(rmsd);
+		calculate_rmsd_condensed_matrix_with_fitting_and_calculation_coordinates(rmsd);
 	}
 }
 
@@ -101,7 +101,7 @@ void RMSDCalculator::calculateRMSDCondensedMatrix(std::vector<double>& rmsd){
  * \param rmsd Linear vector that will hold the rmsd values of the matrix. The Nth-1 elements will
  * form the first row, the next N-2 the second row and so on.
  */
-void RMSDCalculator::calculateRMSDCondensedMatrixWithFittingCoordinates(vector<double>& rmsd){
+void RMSDCalculator::calculate_rmsd_condensed_matrix_with_fitting_coordinates(vector<double>& rmsd){
 
 	RMSDTools::centerAllAtOrigin(this->rmsdData->atomsPerFittingConformation,
 									this->rmsdData->numberOfConformations,
@@ -113,7 +113,7 @@ void RMSDCalculator::calculateRMSDCondensedMatrixWithFittingCoordinates(vector<d
 										this->rmsdData->calculationConformationLength,
 										this->rmsdData->numberOfConformations);
 
-	for(int reference_index = 0; reference_index<this->rmsdData->numberOfConformations; ++reference_index){
+	for(int reference_index = 0; reference_index < this->rmsdData->numberOfConformations; ++reference_index){
 			int offset = reference_index*(this->rmsdData->numberOfConformations-1)- (((reference_index-1)*reference_index)/2) ;
 			double* reference_conformation = this->rmsdData->getFittingConformationAt(reference_index);
 			this->kernelFunctions->matrixOneVsFollowingFitEqualCalcWithoutConfRotation(
@@ -127,6 +127,7 @@ void RMSDCalculator::calculateRMSDCondensedMatrixWithFittingCoordinates(vector<d
 	}
 
 }
+
 /**
  * Exactly the same than 'calculateRMSDCondensedMatrixWithFittingCoordinates' but this time uses
  * one coordinate set for fitting and other to calculate the RMSD.
@@ -134,7 +135,7 @@ void RMSDCalculator::calculateRMSDCondensedMatrixWithFittingCoordinates(vector<d
  * \param rmsd Linear vector that will hold the rmsd values of the matrix. The Nth-1 elements will
  * form the first row, the next N-2 the second row and so on.
  */
-void RMSDCalculator::calculateRMSDCondensedMatrixWithFittingAndCalculationCoordinates(vector<double>& rmsd){
+void RMSDCalculator::calculate_rmsd_condensed_matrix_with_fitting_and_calculation_coordinates(vector<double>& rmsd){
 	double* fit_centers =new double[this->rmsdData->numberOfConformations*3];
 
 	RMSDTools::centerAllAtOrigin(this->rmsdData->atomsPerFittingConformation,
@@ -175,27 +176,28 @@ void RMSDCalculator::calculateRMSDCondensedMatrixWithFittingAndCalculationCoordi
 	}
 
 }
-/*
+
+/**
+ *	Prepares coordinates and launches the kernel function that will do the i vs i+1:N superpostion +
+ *	rmsd calculation operation where the RMSD calculation will be performed with the fitting coordinates.
+ *	Modifies all input coordinates.
  *
+ * \param reference A pointer to the reference conformation.
+ * \param reference_index The place that the reference conformation has in the conformations sequence
+ * (the fitting coordinates array).
+ * \param rmsd An array with enough room to store the calculated rmsd values.
  */
 void RMSDCalculator::_one_vs_following_fit_equals_calc_coords(
 		double* reference,
-		int reference_conformation_number,
+		int reference_index,
 		double *rmsd){
-}
-
-/*
- * This one modifies the input coordinates that will be superposed with the reference.
- *
- */
-void RMSDCalculator::_one_vs_following_fit_equals_calc_coords_rotating_coordinates(double* reference, int reference_conformation_number, double *rmsd){
 	RMSDTools::centerAllAtOrigin(this->rmsdData->atomsPerFittingConformation,
 			this->rmsdData->numberOfConformations,
 			this->rmsdData->fittingCoordinates);
 
 	this->kernelFunctions->oneVsFollowingFitEqualCalcWithConfRotation(
 			reference,
-			reference_conformation_number,
+			reference_index,
 			rmsd,
 			this->rmsdData->numberOfConformations,
 			this->rmsdData->fittingConformationLength,
@@ -203,18 +205,20 @@ void RMSDCalculator::_one_vs_following_fit_equals_calc_coords_rotating_coordinat
 			this->rmsdData->fittingCoordinates);
 }
 
+/**
+ *	Prepares coordinates and launches the kernel function that will do the i vs i+1:N superpostion +
+ *	rmsd calculation operation. The RMSD calculation will be performed over a set which is different
+ *	from the fitting coordinates set. Modifies all input coordinates.
+ *
+ * \param reference A pointer to the reference conformation.
+ * \param reference_index The place that the reference conformation has in the conformations sequence
+ * (the fitting coordinates array).
+ * \param rmsd An array with enough room to store the calculated rmsd values.
+ */
 void RMSDCalculator::_one_vs_following_fit_differs_calc_coords(
 		double* fitReference,
 		double* calcReference,
-		int reference_conformation_number,
-		double *rmsd){
-
-}
-
-void RMSDCalculator::_one_vs_following_fit_differs_calc_coords_rotating_coordinates(
-		double* fitReference,
-		double* calcReference,
-		int reference_conformation_number,
+		int reference_index,
 		double *rmsd){
 
 	double* fitCenters = NULL;
@@ -236,7 +240,7 @@ void RMSDCalculator::_one_vs_following_fit_differs_calc_coords_rotating_coordina
 	this->kernelFunctions->oneVsFollowingFitDiffersCalcWithConfRotation(
 			fitReference,
 			calcReference,
-			reference_conformation_number,
+			reference_index,
 			rmsd,
 			this->rmsdData->numberOfConformations,
 			this->rmsdData->fittingConformationLength,
@@ -247,6 +251,30 @@ void RMSDCalculator::_one_vs_following_fit_differs_calc_coords_rotating_coordina
 			this->rmsdData->calculationCoordinates);
 }
 
+/**
+ *	Performs an iterative superposition algorithm (it tries to be equivalent to the one implemented in
+ *	prody @ http://www.csb.pitt.edu/prody/). If the calculation coordinates set has been defined, it will
+ *	also rotate them so that one can define a set of coordinates for fitting, and a set of coordinates
+ *	for querying later. Input coordinates are modified.
+ *
+ *	Prody scheme is:
+ *
+ *	 Ensemble @ .../prody/ensemble/ensemble.py
+ *	 PDBEnsemble @ .../prody/ensemble/pdbensemble.py
+ *
+ *	 Steps:
+ *	 1: PDBEnsemble::iterpose -> confs_tmp = confs
+ *	 2: PDBEnsemble::iterpose -> Ensemble::iterpose(confs_tmp)
+ *	 Iterative
+ *	 		3: PDBEnsemble::_superpose()
+ *	 4: Ensemble::superpose()
+ *	 5: PDBEnsemble::_superpose(trans=True)
+ *
+ * \param rmsd_diff_to_stop Once the rmsd difference is lower than this value the algorithm has
+ * converged.
+ * \param iteration_rmsd Correctly sized vector where the rmsd difference value of each step will
+ * be stored.
+ */
 void RMSDCalculator::iterativeSuperposition(double rmsd_diff_to_stop, double* iteration_rmsd){
 	double MAX_ITERATIONS = 200;
 	double* reference_coords = new double[this->rmsdData->fittingConformationLength];
@@ -280,7 +308,14 @@ void RMSDCalculator::iterativeSuperposition(double rmsd_diff_to_stop, double* it
 	delete [] mean_coords;
 }
 
-double RMSDCalculator::iterative_superposition_step(double* reference_coords, double* mean_coords ){
+/**
+ * Performs one step of the iterative superposition method.
+ *
+ * \param reference_coords A vector with the reference conformation. It is the first conformation in the
+ * first step, and mean conformation in next steps.
+ * \param mean_coords A buffer vector to calculate the mean conformation.
+ */
+double RMSDCalculator::iterative_superposition_step(double* reference_coords, double* mean_coords){
 		double rmsd_difference = 0;
 
 		superposition_with_external_reference(reference_coords);
@@ -304,18 +339,30 @@ double RMSDCalculator::iterative_superposition_step(double* reference_coords, do
 		return rmsd_difference;
 }
 
-void RMSDCalculator::superposition_with_external_reference(double* reference_coords){
+
+/**
+ * Helper function to choose the superposition method depending on the definition or not of the
+ * extra calculation set.
+ *
+ * \param reference Is the reference conformation to be used in superposition (mean conformation
+ * in this case).
+ */
+void RMSDCalculator::superposition_with_external_reference(double* reference){
 	if (! this->rmsdData->hasCalculationCoordinatesSet()){
-		superposition_with_external_reference_without_calc_coords(reference_coords);
+		superposition_with_external_reference_without_calc_coords(reference);
 	}
 	else{
-		superposition_with_external_reference_rotating_calc_coords(reference_coords);
+		superposition_with_external_reference_rotating_calc_coords(reference);
 	}
 }
 
-
-// Reference coordinates is already a copy, in a different memory space than allCoordinates
-// In this case (used for iterative superposition) conformations are recentered over the reference conformation.
+/**
+ * Superposes all coordinates to the reference conformation. In this case reference coordinates can be
+ * placed into a different memory space than the working coordinates set.
+ *
+ * \param reference Is the reference conformation to be used in superposition (mean conformation
+ * in this case).
+ */
 void RMSDCalculator::superposition_with_external_reference_without_calc_coords(double* reference){
 
 	// Recentering coordinates each step gives us am easier way of comparing with prody,
@@ -337,6 +384,13 @@ void RMSDCalculator::superposition_with_external_reference_without_calc_coords(d
 			this->rmsdData->fittingCoordinates);
 }
 
+/**
+ * Exacly the same that 'superposition_with_external_reference_without_calc_coords', but in this case
+ * it will also modify the calculation coordinates set.
+ *
+ * \param reference Is the reference conformation to be used in superposition ( mean conformation
+ * in this case).
+ */
 void RMSDCalculator::superposition_with_external_reference_rotating_calc_coords(double* reference){
 
 	// Center fitting coordinates

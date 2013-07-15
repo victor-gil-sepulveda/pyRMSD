@@ -25,23 +25,17 @@ class RMSDCalculator{
 		double 			iterative_superposition_step(double* reference_coords, double* mean_coords);
 
 	protected:
-		void calculateRMSDCondensedMatrixWithFittingCoordinates(std::vector<double>& rmsd);
-		void calculateRMSDCondensedMatrixWithFittingAndCalculationCoordinates(std::vector<double>& rmsd);
+
+		void calculate_rmsd_condensed_matrix_with_fitting_coordinates(std::vector<double>& rmsd);
+		void calculate_rmsd_condensed_matrix_with_fitting_and_calculation_coordinates(std::vector<double>& rmsd);
 
 		void superposition_with_external_reference(double*);
 		void superposition_with_external_reference_without_calc_coords(double*);
 		void superposition_with_external_reference_rotating_calc_coords(double*);
 
-		virtual void _one_vs_following_fit_equals_calc_coords(double* reference,
+		void _one_vs_following_fit_equals_calc_coords(double* reference,
 				int reference_conformation_number, double *rmsd);
-
-		virtual void _one_vs_following_fit_differs_calc_coords(double* fitReference,
-				double* calcReference, int reference_conformation_number, double *rmsd);
-
-		virtual void _one_vs_following_fit_equals_calc_coords_rotating_coordinates(double* reference,
-				int reference_conformation_number, double *rmsd);
-
-		virtual void _one_vs_following_fit_differs_calc_coords_rotating_coordinates(double* fitReference,
+		void _one_vs_following_fit_differs_calc_coords(double* fitReference,
 				double* calcReference, int reference_conformation_number, double *rmsd);
 
 
