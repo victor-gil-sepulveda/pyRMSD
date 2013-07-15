@@ -102,6 +102,17 @@ int main(int argc, char **argv){
 				"test_data/Iterpose_Fit_CA_Rot_BEN/step_rmsd_diff.rmsd",
 				1e-12,
 				10);
+
+		test_matrix_with_fit_coordinates(available_calculators[i],
+				"test_data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.CA.coords",
+				"test_data/Matrix_Fit_CA/prot_plus_ligand_offset_very_different.CA.rmsd_matrix",
+				1e-12);
+
+		test_matrix_with_fit_and_calculation_coordinates(available_calculators[i],
+				"test_data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.CA.coords",
+				"test_data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.ligand.coords",
+				"test_data/Matrix_Fit_CA_Calc_BEN/prot_plus_ligand_offset_very_different.CA.rmsd_matrix",
+				1e-12);
 	}
 
 	return 0;

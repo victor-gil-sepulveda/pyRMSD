@@ -54,5 +54,16 @@
 						double precision_of_check,
 						int expected_number_of_iterations);
 
+	void test_matrix_with_fit_coordinates(RMSDCalculatorType type,
+						const char* initial_prot_coords_file,
+						const char* rmsd_results_file,
+						double precision_of_check);
+
+	void test_matrix_with_fit_and_calculation_coordinates(RMSDCalculatorType type,
+								const char* initial_prot_coords_file,
+								const char* initial_lig_coords_file,
+								const char* rmsd_results_file,
+								double precision_of_check);
+
 
 #endif /* TESTS_H_ */

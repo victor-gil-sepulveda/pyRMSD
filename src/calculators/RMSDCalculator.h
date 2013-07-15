@@ -33,6 +33,10 @@ class RMSDCalculator{
 		}
 
 	protected:
+		void calculateRMSDCondensedMatrixWithFittingCoordinates(std::vector<double>& rmsd);
+
+		void calculateRMSDCondensedMatrixWithFittingAndCalculationCoordinates(std::vector<double>& rmsd);
+
 		void superposition_with_external_reference(double*);
 
 		void superposition_with_external_reference_without_calc_coords(double*);

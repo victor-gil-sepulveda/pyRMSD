@@ -572,80 +572,162 @@ void test_iterative_superposition_with_fit_and_calc_rotation(RMSDCalculatorType 
 						int expected_number_of_iterations){
 
 	print_test_tittle(__FUNCTION__);
-		print_calculator_and_precission(type, precision_of_check);
+	print_calculator_and_precission(type, precision_of_check);
 
-		vector<double> 		initial_fit_coordinates, initial_lig_coordinates,
-							expected_final_fit_coordinates, expected_final_lig_coordinates,
-							calculated_by_step_rmsds, expected_by_step_rmsds;
+	vector<double> 		initial_fit_coordinates, initial_lig_coordinates,
+						expected_final_fit_coordinates, expected_final_lig_coordinates,
+						calculated_by_step_rmsds, expected_by_step_rmsds;
 
-		vector<int> expected_final_fit_coordinates_shape,expected_final_lig_coordinates_shape,
-					initial_fit_coordinates_shape,initial_lig_coordinates_shape;
-		vector<double> centers;
+	vector<int> expected_final_fit_coordinates_shape,expected_final_lig_coordinates_shape,
+				initial_fit_coordinates_shape,initial_lig_coordinates_shape;
+	vector<double> centers;
 
-		load_vector(expected_by_step_rmsds, iteration_rmsd_results_file);
+	load_vector(expected_by_step_rmsds, iteration_rmsd_results_file);
 
-		load_pdb_coords(initial_fit_coordinates,
-							initial_fit_coordinates_shape,
-							initial_prot_coords_file);
+	load_pdb_coords(initial_fit_coordinates,
+						initial_fit_coordinates_shape,
+						initial_prot_coords_file);
 
-		load_and_center_pdb_coords(expected_final_fit_coordinates,
-									expected_final_fit_coordinates_shape,
-									final_prot_coords_file,
-									&centers);
+	load_and_center_pdb_coords(expected_final_fit_coordinates,
+								expected_final_fit_coordinates_shape,
+								final_prot_coords_file,
+								&centers);
 
-		load_pdb_coords(initial_lig_coordinates,
-						initial_lig_coordinates_shape,
-						initial_lig_coords_file);
+	load_pdb_coords(initial_lig_coordinates,
+					initial_lig_coordinates_shape,
+					initial_lig_coords_file);
 
-		load_and_move_pdb_coords(expected_final_lig_coordinates,
-									expected_final_lig_coordinates_shape,
-									final_lig_coords_file,
-									TOPOINTER(centers));
+	load_and_move_pdb_coords(expected_final_lig_coordinates,
+								expected_final_lig_coordinates_shape,
+								final_lig_coords_file,
+								TOPOINTER(centers));
 
-		cout<<"*"<<expected_final_fit_coordinates[0]<<" "<<expected_final_fit_coordinates[1]<<" "<<expected_final_fit_coordinates[2]<<" "<<endl;
-		cout<<"*"<<expected_final_lig_coordinates[0]<<" "<<expected_final_lig_coordinates[1]<<" "<<expected_final_lig_coordinates[2]<<" "<<endl;
+	calculated_by_step_rmsds.resize(expected_number_of_iterations,0);
+	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
+									type,
+									initial_fit_coordinates_shape[0],
+									initial_fit_coordinates_shape[1],
+									TOPOINTER(initial_fit_coordinates));
 
-		calculated_by_step_rmsds.resize(expected_number_of_iterations,0);
-		RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
-										type,
-										initial_fit_coordinates_shape[0],
-										initial_fit_coordinates_shape[1],
-										TOPOINTER(initial_fit_coordinates));
+	calculator->setCalculationCoordinates(initial_lig_coordinates_shape[1],
+									TOPOINTER(initial_lig_coordinates));
 
-		calculator->setCalculationCoordinates(initial_lig_coordinates_shape[1],
-										TOPOINTER(initial_lig_coordinates));
-
-		calculator->iterativeSuperposition(1e-4,
-				TOPOINTER(calculated_by_step_rmsds));
+	calculator->iterativeSuperposition(1e-4,
+			TOPOINTER(calculated_by_step_rmsds));
 
 //		print_vector("calculated RMSD: ", TODOUBLEP(calculated_by_step_rmsds), calculated_by_step_rmsds.size(),12);
 //		print_vector("expected RMSD: ", TODOUBLEP(expected_by_step_rmsds), expected_by_step_rmsds.size(),12);
-		print_vector("initial_pfit_coordinates_shape: ", TOPOINTER(initial_fit_coordinates_shape), initial_fit_coordinates_shape.size(),1);
-		print_vector("expected_final_fit_coordinates_shape: ", TOPOINTER(expected_final_fit_coordinates_shape), expected_final_fit_coordinates_shape.size(),1);
-		print_vector("initial_lig_coordinates_shape: ", TOPOINTER(initial_lig_coordinates_shape), initial_lig_coordinates_shape.size(),1);
-		print_vector("expected_final_lig_coordinates_shape: ", TOPOINTER(expected_final_lig_coordinates_shape), expected_final_lig_coordinates_shape.size(),1);
+//		print_vector("initial_pfit_coordinates_shape: ", TOPOINTER(initial_fit_coordinates_shape), initial_fit_coordinates_shape.size(),1);
+//		print_vector("expected_final_fit_coordinates_shape: ", TOPOINTER(expected_final_fit_coordinates_shape), expected_final_fit_coordinates_shape.size(),1);
+//		print_vector("initial_lig_coordinates_shape: ", TOPOINTER(initial_lig_coordinates_shape), initial_lig_coordinates_shape.size(),1);
+//		print_vector("expected_final_lig_coordinates_shape: ", TOPOINTER(expected_final_lig_coordinates_shape), expected_final_lig_coordinates_shape.size(),1);
 
-		compareVectors("\tFinal iterposed coordinates are as expected: ",
-					TOPOINTER(expected_final_fit_coordinates),
-					TOPOINTER(initial_fit_coordinates),
-						expected_final_fit_coordinates_shape[0] *
-						expected_final_fit_coordinates_shape[1] *
-						expected_final_fit_coordinates_shape[2],
-					precision_of_check);
+	compareVectors("\tFinal iterposed coordinates are as expected: ",
+				TOPOINTER(expected_final_fit_coordinates),
+				TOPOINTER(initial_fit_coordinates),
+					expected_final_fit_coordinates_shape[0] *
+					expected_final_fit_coordinates_shape[1] *
+					expected_final_fit_coordinates_shape[2],
+				precision_of_check);
 
-		compareVectors("\tAnd ligands have been moved to its correct positions : ",
-							TOPOINTER(expected_final_lig_coordinates),
-							TOPOINTER(initial_lig_coordinates),
-								expected_final_lig_coordinates_shape[0] *
-								expected_final_lig_coordinates_shape[1] *
-								expected_final_lig_coordinates_shape[2],
-							precision_of_check);
-
-		compareVectors("\tPer-step rmsd values are the same: ",
-						TOPOINTER(expected_by_step_rmsds),
-						TOPOINTER(calculated_by_step_rmsds),
-						expected_number_of_iterations,
+	compareVectors("\tAnd ligands have been moved to its correct positions : ",
+						TOPOINTER(expected_final_lig_coordinates),
+						TOPOINTER(initial_lig_coordinates),
+							expected_final_lig_coordinates_shape[0] *
+							expected_final_lig_coordinates_shape[1] *
+							expected_final_lig_coordinates_shape[2],
 						precision_of_check);
 
-		delete calculator;
+	compareVectors("\tPer-step rmsd values are the same: ",
+					TOPOINTER(expected_by_step_rmsds),
+					TOPOINTER(calculated_by_step_rmsds),
+					expected_number_of_iterations,
+					precision_of_check);
+
+	delete calculator;
 }
+
+void test_matrix_with_fit_coordinates(RMSDCalculatorType type,
+							const char* initial_prot_coords_file,
+							const char* rmsd_results_file,
+							double precision_of_check){
+
+	print_test_tittle(__FUNCTION__);
+	print_calculator_and_precission(type, precision_of_check);
+
+	vector<double> 		initial_fit_coordinates,
+						calculated_rmsds, expected_rmsds;
+
+	vector<int> initial_fit_coordinates_shape;
+
+	load_vector(expected_rmsds, rmsd_results_file);
+
+	load_pdb_coords(initial_fit_coordinates,
+					initial_fit_coordinates_shape,
+					initial_prot_coords_file);
+
+	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
+											type,
+											initial_fit_coordinates_shape[0],
+											initial_fit_coordinates_shape[1],
+											TOPOINTER(initial_fit_coordinates));
+
+	calculator->calculateRMSDCondensedMatrix(calculated_rmsds);
+
+	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),12);
+	print_vector<double>("expected RMSD: ", TOPOINTER(expected_rmsds), expected_rmsds.size(),12);
+
+	compareVectors("\tThe RMSD matrix is as expected: ",
+						TOPOINTER(expected_rmsds),
+						TOPOINTER(calculated_rmsds),
+						expected_rmsds.size(),
+						precision_of_check);
+
+}
+
+void test_matrix_with_fit_and_calculation_coordinates(RMSDCalculatorType type,
+							const char* initial_prot_coords_file,
+							const char* initial_lig_coords_file,
+							const char* rmsd_results_file,
+							double precision_of_check){
+
+	print_test_tittle(__FUNCTION__);
+	print_calculator_and_precission(type, precision_of_check);
+
+	vector<double> 		initial_fit_coordinates, initial_lig_coordinates,
+						calculated_rmsds, expected_rmsds;
+
+	vector<int> initial_fit_coordinates_shape,initial_lig_coordinates_shape;
+
+	load_vector(expected_rmsds, rmsd_results_file);
+
+	load_pdb_coords(initial_fit_coordinates,
+					initial_fit_coordinates_shape,
+					initial_prot_coords_file);
+
+	load_pdb_coords(initial_lig_coordinates,
+					initial_lig_coordinates_shape,
+					initial_lig_coords_file);
+
+	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
+											type,
+											initial_fit_coordinates_shape[0],
+											initial_fit_coordinates_shape[1],
+											TOPOINTER(initial_fit_coordinates));
+
+	calculator->setCalculationCoordinates(initial_lig_coordinates_shape[1],
+										TOPOINTER(initial_lig_coordinates));
+
+	calculator->calculateRMSDCondensedMatrix(calculated_rmsds);
+
+	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),12);
+	print_vector<double>("expected RMSD: ", TOPOINTER(expected_rmsds), expected_rmsds.size(),12);
+
+	compareVectors("\tThe RMSD matrix is as expected: ",
+						TOPOINTER(expected_rmsds),
+						TOPOINTER(calculated_rmsds),
+						expected_rmsds.size(),
+						precision_of_check);
+
+}
+

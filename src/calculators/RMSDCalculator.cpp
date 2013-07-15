@@ -9,6 +9,7 @@ RMSDCalculator::RMSDCalculator(	int numberOfConformations,
 									int atomsPerConformation,
 									double* allCoordinates,
 									KernelFunctions* kernelFunctions){
+
 	this->numberOfConformations = numberOfConformations;
 	this->atomsPerFittingConformation = atomsPerConformation;
 	this->allFittingCoordinates = allCoordinates;
@@ -75,18 +76,56 @@ void RMSDCalculator::oneVsFollowing(int reference_conformation_number, double* r
 void RMSDCalculator::calculateRMSDCondensedMatrix(std::vector<double>& rmsd){
 
 	int num_of_rmsds = numberOfConformations * (numberOfConformations-1.) /2.;
-	double* rmsd_tmp =  new double[num_of_rmsds];
+	rmsd.clear();
+	rmsd.resize(num_of_rmsds);
 
-	// Coordinates are modified here
-	double* fit_centers =new double[numberOfConformations*3];
-	//double* calc_centers = NULL;
-	RMSDTools::centerAllAtOrigin(atomsPerFittingConformation, numberOfConformations, allFittingCoordinates, fit_centers);
-	if(this->allCalculationCoordinates == NULL){
-		//calc_centers = new double[numberOfConformations*3];
-		//RMSDTools::centerAllAtOrigin(atomsPerCalculationConformation, numberOfConformations, allCalculationCoordinates, calc_centers);
-		RMSDTools::applyTranslationsToAll(atomsPerCalculationConformation, numberOfConformations,
-												allCalculationCoordinates, fit_centers, -1);
+	if(allCalculationCoordinates == NULL){
+		calculateRMSDCondensedMatrixWithFittingCoordinates(rmsd);
 	}
+	else{
+		calculateRMSDCondensedMatrixWithFittingAndCalculationCoordinates(rmsd);
+	}
+}
+
+void RMSDCalculator::calculateRMSDCondensedMatrixWithFittingCoordinates(vector<double>& rmsd){
+
+	RMSDTools::centerAllAtOrigin(atomsPerFittingConformation,
+									numberOfConformations,
+									allFittingCoordinates);
+
+	this->kernelFunctions->matrixInit( allFittingCoordinates,
+										atomsPerFittingConformation*3,
+										allCalculationCoordinates,
+										atomsPerCalculationConformation*3,
+										numberOfConformations);
+
+	for(int conformation_number = 0; conformation_number<numberOfConformations; ++conformation_number){
+			int offset = conformation_number*(numberOfConformations-1)- (((conformation_number-1)*conformation_number)/2) ;
+			double* fit_reference_conformation = &(allFittingCoordinates[conformation_number*coordinatesPerFittingConformation]);
+			this->kernelFunctions->matrixOneVsFollowingFitEqualCalcWithoutConfRotation(
+																fit_reference_conformation,
+																conformation_number,
+																&(rmsd[offset]),
+																numberOfConformations,
+																coordinatesPerFittingConformation,
+																atomsPerFittingConformation,
+																allFittingCoordinates);
+	}
+
+}
+
+void RMSDCalculator::calculateRMSDCondensedMatrixWithFittingAndCalculationCoordinates(vector<double>& rmsd){
+	double* fit_centers =new double[numberOfConformations*3];
+	RMSDTools::centerAllAtOrigin(atomsPerFittingConformation,
+									numberOfConformations,
+									allFittingCoordinates,
+									fit_centers);
+
+	RMSDTools::applyTranslationsToAll(atomsPerCalculationConformation,
+										numberOfConformations,
+										allCalculationCoordinates,
+										fit_centers, -1);
+	delete [] fit_centers;
 
 	this->kernelFunctions->matrixInit(allFittingCoordinates,
 										atomsPerFittingConformation*3,
@@ -94,47 +133,22 @@ void RMSDCalculator::calculateRMSDCondensedMatrix(std::vector<double>& rmsd){
 										atomsPerCalculationConformation*3,
 										numberOfConformations);
 
-	for(int conformation_number = 0;conformation_number<numberOfConformations;++conformation_number){
+	for(int conformation_number = 0; conformation_number<numberOfConformations; ++conformation_number){
 		int offset = conformation_number*(numberOfConformations-1)- (((conformation_number-1)*conformation_number)/2) ;
 		double* fit_reference_conformation = &(allFittingCoordinates[conformation_number*coordinatesPerFittingConformation]);
-
-		if(this->allCalculationCoordinates == NULL){
-			this->kernelFunctions->matrixOneVsFollowingFitEqualCalcWithoutConfRotation(
-																fit_reference_conformation,
-																conformation_number,
-																&(rmsd_tmp[offset]),
-																numberOfConformations,
-																coordinatesPerFittingConformation,
-																atomsPerFittingConformation,
-																allFittingCoordinates);
-		}
-		else{
-			double* calc_reference_conformation = &(allCalculationCoordinates[conformation_number*coordinatesPerCalculationConformation]);
-			this->kernelFunctions->matrixOneVsFollowingFitDiffersCalcWithoutConfRotation(
-																fit_reference_conformation,
-																calc_reference_conformation,
-																conformation_number,
-																&(rmsd_tmp[offset]),
-																numberOfConformations,
-																coordinatesPerFittingConformation,
-																atomsPerFittingConformation,
-																allFittingCoordinates,
-																coordinatesPerCalculationConformation,
-																atomsPerCalculationConformation,
-																allCalculationCoordinates);
-		}
-	}
-
-	this->kernelFunctions->matrixEnd(rmsd_tmp, num_of_rmsds, rmsd);
-	delete [] rmsd_tmp;
-
-	RMSDTools::applyTranslationsToAll(atomsPerFittingConformation, numberOfConformations, allFittingCoordinates, fit_centers);
-	delete [] fit_centers;
-
-	if(this->allCalculationCoordinates == NULL 	){
-		RMSDTools::applyTranslationsToAll(atomsPerCalculationConformation, numberOfConformations, allCalculationCoordinates, fit_centers);
-		//RMSDTools::applyTranslationsToAll(atomsPerCalculationConformation, numberOfConformations, allCalculationCoordinates, calc_centers);
-		//delete [] calc_centers;
+		double* calc_reference_conformation = &(allCalculationCoordinates[conformation_number*coordinatesPerCalculationConformation]);
+		this->kernelFunctions->matrixOneVsFollowingFitDiffersCalcWithoutConfRotation(
+															fit_reference_conformation,
+															calc_reference_conformation,
+															conformation_number,
+															&(rmsd[offset]),
+															numberOfConformations,
+															coordinatesPerFittingConformation,
+															atomsPerFittingConformation,
+															allFittingCoordinates,
+															coordinatesPerCalculationConformation,
+															atomsPerCalculationConformation,
+															allCalculationCoordinates);
 	}
 
 }

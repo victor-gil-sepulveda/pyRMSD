@@ -73,7 +73,7 @@ class KernelFunctions{
 
 		}
 
-		virtual void matrixEnd(double* rmsds_tmp, int rmsds_tmp_len, std::vector<double>& rmsds){
+		virtual inline void matrixEnd(double* rmsds_tmp, int rmsds_tmp_len, std::vector<double>& rmsds){
 			for (int i = 0; i < rmsds_tmp_len; ++i){
 				rmsds.push_back(rmsds_tmp[i]);
 			}
