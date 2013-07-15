@@ -150,8 +150,7 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 					all_calc_coordinates,
 					number_of_threads,
 					threads_per_block,
-					blocks_per_grid,
-					(bool) modify_coordinates);
+					blocks_per_grid);
 
     rmsdCalculator->oneVsFollowing(conformation_number,&(rmsd[0]));
 

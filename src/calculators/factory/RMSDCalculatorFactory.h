@@ -25,8 +25,7 @@ class RMSDCalculatorFactory {
 				double* allCalculationCoordinates = NULL,
 				int number_of_threads = 4,
 				int threads_per_block = 8,
-				int blocks_per_grid = 16,
-				bool modify_coordinates = false);
+				int blocks_per_grid = 16);
 };
 
 #endif /* RMSDCALCULATORFACTORY_H_ */

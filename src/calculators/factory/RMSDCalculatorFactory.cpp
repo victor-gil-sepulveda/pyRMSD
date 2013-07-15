@@ -37,8 +37,7 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 		double* allCalculationCoordinates,
 		int number_of_threads,
 		int threads_per_block,
-		int blocks_per_grid,
-		bool modify_coordinates) {
+		int blocks_per_grid) {
 
 	KernelFunctions* kernelFunctions;
 
@@ -109,9 +108,6 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 		calculator->setCalculationCoordinates(atomsPerCalculationConformation, allCalculationCoordinates);
 	}
 
-	if(modify_coordinates){
-		calculator->setCoordinatesRotationTo(true);
-	}
 
 	return calculator;
 }
