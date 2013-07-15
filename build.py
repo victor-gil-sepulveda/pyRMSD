@@ -66,7 +66,7 @@ if __name__ == '__main__':
     }
     
     files_to_compile_with_gcc = {
-                                 "src/calculators":["RMSDCalculator.cpp","RMSDTools.cpp"],
+                                 "src/calculators":["RMSDCalculator.cpp","RMSDTools.cpp","RMSDCalculationData.cpp"],
                                  "src/calculators/factory":["RMSDCalculatorFactory.cpp"],
                                  "src/calculators/KABSCH":["KABSCHSerialKernel.cpp"],
                                  "src/calculators/QTRFIT":["QTRFITSerialKernel.cpp"],
@@ -128,6 +128,7 @@ if __name__ == '__main__':
                             files_to_link["QCPSerialKernel"],
                             files_to_link["QCPOmpKernel"],
                             files_to_link["RMSDCalculatorFactory"],
+                            files_to_link["RMSDCalculationData"],
                             files_to_link["RMSDCalculator"],
                             files_to_link["pyRMSD"]
     ]

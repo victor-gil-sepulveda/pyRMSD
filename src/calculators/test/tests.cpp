@@ -386,10 +386,9 @@ void test_superposition_with_fit_and_calc(RMSDCalculatorType type,
 									type,
 									not_superposed_fit_coordinates_shape[0],
 									not_superposed_fit_coordinates_shape[1],
-									TOPOINTER(not_superposed_fit_coordinates));
-	calculator->setCalculationCoordinates(
-			not_superposed_calc_coordinates_shape[1],
-			TOPOINTER(not_superposed_calc_coordinates));
+									TOPOINTER(not_superposed_fit_coordinates),
+									not_superposed_calc_coordinates_shape[1],
+									TOPOINTER(not_superposed_calc_coordinates));
 
 	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
 
@@ -607,9 +606,8 @@ void test_iterative_superposition_with_fit_and_calc_rotation(RMSDCalculatorType 
 									type,
 									initial_fit_coordinates_shape[0],
 									initial_fit_coordinates_shape[1],
-									TOPOINTER(initial_fit_coordinates));
-
-	calculator->setCalculationCoordinates(initial_lig_coordinates_shape[1],
+									TOPOINTER(initial_fit_coordinates),
+									initial_lig_coordinates_shape[1],
 									TOPOINTER(initial_lig_coordinates));
 
 	calculator->iterativeSuperposition(1e-4,
@@ -674,8 +672,8 @@ void test_matrix_with_fit_coordinates(RMSDCalculatorType type,
 
 	calculator->calculateRMSDCondensedMatrix(calculated_rmsds);
 
-	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),12);
-	print_vector<double>("expected RMSD: ", TOPOINTER(expected_rmsds), expected_rmsds.size(),12);
+//	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),12);
+//	print_vector<double>("expected RMSD: ", TOPOINTER(expected_rmsds), expected_rmsds.size(),12);
 
 	compareVectors("\tThe RMSD matrix is as expected: ",
 						TOPOINTER(expected_rmsds),
@@ -694,8 +692,8 @@ void test_matrix_with_fit_and_calculation_coordinates(RMSDCalculatorType type,
 	print_test_tittle(__FUNCTION__);
 	print_calculator_and_precission(type, precision_of_check);
 
-	vector<double> 		initial_fit_coordinates, initial_lig_coordinates,
-						calculated_rmsds, expected_rmsds;
+	vector<double> 	initial_fit_coordinates, initial_lig_coordinates,
+					calculated_rmsds, expected_rmsds;
 
 	vector<int> initial_fit_coordinates_shape,initial_lig_coordinates_shape;
 
@@ -713,15 +711,14 @@ void test_matrix_with_fit_and_calculation_coordinates(RMSDCalculatorType type,
 											type,
 											initial_fit_coordinates_shape[0],
 											initial_fit_coordinates_shape[1],
-											TOPOINTER(initial_fit_coordinates));
-
-	calculator->setCalculationCoordinates(initial_lig_coordinates_shape[1],
-										TOPOINTER(initial_lig_coordinates));
+											TOPOINTER(initial_fit_coordinates),
+											initial_lig_coordinates_shape[1],
+											TOPOINTER(initial_lig_coordinates));
 
 	calculator->calculateRMSDCondensedMatrix(calculated_rmsds);
 
-	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),12);
-	print_vector<double>("expected RMSD: ", TOPOINTER(expected_rmsds), expected_rmsds.size(),12);
+//	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),12);
+//	print_vector<double>("expected RMSD: ", TOPOINTER(expected_rmsds), expected_rmsds.size(),12);
 
 	compareVectors("\tThe RMSD matrix is as expected: ",
 						TOPOINTER(expected_rmsds),

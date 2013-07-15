@@ -6,6 +6,10 @@
  */
 
 #include "RMSDCalculatorFactory.h"
+#include "../RMSDCalculationData.h"
+#include <iostream>
+#include <cstdlib>
+
 #include "../KernelFunctions.h"
 #include "../RMSDCalculator.h"
 #include "../KABSCH/KABSCHSerialKernel.h"
@@ -20,8 +24,6 @@
 	#include "../QCP/QCPCUDAMemKernel.h"
 #endif
 
-#include <iostream>
-#include <cstdlib>
 using namespace std;
 
 RMSDCalculatorFactory::RMSDCalculatorFactory() {}
@@ -40,6 +42,7 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 		int blocks_per_grid) {
 
 	KernelFunctions* kernelFunctions;
+
 
 	switch (type) {
 		case KABSCH_SERIAL_CALCULATOR:
@@ -101,13 +104,15 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 			exit(-1);
 	}
 
-	RMSDCalculator* calculator = new RMSDCalculator(numberOfConformations,
-			atomsPerFittingConformation, allFittingCoordinates, kernelFunctions);
 
-	if(allCalculationCoordinates != NULL && atomsPerCalculationConformation!= 0){
-		calculator->setCalculationCoordinates(atomsPerCalculationConformation, allCalculationCoordinates);
-	}
+	// Package input data
+	RMSDCalculationData* rmsdData = new RMSDCalculationData(	numberOfConformations,
+															atomsPerFittingConformation,
+															allFittingCoordinates,
+															atomsPerCalculationConformation,
+															allCalculationCoordinates);
 
+	RMSDCalculator* calculator = new RMSDCalculator(rmsdData, kernelFunctions);
 
 	return calculator;
 }

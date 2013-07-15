@@ -12,22 +12,32 @@ class RMSDCalculationData {
 	public:
 		RMSDCalculationData(int numberOfConformations,
 							int atomsPerFittingConformation,
-							double* const fittingCoordinates,
+							double* fittingCoordinates,
 							int atomsPerCalculationConformation,
-							double* const calculationCoordinates);
+							double* calculationCoordinates);
 
 		virtual ~RMSDCalculationData();
+
+		bool hasCalculationCoordinatesSet();
+
+		inline double* getFittingConformationAt(int index){
+			return &(this->fittingCoordinates[index*this->fittingConformationLength]);
+		}
+
+		inline double* getCalculationConformationAt(int index){
+			return &(this->calculationCoordinates[index*this->calculationConformationLength]);
+		}
 
 		int numberOfConformations;
 
 		int atomsPerFittingConformation;
 		int fittingConformationLength;
 		int fittingCoordinatesLength;
-		double* const fittingCoordinates;
+		double* fittingCoordinates;
 
 		int atomsPerCalculationConformation;
 		int calculationConformationLength;
 		int calculationCoordinatesLength;
-		double* const calculationCoordinates;
+		double* calculationCoordinates;
 };
 #endif /* RMSDCALCULATIONDATA_H_ */
