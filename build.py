@@ -37,8 +37,11 @@ BASE_DIR = os.getcwd()
 
 
 if __name__ == '__main__':
-    parser = optparse.OptionParser(usage='%prog [--cuda]', version='1.0')
+    parser = optparse.OptionParser(usage='%prog [--cuda] [--clear] [--clear-all]', version='1.0')
     parser.add_option('--cuda', dest = "cuda_type",  help="Use this flag if you want to compile the CUDA calculator.")
+    parser.add_option('--clear', dest = "clear",  action="store_true", help="Clear all .o generated files.")
+    parser.add_option('--clear-all', dest = "clear_all", action="store_true",  help="The same as --clear, but it also removes generates libs and exes.")
+    
     options, args = parser.parse_args()
     
     CUDA_PRECISION_FLAG = ""
@@ -216,8 +219,17 @@ def availableCalculators():
     os.system('echo "\033[33mWriting available calculators...\033[0m"')
     open("pyRMSD/availableCalculators.py","w").write(calcs_str)
     
-#     os.system('echo "\033[32mCleaning...\033[0m"')
-#     for produced_file in  files_to_link:
-#         if files_to_link[produced_file] != "":
-#             os.system("rm "+files_to_link[produced_file])
-
+    if options.clear or options.clear_all:
+        os.system('echo "\033[32mCleaning...\033[0m"')
+        for produced_file in  files_to_link:
+            if files_to_link[produced_file] != "":
+                os.system("rm "+files_to_link[produced_file])
+        os.system("find src/ -name '.modif*' -exec rm {} \;")
+        
+    if options.clear_all:
+        os.system('echo "\033[32mCleaning exes and libs...\033[0m"')
+        os.system("rm pyRMSD/calculators.so")
+        os.system("rm pyRMSD/condensedMatrix.so")
+        os.system("rm pyRMSD/pdbReader.so")
+        os.system("rm src/calculators/test/test_rmsdtools_main")
+        os.system("rm src/calculators/test/check_memory")

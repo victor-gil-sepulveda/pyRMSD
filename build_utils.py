@@ -99,14 +99,16 @@ def compile_a_file_collection(base_dir, file_collection, compiler, options, incl
         modif_file = ".modif_"+hex(hash(str(file_collection)))[4:9]
         if os.path.exists(os.path.join(folder,modif_file)):
             modif_dict = pickle.load(open(os.path.join(folder,modif_file),"r"))
+        
         for f in file_collection[folder]:
             modif_dict[f] = os.path.getmtime(os.path.join(folder,f))
-        # Then open the dic with last mod. dates
         
+        # Then open the dic with last mod. dates
         if os.path.exists(os.path.join(folder,modif_file)):
             last_modif = pickle.load(open(os.path.join(folder,modif_file),"r"))
         else:
             last_modif = modif_dict
+       
         # Finally, do last = current for the next step
         pickle.dump(modif_dict, open(os.path.join(folder,modif_file),"w"))
         
@@ -116,7 +118,7 @@ def compile_a_file_collection(base_dir, file_collection, compiler, options, incl
             filewoext,extension = file_name.split(".") #@UnusedVariable
             product = os.path.join(folder,filewoext)+product_extension
             files_to_link[filewoext] = product
-            if last_modif[file_name] != modif_dict[file_name] or not os.path.exists(filewoext+product_extension):
+            if not file_name in last_modif or last_modif[file_name] != modif_dict[file_name] or not os.path.exists(filewoext+product_extension):
                 comp = Compile().using(compiler).with_options(options).including_folders(includes).the_file(file_name)
                 os.system('echo "\\033[31m'+ comp.getCompilingCommand()+'\\033[0m"')
                 os.system(comp.getCompilingCommand())
