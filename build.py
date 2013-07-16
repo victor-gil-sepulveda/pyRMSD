@@ -4,6 +4,7 @@ import optparse
 import collections
 import distutils.sysconfig
 import os
+
 ##############################################
 #####                                  #######
 #####     Compiling Options            #######
@@ -37,13 +38,16 @@ BASE_DIR = os.getcwd()
 
 
 if __name__ == '__main__':
-    parser = optparse.OptionParser(usage='%prog [--cuda] [--clear] [--clear-all]', version='1.0')
+    parser = optparse.OptionParser(usage='%prog [--cuda] [--build] [--clear] [--clear-all]', version='3.0')
     parser.add_option('--cuda', dest = "cuda_type",  help="Use this flag if you want to compile the CUDA calculator.")
+    parser.add_option('--build', dest = "build", action="store_true", help="Use this flag if you want to compile pyRMSD.")
     parser.add_option('--clear', dest = "clear",  action="store_true", help="Clear all .o generated files.")
     parser.add_option('--clear-all', dest = "clear_all", action="store_true",  help="The same as --clear, but it also removes generates libs and exes.")
-    
     options, args = parser.parse_args()
     
+    ######################################
+    ### SET CUDA FLAGS
+    ######################################
     CUDA_PRECISION_FLAG = ""
     if not options.cuda_type is None:
         if options.cuda_type == "single":
@@ -51,15 +55,16 @@ if __name__ == '__main__':
         elif options.cuda_type =="double":
             CUDA_PRECISION_FLAG = "CUDA_PRECISION_DOUBLE"
         else:
-            parser.error("Please, choose  precision for CUDA building: 'single' or 'double'")
+            parser.error("Please, choose precision for CUDA building: 'single' or 'double'")
         options.use_cuda = True
         CUDA_OPTIONS = CUDA_OPTIONS +" -D"+CUDA_PRECISION_FLAG
         DEFINE_USE_CUDA = DEFINE_USE_CUDA +" -D"+CUDA_PRECISION_FLAG
     else:
         options.use_cuda = False
-    
     ######################################
-    ### Files we are going to use
+
+    ######################################
+    ### FILE DESCRIPTION
     ######################################
     files_to_compile_with_nvcc = {
                                   "src/calculators/QCP":["QCPCUDAKernel.cu","QCPCUDAMemKernel.cu","kernel_functions_cuda.cu"]
@@ -83,110 +88,116 @@ if __name__ == '__main__':
                                             "src/calculators/QTRFIT":["QTRFITOmpKernel.cpp"],
                                             "src/calculators/QCP":["QCPOmpKernel.cpp"],
     }
+    ######################################
+    
     #########################################
-    
-    files_to_link = collections.defaultdict(str)
-    
-    if options.use_cuda:
-        PYTHON_EXTENSION_OPTIONS = PYTHON_EXTENSION_OPTIONS+" "+DEFINE_USE_CUDA
-    
-    compile_a_file_collection(BASE_DIR, files_to_compile_with_gcc, "gcc", PYTHON_EXTENSION_OPTIONS, [PYTHON_INCLUDE_FOLDER, NUMPY_INCLUDE], ".o",files_to_link)
+    ###
+    ###     BUILDING PROCESS
+    ###
+    #########################################
+    if options.build:
+        files_to_link = collections.defaultdict(str)
         
-    compile_a_file_collection(BASE_DIR, files_to_compile_with_gcc_and_openmp, "gcc", PYTHON_EXTENSION_OPTIONS+" "+OPENMP_OPTION, [PYTHON_INCLUDE_FOLDER, NUMPY_INCLUDE], ".o",files_to_link)
-    
-    if options.use_cuda:
-        compile_a_file_collection(BASE_DIR, files_to_compile_with_nvcc, "nvcc", CUDA_OPTIONS, [CUDA_INCLUDE_FOLDER], ".o",files_to_link)
-    
-    linkDSL = Link().\
-                    using("g++").\
-                    with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
-                    using_libs([PYTHON_LIBRARY]).\
-                    using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
-                    this_object_files([files_to_link["Matrix"],files_to_link["Statistics"]]).\
-                    to_produce("condensedMatrix.so")
-    
-    os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            
-    os.system( linkDSL.getLinkingCommand())
-    
-    linkDSL = Link().\
-                    using("g++").\
-                    with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
-                    using_libs([PYTHON_LIBRARY]).\
-                    using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
-                    this_object_files([files_to_link["PDBReaderObject"],files_to_link["PDBReader"]]).\
-                    to_produce("pdbReader.so")
-    
-    os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            
-    os.system( linkDSL.getLinkingCommand())
-    
-    calculator_obj_files = [
-                            files_to_link["RMSDTools"],
-                            files_to_link["KABSCHSerialKernel"],
-                            files_to_link["KABSCHOmpKernel"],
-                            files_to_link["QTRFITSerialKernel"],
-                            files_to_link["QTRFITOmpKernel"],
-                            files_to_link["QCPSerialKernel"],
-                            files_to_link["QCPOmpKernel"],
-                            files_to_link["RMSDCalculatorFactory"],
-                            files_to_link["RMSDCalculationData"],
-                            files_to_link["RMSDCalculator"],
-                            files_to_link["pyRMSD"]
-    ]
-    if options.use_cuda:
-        calculator_obj_files.extend([files_to_link["QCPCUDAKernel"],files_to_link["QCPCUDAMemKernel"],files_to_link["kernel_functions_cuda"]])
-        calculator_libraries = [PYTHON_LIBRARY,CUDA_LIBRARY]
-        calculator_library_locations  = [PYTHON_LIBRARY_FOLDER, CUDA_LIBRARIES_FOLDER]
+        if options.use_cuda:
+            PYTHON_EXTENSION_OPTIONS = PYTHON_EXTENSION_OPTIONS+" "+DEFINE_USE_CUDA
         
-    else:
-        calculator_libraries = [PYTHON_LIBRARY]
-        calculator_library_locations  = [PYTHON_LIBRARY_FOLDER]
-    
-    linkDSL = Link().\
-                    using("g++").\
-                    with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
-                    using_libs(calculator_libraries).\
-                    using_lib_locations(calculator_library_locations).\
-                    this_object_files(calculator_obj_files).\
-                    to_produce("calculators.so")
-    
-    os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
-    os.system(linkDSL.getLinkingCommand())
-    
-    test_obj_files = list(calculator_obj_files)
-    test_obj_files.remove(files_to_link["pyRMSD"])
-    test_obj_files.extend([files_to_link["main"], files_to_link["test_tools"], files_to_link["tests"]])
-    linkDSL = Link().\
-                    using("g++").\
-                    with_options([OPENMP_OPTION]).\
-                    using_libs(calculator_libraries).\
-                    using_lib_locations(calculator_library_locations).\
-                    this_object_files(test_obj_files).\
-                    to_produce("test_rmsdtools_main")
-    os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
-    os.system(linkDSL.getLinkingCommand())
-    
-    test_obj_files.remove(files_to_link["main"])
-    test_obj_files.extend([files_to_link["check_mem"]])
-    linkDSL = Link().\
-                    using("g++").\
-                    with_options([OPENMP_OPTION]).\
-                    using_libs(calculator_libraries).\
-                    using_lib_locations(calculator_library_locations).\
-                    this_object_files(test_obj_files).\
-                    to_produce("check_memory")
-                    
-    os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
-    os.system(linkDSL.getLinkingCommand())
-    
-    os.system("mv calculators.so pyRMSD/")
-    os.system("mv condensedMatrix.so pyRMSD/")
-    os.system("mv pdbReader.so pyRMSD/")
-    os.system("mv test_rmsdtools_main src/calculators/test")
-    os.system("mv check_memory src/calculators/test")
-    
-    ##Calculators
-    if options.use_cuda:
-        calcs_str = """
+        compile_a_file_collection(BASE_DIR, files_to_compile_with_gcc, "gcc", PYTHON_EXTENSION_OPTIONS, [PYTHON_INCLUDE_FOLDER, NUMPY_INCLUDE], ".o",files_to_link)
+            
+        compile_a_file_collection(BASE_DIR, files_to_compile_with_gcc_and_openmp, "gcc", PYTHON_EXTENSION_OPTIONS+" "+OPENMP_OPTION, [PYTHON_INCLUDE_FOLDER, NUMPY_INCLUDE], ".o",files_to_link)
+        
+        if options.use_cuda:
+            compile_a_file_collection(BASE_DIR, files_to_compile_with_nvcc, "nvcc", CUDA_OPTIONS, [CUDA_INCLUDE_FOLDER], ".o",files_to_link)
+        
+        linkDSL = Link().\
+                        using("g++").\
+                        with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
+                        using_libs([PYTHON_LIBRARY]).\
+                        using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
+                        this_object_files([files_to_link["Matrix"],files_to_link["Statistics"]]).\
+                        to_produce("condensedMatrix.so")
+        
+        os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            
+        os.system( linkDSL.getLinkingCommand())
+        
+        linkDSL = Link().\
+                        using("g++").\
+                        with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
+                        using_libs([PYTHON_LIBRARY]).\
+                        using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
+                        this_object_files([files_to_link["PDBReaderObject"],files_to_link["PDBReader"]]).\
+                        to_produce("pdbReader.so")
+        
+        os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            
+        os.system( linkDSL.getLinkingCommand())
+        
+        calculator_obj_files = [
+                                files_to_link["RMSDTools"],
+                                files_to_link["KABSCHSerialKernel"],
+                                files_to_link["KABSCHOmpKernel"],
+                                files_to_link["QTRFITSerialKernel"],
+                                files_to_link["QTRFITOmpKernel"],
+                                files_to_link["QCPSerialKernel"],
+                                files_to_link["QCPOmpKernel"],
+                                files_to_link["RMSDCalculatorFactory"],
+                                files_to_link["RMSDCalculationData"],
+                                files_to_link["RMSDCalculator"],
+                                files_to_link["pyRMSD"]
+        ]
+        if options.use_cuda:
+            calculator_obj_files.extend([files_to_link["QCPCUDAKernel"],files_to_link["QCPCUDAMemKernel"],files_to_link["kernel_functions_cuda"]])
+            calculator_libraries = [PYTHON_LIBRARY,CUDA_LIBRARY]
+            calculator_library_locations  = [PYTHON_LIBRARY_FOLDER, CUDA_LIBRARIES_FOLDER]
+            
+        else:
+            calculator_libraries = [PYTHON_LIBRARY]
+            calculator_library_locations  = [PYTHON_LIBRARY_FOLDER]
+        
+        linkDSL = Link().\
+                        using("g++").\
+                        with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
+                        using_libs(calculator_libraries).\
+                        using_lib_locations(calculator_library_locations).\
+                        this_object_files(calculator_obj_files).\
+                        to_produce("calculators.so")
+        
+        os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
+        os.system(linkDSL.getLinkingCommand())
+        
+        test_obj_files = list(calculator_obj_files)
+        test_obj_files.remove(files_to_link["pyRMSD"])
+        test_obj_files.extend([files_to_link["main"], files_to_link["test_tools"], files_to_link["tests"]])
+        linkDSL = Link().\
+                        using("g++").\
+                        with_options([OPENMP_OPTION]).\
+                        using_libs(calculator_libraries).\
+                        using_lib_locations(calculator_library_locations).\
+                        this_object_files(test_obj_files).\
+                        to_produce("test_rmsdtools_main")
+        os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
+        os.system(linkDSL.getLinkingCommand())
+        
+        test_obj_files.remove(files_to_link["main"])
+        test_obj_files.extend([files_to_link["check_mem"]])
+        linkDSL = Link().\
+                        using("g++").\
+                        with_options([OPENMP_OPTION]).\
+                        using_libs(calculator_libraries).\
+                        using_lib_locations(calculator_library_locations).\
+                        this_object_files(test_obj_files).\
+                        to_produce("check_memory")
+                        
+        os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
+        os.system(linkDSL.getLinkingCommand())
+        
+        os.system("mv calculators.so pyRMSD/")
+        os.system("mv condensedMatrix.so pyRMSD/")
+        os.system("mv pdbReader.so pyRMSD/")
+        os.system("mv test_rmsdtools_main src/calculators/test")
+        os.system("mv check_memory src/calculators/test")
+        
+        ##Calculators
+        if options.use_cuda:
+            calcs_str = """
 def availableCalculators():
     return {
             "KABSCH_SERIAL_CALCULATOR": 0, 
@@ -201,8 +212,8 @@ def availableCalculators():
             "QCP_CUDA_MEM_CALCULATOR":9
     }
 """
-    else:
-        calcs_str = """
+        else:
+            calcs_str = """
 def availableCalculators():
     return {
             "KABSCH_SERIAL_CALCULATOR": 0, 
@@ -217,16 +228,41 @@ def availableCalculators():
             #"QCP_CUDA_MEM_CALCULATOR":9
     }
 """
-    os.system('echo "\033[33mWriting available calculators...\033[0m"')
-    open("pyRMSD/availableCalculators.py","w").write(calcs_str)
-    
-    if options.clear or options.clear_all:
-        os.system('echo "\033[32mCleaning...\033[0m"')
+        os.system('echo "\033[33mWriting available calculators...\033[0m"')
+        open("pyRMSD/availableCalculators.py","w").write(calcs_str)
+        
+        # Save all produced files
+        produced_file_handler = open(".products","w")
         for produced_file in  files_to_link:
             if files_to_link[produced_file] != "":
-                os.system("rm "+files_to_link[produced_file])
+                produced_file_handler.write(files_to_link[produced_file] +"\n")
+        produced_file_handler.close()
+    ######################################
+    
+    #########################################
+    ###
+    ###     REMOVE ALL .o AND TRACKING FILES
+    ###
+    #########################################
+    if options.clear or options.clear_all:
+        os.system('echo "\033[32mCleaning...\033[0m"')
+        if os.path.exists(".products"):
+            produced_file = open(".products","r")
+            for produced_file_line in produced_file:
+                os.system("rm "+produced_file_line)
+                print "rm "+produced_file_line[:-1]
+            produced_file.close()
+            # Clear the products file itself
+            os.system("rm .products")
+        # Remove all trackers
         os.system("find src/ -name '.modif*' -exec rm {} \;")
-        
+    ######################################
+    
+    #########################################
+    ###
+    ###     REMOVE ALL LIBS AND EXES
+    ###
+    #########################################
     if options.clear_all:
         os.system('echo "\033[32mCleaning exes and libs...\033[0m"')
         os.system("rm pyRMSD/calculators.so")
@@ -234,3 +270,4 @@ def availableCalculators():
         os.system("rm pyRMSD/pdbReader.so")
         os.system("rm src/calculators/test/test_rmsdtools_main")
         os.system("rm src/calculators/test/check_memory")
+    ######################################
