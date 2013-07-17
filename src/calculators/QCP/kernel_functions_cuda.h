@@ -15,9 +15,6 @@
 	#define floating_point_type double
 #endif
 
-__global__ void centerCoordsOfAllConformations(const int number_of_conformations, const int number_of_atoms, floating_point_type* all_coordinates);
-
-__device__ void centerCoords( floating_point_type* all_cooordinates, const int number_of_atoms);
 
 __device__ floating_point_type innerProduct(
 		floating_point_type* A,

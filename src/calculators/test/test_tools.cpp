@@ -44,7 +44,8 @@ void writeVector(vector<double> & vector, const char* path){
 
 void compareVectors(const char* message, const double * const expectedVector, const double * const calculatedVector, int dimension, double precision){
 	cout<<message;
-	bool comparison = expectedVectorEqualsCalculatedWithinPrecision(expectedVector,calculatedVector,dimension,precision);
+	bool comparison = false;
+	comparison = expectedVectorEqualsCalculatedWithinPrecision(expectedVector,calculatedVector,dimension,precision);
 
 	if(comparison == true){
 		cout<<"\033[1;32mOK\033[0m"<<endl;
@@ -61,12 +62,11 @@ bool expectedVectorEqualsCalculatedWithinPrecision(
 		double precision){
 	bool equal = true;
 
-    for(int i = 0; i < dimension; ++i)
-    {
-        if( isnan(calculatedVector[i]) || fabs(expectedVector[i]-calculatedVector[i]) >= precision )
-        {
+    for(int i = 0; i < dimension; ++i){
+    	bool is_nan = isnan(calculatedVector[i]);
+    	bool has_big_error = fabs(expectedVector[i]-calculatedVector[i]) >= precision;
+        if( is_nan || has_big_error ){
             equal = false;
-
             cout<<setprecision(16)<<"Problem: expectedVector["<<i<<"]="<<expectedVector[i]<<
             		" calculatedVector["<<i<<"]="<<calculatedVector[i]<<endl;
             cout<<" (dif = "<<fabs(expectedVector[i]-calculatedVector[i])<<")"<<endl;

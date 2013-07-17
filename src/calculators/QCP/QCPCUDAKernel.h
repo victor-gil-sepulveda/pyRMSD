@@ -36,7 +36,7 @@ class QCPCUDAKernel: public KernelFunctions{
 
 		virtual ~QCPCUDAKernel();
 
-		virtual void changeCalculationCoords(
+		virtual void setCalculationCoords(
 				double* calcCoords,
 				int number_of_atoms,
 				int numberOfConformations);
@@ -63,7 +63,7 @@ class QCPCUDAKernel: public KernelFunctions{
 				double* rmsd
 				);
 
-		virtual void oneVsFollowingFitEqualCalcWithoutConfRotation(
+		virtual void oneVsFollowingFitEqualCalcCoords(
 					double* reference,
 					int reference_conformation_number,
 					double* rmsd,
@@ -72,29 +72,7 @@ class QCPCUDAKernel: public KernelFunctions{
 					int atomsPerConformation,
 					double *allCoordinates);
 
-		virtual void oneVsFollowingFitEqualCalcWithConfRotation(
-					double* reference,
-					int reference_conformation_number,
-					double* rmsd,
-					int numberOfConformations,
-					int coordinatesPerConformation,
-					int atomsPerConformation,
-					double *allCoordinates);
-
-		virtual void oneVsFollowingFitDiffersCalcWithoutConfRotation(
-					double* fitReference,
-					double* calcReference,
-					int reference_conformation_number,
-					double* rmsd,
-					int numberOfConformations,
-					int coordinatesPerConformation,
-					int atomsPerConformation,
-					double *allCoordinates,
-					int coordinatesPerRMSDConformation,
-					int atomsPerRMSDConformation,
-					double *allRMSDCoordinates);
-
-		virtual void oneVsFollowingFitDiffersCalcWithConfRotation(
+		virtual void oneVsFollowingFitDiffersCalcCoords(
 					double* fitReference,
 					double* calcReference,
 					int reference_conformation_number,
@@ -114,7 +92,7 @@ class QCPCUDAKernel: public KernelFunctions{
 				int coordinatesPerCalculationConformation,
 				int numberOfConformations);
 
-		virtual void matrixOneVsFollowingFitEqualCalcWithoutConfRotation(
+		virtual void matrixOneVsFollowingFitEqualCalc(
 													double* reference,
 													int reference_conformation_number,
 													double* rmsd,
@@ -123,7 +101,7 @@ class QCPCUDAKernel: public KernelFunctions{
 													int atomsPerConformation,
 													double *allCoordinates);
 
-		virtual void matrixOneVsFollowingFitDiffersCalcWithoutConfRotation(
+		virtual void matrixOneVsFollowingFitDiffersCalc(
 														double* fitReference,
 														double* calcReference,
 														int reference_conformation_number,

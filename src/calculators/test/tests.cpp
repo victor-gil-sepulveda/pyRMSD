@@ -152,7 +152,7 @@ void test_QCP_Kernel(){
 	// Using the function modifying coords
 	RMSDTools::copyArrays(frag_b_copy,frag_b,atoms_len*3);
 	RMSDTools::centerAllAtOrigin(atoms_len,1,frag_b_copy,translations);
-	kernel.oneVsFollowingFitEqualCalcWithConfRotation(
+	kernel.oneVsFollowingFitEqualCalcCoords(
 			frag_a,
 			-1,
 			&rmsd,
@@ -214,7 +214,7 @@ void test_KABSCH_Kernel(){
 		// Using the function modifying coords
 		RMSDTools::copyArrays(frag_b_copy,frag_b,atoms_len*3);
 		RMSDTools::centerAllAtOrigin(atoms_len,1,frag_b_copy,translations);
-		kernel.oneVsFollowingFitEqualCalcWithConfRotation(
+		kernel.oneVsFollowingFitEqualCalcCoords(
 				frag_a,
 				-1,
 				&rmsd,
@@ -479,8 +479,7 @@ void test_step_by_step_iterative_superposition_with_fit(RMSDCalculatorType type,
 											one_step_shape,
 											mean_step_file.c_str());
 
-		double rmsd_diff = calculator->iterative_superposition_step(reference_coords, mean_coords);
-		cout<<"RMSD diff "<<rmsd_diff<<endl;
+		calculator->iterative_superposition_step(reference_coords, mean_coords);
 
 		compareVectors((string("\tMean coordinates for this step (")+toString(i)+ string("): ")).c_str(),
 							mean_coords,
@@ -642,6 +641,7 @@ void test_iterative_superposition_with_fit_and_calc_rotation(RMSDCalculatorType 
 					expected_number_of_iterations,
 					precision_of_check);
 
+	cout<<"ENDING"<<endl<<flush;
 	delete calculator;
 }
 

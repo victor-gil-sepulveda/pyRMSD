@@ -8,6 +8,8 @@
 #include "QCPCUDAMemKernel.h"
 #include "kernel_functions_cuda.h"
 
+#define OFFSET_FOR(conformation_number, number_of_conformations) (((number_of_conformations-1)* conformation_number) - (conformation_number*(conformation_number-1))/2)
+
 inline void checkCudaError(char* message, cudaError error_code){
 	if (error_code != 0){
 		std::cout<<"Error in "<<message<<". Error code: "<<error_code<<". Exiting..."<<std::flush<<std::endl;
@@ -54,12 +56,9 @@ void QCPCUDAMemKernel::matrixInit(
 	
 }
 
-void QCPCUDAMemKernel::matrixEnd(double* rmsds_tmp, 
-								int rmsds_tmp_len, 
-								std::vector<double>& rmsds){
-	
-	
-	
+void QCPCUDAMemKernel::matrixEnd(	int rmsds_tmp_len,
+									std::vector<double>& rmsds){
+	rmsds.clear();
 	rmsds.resize(rmsds_tmp_len);
 	
 	#ifdef CUDA_PRECISION_SINGLE
@@ -90,18 +89,8 @@ void QCPCUDAMemKernel::matrixEnd(double* rmsds_tmp,
 				cudaFree(this->allDeviceRMSDs));
 }
 
-int calculate_offset_for(int conformation_number, int number_of_conformations){
-	/*int offset = 0;
-	
-	for(int i = 0; i < conformation_number; ++i){
-		offset += (number_of_conformations-i-1);
-	}
-	
-	return offset;*/
-	return ((number_of_conformations-1)* conformation_number) - (conformation_number*(conformation_number-1))/2;
-}
 
-void QCPCUDAMemKernel::matrixOneVsFollowingFitEqualCalcWithoutConfRotation(
+void QCPCUDAMemKernel::matrixOneVsFollowingFitEqualCalc(
 									double* reference, 
 									int reference_conformation_number, 
 									double* rmsd,
@@ -120,10 +109,10 @@ void QCPCUDAMemKernel::matrixOneVsFollowingFitEqualCalcWithoutConfRotation(
 			numberOfConformations,
 			atomsPerConformation,
 			coordinatesPerConformation,
-			&(this->allDeviceRMSDs[calculate_offset_for(reference_conformation_number, numberOfConformations)]));
+			&(this->allDeviceRMSDs[OFFSET_FOR(reference_conformation_number, numberOfConformations)]));
 }
 
-void QCPCUDAMemKernel::matrixOneVsFollowingFitDiffersCalcWithoutConfRotation(
+void QCPCUDAMemKernel::matrixOneVsFollowingFitDiffersCalc(
 											double* fitReference, 
 											double* calcReference,
 											int reference_conformation_number, 
@@ -144,7 +133,7 @@ void QCPCUDAMemKernel::matrixOneVsFollowingFitDiffersCalcWithoutConfRotation(
 			tmpFitDeviceReference,
 			tmpCalcDeviceReference,
 			reference_conformation_number,
-			&(this->allDeviceRMSDs[calculate_offset_for(reference_conformation_number, numberOfConformations)]),
+			&(this->allDeviceRMSDs[OFFSET_FOR(reference_conformation_number, numberOfConformations)]),
 			numberOfConformations,
 			coordinatesPerConformation,
 			atomsPerConformation,

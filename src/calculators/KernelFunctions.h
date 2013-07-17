@@ -15,12 +15,12 @@ class KernelFunctions{
 		KernelFunctions(){}
 		virtual ~KernelFunctions(){}
 
-		virtual void changeCalculationCoords(
+		virtual void setCalculationCoords(
 				double* calcCoords,
 				int number_of_atoms,
 				int numberOfConformations){}
 
-		virtual void oneVsFollowingFitEqualCalcWithoutConfRotation(
+		virtual void oneVsFollowingFitEqualCalcCoords(
 				double* reference,
 				int reference_conformation_number,
 				double* rmsd,
@@ -29,29 +29,7 @@ class KernelFunctions{
 				int atomsPerConformation,
 				double *allCoordinates) = 0;
 
-		virtual void oneVsFollowingFitEqualCalcWithConfRotation(
-				double* reference,
-				int reference_conformation_number,
-				double* rmsd,
-				int numberOfConformations,
-				int coordinatesPerConformation,
-				int atomsPerConformation,
-				double *allCoordinates) = 0;
-
-		virtual void oneVsFollowingFitDiffersCalcWithoutConfRotation(
-				double* fitReference,
-				double* calcReference,
-				int reference_conformation_number,
-				double* rmsd,
-				int numberOfConformations,
-				int coordinatesPerConformation,
-				int atomsPerConformation,
-				double *allCoordinates,
-				int coordinatesPerRMSDConformation,
-				int atomsPerRMSDConformation,
-				double *allRMSDCoordinates) = 0;
-
-		virtual void oneVsFollowingFitDiffersCalcWithConfRotation(
+		virtual void oneVsFollowingFitDiffersCalcCoords(
 				double* fitReference,
 				double* calcReference,
 				int reference_conformation_number,
@@ -73,13 +51,12 @@ class KernelFunctions{
 
 		}
 
-		virtual inline void matrixEnd(double* rmsds_tmp, int rmsds_tmp_len, std::vector<double>& rmsds){
-			for (int i = 0; i < rmsds_tmp_len; ++i){
-				rmsds.push_back(rmsds_tmp[i]);
-			}
+		virtual void matrixEnd(
+						int rmsds_tmp_len,
+						std::vector<double>& rmsds){
 		}
 
-		virtual void matrixOneVsFollowingFitEqualCalcWithoutConfRotation(
+		virtual void matrixOneVsFollowingFitEqualCalc(
 													double* reference,
 													int reference_conformation_number,
 													double* rmsd,
@@ -88,7 +65,7 @@ class KernelFunctions{
 													int atomsPerConformation,
 													double *allCoordinates){
 
-			oneVsFollowingFitEqualCalcWithoutConfRotation(
+			oneVsFollowingFitEqualCalcCoords(
 									reference,
 									reference_conformation_number,
 									rmsd,
@@ -98,7 +75,7 @@ class KernelFunctions{
 									allCoordinates);
 		}
 
-		virtual void matrixOneVsFollowingFitDiffersCalcWithoutConfRotation(
+		virtual void matrixOneVsFollowingFitDiffersCalc(
 														double* fitReference,
 														double* calcReference,
 														int reference_conformation_number,
@@ -110,7 +87,7 @@ class KernelFunctions{
 														int coordinatesPerRMSDConformation,
 														int atomsPerRMSDConformation,
 														double *allRMSDCoordinates){
-			oneVsFollowingFitDiffersCalcWithoutConfRotation(
+			oneVsFollowingFitDiffersCalcCoords(
 												fitReference,
 												calcReference,
 												reference_conformation_number,

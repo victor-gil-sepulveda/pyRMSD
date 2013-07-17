@@ -15,7 +15,7 @@ class QTRFITOmpKernel: public QTRFITSerialKernel {
 		QTRFITOmpKernel(int number_of_threads);
 		virtual ~QTRFITOmpKernel();
 
-		virtual void oneVsFollowingFitEqualCalcWithoutConfRotation(
+		virtual void oneVsFollowingFitEqualCalcCoords(
 				double* reference,
 				int reference_conformation_number,
 				double* rmsd,
@@ -24,29 +24,7 @@ class QTRFITOmpKernel: public QTRFITSerialKernel {
 				int atomsPerConformation,
 				double *allCoordinates);
 
-		virtual void oneVsFollowingFitEqualCalcWithConfRotation(
-				double* reference,
-				int reference_conformation_number,
-				double* rmsd,
-				int numberOfConformations,
-				int coordinatesPerConformation,
-				int atomsPerConformation,
-				double *allCoordinates);
-
-		virtual void oneVsFollowingFitDiffersCalcWithoutConfRotation(
-				double* fitReference,
-				double* calcReference,
-				int reference_conformation_number,
-				double* rmsd,
-				int numberOfConformations,
-				int coordinatesPerConformation,
-				int atomsPerConformation,
-				double *allCoordinates,
-				int coordinatesPerRMSDConformation,
-				int atomsPerRMSDConformation,
-				double *allRMSDCoordinates);
-
-		virtual void oneVsFollowingFitDiffersCalcWithConfRotation(
+		virtual void oneVsFollowingFitDiffersCalcCoords(
 				double* fitReference,
 				double* calcReference,
 				int reference_conformation_number,

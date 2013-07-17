@@ -15,29 +15,7 @@ KABSCHSerialKernel::KABSCHSerialKernel() {}
 
 KABSCHSerialKernel::~KABSCHSerialKernel() {}
 
-void KABSCHSerialKernel::oneVsFollowingFitEqualCalcWithoutConfRotation(
-			double* reference,
-			int reference_conformation_number,
-			double* rmsd,
-			int numberOfConformations,
-			int coordinatesPerConformation,
-			int atomsPerConformation,
-			double *allCoordinates){
-
-
-	for (int second_conformation_id = reference_conformation_number + 1;
-					second_conformation_id < numberOfConformations; ++second_conformation_id){
-		double* second_conformation_coords = &(allCoordinates[second_conformation_id*coordinatesPerConformation]);
-		double rmsd_val = this->calculate_rmsd(
-				reference,
-				second_conformation_coords,
-				atomsPerConformation);
-
-		rmsd[second_conformation_id-(reference_conformation_number+1)] = rmsd_val;
-	}
-}
-
-void KABSCHSerialKernel::oneVsFollowingFitEqualCalcWithConfRotation(
+void KABSCHSerialKernel::oneVsFollowingFitEqualCalcCoords(
 			double* reference,
 			int reference_conformation_number,
 			double* rmsd,
@@ -70,48 +48,7 @@ void KABSCHSerialKernel::oneVsFollowingFitEqualCalcWithConfRotation(
 		}
 }
 
-void KABSCHSerialKernel::oneVsFollowingFitDiffersCalcWithoutConfRotation(
-		double* fitReference,
-		double* calcReference,
-		int reference_conformation_number,
-		double* rmsd,
-		int numberOfConformations,
-		int coordinatesPerConformation,
-		int atomsPerConformation,
-		double *allCoordinates,
-		int coordinatesPerRMSDConformation,
-		int atomsPerRMSDConformation,
-		double *allRMSDCoordinates){
-
-	int coordinates_per_fit_conformation = atomsPerConformation * 3;
-	int coordinates_per_calc_conformation = atomsPerRMSDConformation * 3;
-	double rot_matrix[3][3];
-
-	for (int second_conformation_id = reference_conformation_number + 1;
-			second_conformation_id < numberOfConformations; ++second_conformation_id){
-
-		double* fit_conformation_coords = &(allCoordinates[second_conformation_id*coordinates_per_fit_conformation]);
-		RMSDTools::initializeTo(rot_matrix[0], 0.0, 9);
-
-		this->calculate_rotation_rmsd(
-				fitReference,
-				fit_conformation_coords,
-				atomsPerConformation,
-				rot_matrix);
-
-		double* calc_conformation_coords =  &(allRMSDCoordinates[second_conformation_id*coordinates_per_calc_conformation]);
-		double* calc_conformation_coords_copy = new double[coordinates_per_calc_conformation];
-		RMSDTools::copyArrays(calc_conformation_coords_copy,calc_conformation_coords,coordinates_per_calc_conformation);
-		RMSDTools::rotate3D(atomsPerRMSDConformation, calc_conformation_coords_copy, rot_matrix);
-
-		rmsd[second_conformation_id-(reference_conformation_number+1)] = RMSDTools::calcRMS(calcReference,
-				calc_conformation_coords_copy, atomsPerRMSDConformation);
-
-		delete [] calc_conformation_coords_copy;
-	}
-}
-
-void KABSCHSerialKernel::oneVsFollowingFitDiffersCalcWithConfRotation(
+void KABSCHSerialKernel::oneVsFollowingFitDiffersCalcCoords(
 		double* fitReference,
 		double* calcReference,
 		int reference_conformation_number,

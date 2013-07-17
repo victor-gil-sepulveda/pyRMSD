@@ -10,52 +10,31 @@ class QCPSerialKernel: public KernelFunctions{
 		QCPSerialKernel(){}
 		virtual ~QCPSerialKernel(){}
 
+
+		virtual void oneVsFollowingFitEqualCalcCoords(
+					double* reference,
+					int reference_conformation_number,
+					double* rmsd,
+					int numberOfConformations,
+					int coordinatesPerConformation,
+					int atomsPerConformation,
+					double *allCoordinates);
+
+		virtual void oneVsFollowingFitDiffersCalcCoords(
+					double* fitReference,
+					double* calcReference,
+					int reference_conformation_number,
+					double* rmsd,
+					int numberOfConformations,
+					int coordinatesPerConformation,
+					int atomsPerConformation,
+					double *allCoordinates,
+					int coordinatesPerRMSDConformation,
+					int atomsPerRMSDConformation,
+					double *allRMSDCoordinates);
+
 		double calcRMSDOfTwoConformations( double* first_conformation_coords, double* second_conformation_coords,
 				int number_of_atoms, double* rot_matrix = NULL);
-
-		virtual void oneVsFollowingFitEqualCalcWithoutConfRotation(
-					double* reference,
-					int reference_conformation_number,
-					double* rmsd,
-					int numberOfConformations,
-					int coordinatesPerConformation,
-					int atomsPerConformation,
-					double *allCoordinates);
-
-		virtual void oneVsFollowingFitEqualCalcWithConfRotation(
-					double* reference,
-					int reference_conformation_number,
-					double* rmsd,
-					int numberOfConformations,
-					int coordinatesPerConformation,
-					int atomsPerConformation,
-					double *allCoordinates);
-
-		virtual void oneVsFollowingFitDiffersCalcWithoutConfRotation(
-					double* fitReference,
-					double* calcReference,
-					int reference_conformation_number,
-					double* rmsd,
-					int numberOfConformations,
-					int coordinatesPerConformation,
-					int atomsPerConformation,
-					double *allCoordinates,
-					int coordinatesPerRMSDConformation,
-					int atomsPerRMSDConformation,
-					double *allRMSDCoordinates);
-
-		virtual void oneVsFollowingFitDiffersCalcWithConfRotation(
-					double* fitReference,
-					double* calcReference,
-					int reference_conformation_number,
-					double* rmsd,
-					int numberOfConformations,
-					int coordinatesPerConformation,
-					int atomsPerConformation,
-					double *allCoordinates,
-					int coordinatesPerRMSDConformation,
-					int atomsPerRMSDConformation,
-					double *allRMSDCoordinates);
 
 		double innerProduct(double* A, double* first_conformation_coords, double* second_conformation_coords, int number_of_atoms);
 
