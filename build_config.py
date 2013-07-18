@@ -3,6 +3,11 @@ import numpy
 import json
 import os.path
 
+# CUDA_BASE                # Base dir for CUDA installation
+# CUDA_INCLUDE_FOLDER      # CUDA headers path
+# CUDA_LIBRARIES_FOLDER    # CUDA libs path ( /lib if you're running it in a 32b machine)
+# CUDA_ARCHITECHTURE       # CUDA architecture of your card.
+
 def get_config_options_for(default_conf_file, this_conf_file):
     # Load defaults
     file_handler = open(default_conf_file,"r")

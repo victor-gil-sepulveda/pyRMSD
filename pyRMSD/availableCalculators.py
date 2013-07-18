@@ -8,7 +8,8 @@ def availableCalculators():
             "QTRFIT_OMP_CALCULATOR":4,
             #"QTRFIT_CUDA_CALCULATOR":5,
             "QCP_SERIAL_CALCULATOR":6,
-            "QCP_OMP_CALCULATOR":7,
-            "QCP_CUDA_CALCULATOR":8,
-            "QCP_CUDA_MEM_CALCULATOR":9
+            #"QCP_SERIAL_FLOAT_CALCULATOR":7,
+            "QCP_OMP_CALCULATOR":8,
+            "QCP_CUDA_CALCULATOR":9,
+            "QCP_CUDA_MEM_CALCULATOR":10
     }

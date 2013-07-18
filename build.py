@@ -4,41 +4,6 @@ import collections
 import os
 from build_config import get_config_options_for
 
-
-
-
-# ##############################################
-# #####                                  #######
-# #####     Compiling Options            #######
-# #####                                  #######
-# ##############################################
-# CUDA_BASE = "/usr/local/cuda-4.2"           # Base dir for CUDA installation
-# CUDA_INCLUDE_FOLDER = CUDA_BASE+"/include"  # CUDA headers path
-# CUDA_LIBRARIES_FOLDER = CUDA_BASE+"/lib64"  # CUDA libs path ( /lib if you're running it in a 32b machine)
-# CUDA_ARCHITECHTURE = "sm_11"                # CUDA architecture of your card.
-# CUDA_LIBRARY = "cudart"
-# PYTHON_EXTENSION_OPTIONS = "-pthread -g -fno-strict-aliasing -fmessage-length=0 -O3 -Wall \
-# -D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -fPIC"
-# PYTHON_INCLUDE_FOLDER = distutils.sysconfig.get_python_inc()
-# PYTHON_LIBRARY_FOLDER = distutils.sysconfig.get_python_lib()
-# PYTHON_LIBRARY = "python2.7"
-# OPENMP_OPTION = "-fopenmp"
-# ###############################################
-# 
-# 
-# ##############################################
-# #####                                  #######
-# #####     Compiling Options            #######
-# #####           for the Brave          #######
-# ##############################################
-# NUMPY_INCLUDE =  numpy.get_include()
-# PYTHON_EXTENSION_LINKING_OPTIONS = "-pthread -shared"
-# CUDA_OPTIONS = "-O3 -use_fast_math --gpu-architecture %s --compiler-options '-fPIC'"%(CUDA_ARCHITECHTURE)
-# DEFINE_USE_CUDA = "-DUSE_CUDA"
-# BASE_DIR = os.getcwd()
-# ###############################################
-
-
 if __name__ == '__main__':
     parser = optparse.OptionParser(usage='%prog [--build-conf] [--cuda] [--build] [--clean] [--clean-all]', version='3.0')
     parser.add_option('--build-conf', dest = "conf_file",  help="Determines the file storing build configuration info.")
@@ -64,8 +29,8 @@ if __name__ == '__main__':
         else:
             parser.error("Please, choose precision for CUDA building: 'single' or 'double'")
         options.use_cuda = True
-        CUDA_OPTIONS = conf["CUDA_OPTIONS"] +" -D"+CUDA_PRECISION_FLAG
-        DEFINE_USE_CUDA = conf["DEFINE_USE_CUDA"] +" -D"+CUDA_PRECISION_FLAG
+        conf["CUDA_OPTIONS"] = conf["CUDA_OPTIONS"] +" -D"+CUDA_PRECISION_FLAG
+        conf["DEFINE_USE_CUDA"] = conf["DEFINE_USE_CUDA"] +" -D"+CUDA_PRECISION_FLAG
     else:
         options.use_cuda = False
     ######################################
@@ -87,7 +52,6 @@ if __name__ == '__main__':
                                  "src/python":["pyRMSD.cpp"],
                                  "src/pdbreaderlite":["PDBReader.cpp","PDBReaderObject.cpp"],
                                  "src/calculators/test":["main.cpp","test_tools.cpp","tests.cpp"],
-                                 "src/calculators/test/memory_check":["check_mem.cpp"],
     }
     
     files_to_compile_with_gcc_and_openmp = {
@@ -106,14 +70,14 @@ if __name__ == '__main__':
         files_to_link = collections.defaultdict(str)
         
         if options.use_cuda:
-            PYTHON_EXTENSION_OPTIONS = conf["PYTHON_EXTENSION_OPTIONS"]+" "+conf["DEFINE_USE_CUDA"]
+            conf["PYTHON_EXTENSION_OPTIONS"] = conf["PYTHON_EXTENSION_OPTIONS"]+" "+conf["DEFINE_USE_CUDA"]
         
         compile_a_file_collection(conf["BASE_DIR"], files_to_compile_with_gcc, "gcc", conf["PYTHON_EXTENSION_OPTIONS"], [conf["PYTHON_INCLUDE_FOLDER"], conf["NUMPY_INCLUDE"]], ".o",files_to_link)
             
-        compile_a_file_collection(conf["BASE_DIR"], files_to_compile_with_gcc_and_openmp, "gcc", PYTHON_EXTENSION_OPTIONS+" "+conf["OPENMP_OPTION"], [conf["PYTHON_INCLUDE_FOLDER"], conf["NUMPY_INCLUDE"]], ".o",files_to_link)
+        compile_a_file_collection(conf["BASE_DIR"], files_to_compile_with_gcc_and_openmp, "gcc", conf["PYTHON_EXTENSION_OPTIONS"]+" "+conf["OPENMP_OPTION"], [conf["PYTHON_INCLUDE_FOLDER"], conf["NUMPY_INCLUDE"]], ".o",files_to_link)
         
         if options.use_cuda:
-            compile_a_file_collection(conf["BASE_DIR"], files_to_compile_with_nvcc, "nvcc", CUDA_OPTIONS, [conf["CUDA_INCLUDE"]], ".o",files_to_link)
+            compile_a_file_collection(conf["BASE_DIR"], files_to_compile_with_nvcc, "nvcc", conf["CUDA_OPTIONS"], [conf["CUDA_INCLUDE"]], ".o",files_to_link)
         
         linkDSL = Link().\
                         using("g++").\
@@ -151,6 +115,7 @@ if __name__ == '__main__':
                                 files_to_link["RMSDCalculator"],
                                 files_to_link["pyRMSD"]
         ]
+        
         if options.use_cuda:
             calculator_obj_files.extend([files_to_link["QCPCUDAKernel"],files_to_link["QCPCUDAMemKernel"],files_to_link["kernel_functions_cuda"]])
             calculator_libraries = [conf["PYTHON_LIBRARY"],conf["CUDA_LIBRARY"]]
@@ -184,24 +149,11 @@ if __name__ == '__main__':
         os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
         os.system(linkDSL.getLinkingCommand())
         
-        test_obj_files.remove(files_to_link["main"])
-        test_obj_files.extend([files_to_link["check_mem"]])
-        linkDSL = Link().\
-                        using("g++").\
-                        with_options([conf["OPENMP_OPTION"]]).\
-                        using_libs(calculator_libraries).\
-                        using_lib_locations(calculator_library_locations).\
-                        this_object_files(test_obj_files).\
-                        to_produce("check_memory")
                         
-        os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
-        os.system(linkDSL.getLinkingCommand())
-        
         os.system("mv calculators.so pyRMSD/")
         os.system("mv condensedMatrix.so pyRMSD/")
         os.system("mv pdbReader.so pyRMSD/")
         os.system("mv test_rmsdtools_main src/calculators/test")
-        os.system("mv check_memory src/calculators/test")
         
         ##Calculators
         if options.use_cuda:
@@ -215,9 +167,10 @@ def availableCalculators():
             "QTRFIT_OMP_CALCULATOR":4,
             #"QTRFIT_CUDA_CALCULATOR":5,
             "QCP_SERIAL_CALCULATOR":6,
-            "QCP_OMP_CALCULATOR":7,
-            "QCP_CUDA_CALCULATOR":8,
-            "QCP_CUDA_MEM_CALCULATOR":9
+            #"QCP_SERIAL_FLOAT_CALCULATOR":7,
+            "QCP_OMP_CALCULATOR":8,
+            "QCP_CUDA_CALCULATOR":9,
+            "QCP_CUDA_MEM_CALCULATOR":10
     }
 """
         else:
@@ -231,9 +184,10 @@ def availableCalculators():
             "QTRFIT_OMP_CALCULATOR":4,
             #"QTRFIT_CUDA_CALCULATOR":5,
             "QCP_SERIAL_CALCULATOR":6,
-            "QCP_OMP_CALCULATOR":7,
-            #"QCP_CUDA_CALCULATOR":8,
-            #"QCP_CUDA_MEM_CALCULATOR":9
+            #"QCP_SERIAL_FLOAT_CALCULATOR":7,
+            "QCP_OMP_CALCULATOR":8,
+            #"QCP_CUDA_CALCULATOR":9,
+            #"QCP_CUDA_MEM_CALCULATOR":10
     }
 """
         os.system('echo "\033[33mWriting available calculators...\033[0m"')
