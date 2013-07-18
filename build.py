@@ -1,49 +1,56 @@
-import numpy
 from build_utils import compile_a_file_collection, Link
 import optparse
 import collections
-import distutils.sysconfig
 import os
-
-##############################################
-#####                                  #######
-#####     Compiling Options            #######
-#####                                  #######
-##############################################
-CUDA_BASE = "/usr/local/cuda-4.2"           # Base dir for CUDA installation
-CUDA_INCLUDE_FOLDER = CUDA_BASE+"/include"  # CUDA headers path
-CUDA_LIBRARIES_FOLDER = CUDA_BASE+"/lib64"  # CUDA libs path ( /lib if you're running it in a 32b machine)
-CUDA_ARCHITECHTURE = "sm_11"                # CUDA architecture of your card.
-CUDA_LIBRARY = "cudart"
-PYTHON_EXTENSION_OPTIONS = "-pthread -g -fno-strict-aliasing -fmessage-length=0 -O3 -Wall \
--D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -fPIC"
-PYTHON_INCLUDE_FOLDER = distutils.sysconfig.get_python_inc()
-PYTHON_LIBRARY_FOLDER = distutils.sysconfig.get_python_lib()
-PYTHON_LIBRARY = "python2.7"
-OPENMP_OPTION = "-fopenmp"
-###############################################
+from build_config import get_config_options_for
 
 
-##############################################
-#####                                  #######
-#####     Compiling Options            #######
-#####           for the Brave          #######
-##############################################
-NUMPY_INCLUDE =  numpy.get_include()
-PYTHON_EXTENSION_LINKING_OPTIONS = "-pthread -shared"
-CUDA_OPTIONS = "-O3 -use_fast_math --gpu-architecture %s --compiler-options '-fPIC'"%(CUDA_ARCHITECHTURE)
-DEFINE_USE_CUDA = "-DUSE_CUDA"
-BASE_DIR = os.getcwd()
-###############################################
+
+
+# ##############################################
+# #####                                  #######
+# #####     Compiling Options            #######
+# #####                                  #######
+# ##############################################
+# CUDA_BASE = "/usr/local/cuda-4.2"           # Base dir for CUDA installation
+# CUDA_INCLUDE_FOLDER = CUDA_BASE+"/include"  # CUDA headers path
+# CUDA_LIBRARIES_FOLDER = CUDA_BASE+"/lib64"  # CUDA libs path ( /lib if you're running it in a 32b machine)
+# CUDA_ARCHITECHTURE = "sm_11"                # CUDA architecture of your card.
+# CUDA_LIBRARY = "cudart"
+# PYTHON_EXTENSION_OPTIONS = "-pthread -g -fno-strict-aliasing -fmessage-length=0 -O3 -Wall \
+# -D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -fPIC"
+# PYTHON_INCLUDE_FOLDER = distutils.sysconfig.get_python_inc()
+# PYTHON_LIBRARY_FOLDER = distutils.sysconfig.get_python_lib()
+# PYTHON_LIBRARY = "python2.7"
+# OPENMP_OPTION = "-fopenmp"
+# ###############################################
+# 
+# 
+# ##############################################
+# #####                                  #######
+# #####     Compiling Options            #######
+# #####           for the Brave          #######
+# ##############################################
+# NUMPY_INCLUDE =  numpy.get_include()
+# PYTHON_EXTENSION_LINKING_OPTIONS = "-pthread -shared"
+# CUDA_OPTIONS = "-O3 -use_fast_math --gpu-architecture %s --compiler-options '-fPIC'"%(CUDA_ARCHITECHTURE)
+# DEFINE_USE_CUDA = "-DUSE_CUDA"
+# BASE_DIR = os.getcwd()
+# ###############################################
 
 
 if __name__ == '__main__':
-    parser = optparse.OptionParser(usage='%prog [--cuda] [--build] [--clear] [--clear-all]', version='3.0')
+    parser = optparse.OptionParser(usage='%prog [--build-conf] [--cuda] [--build] [--clean] [--clean-all]', version='3.0')
+    parser.add_option('--build-conf', dest = "conf_file",  help="Determines the file storing build configuration info.")
     parser.add_option('--cuda', dest = "cuda_type",  help="Use this flag if you want to compile the CUDA calculator.")
     parser.add_option('--build', dest = "build", action="store_true", help="Use this flag if you want to compile pyRMSD.")
-    parser.add_option('--clear', dest = "clear",  action="store_true", help="Clear all .o generated files.")
-    parser.add_option('--clear-all', dest = "clear_all", action="store_true",  help="The same as --clear, but it also removes generates libs and exes.")
+    parser.add_option('--clean', dest = "clear",  action="store_true", help="Clear all .o generated files.")
+    parser.add_option('--clean-all', dest = "clear_all", action="store_true",  help="The same as --clear, but it also removes generates libs and exes.")
     options, args = parser.parse_args()
+    
+    # Load configuration
+    conf = get_config_options_for(os.path.join("build_conf","default.conf"), options.conf_file)
+    
     
     ######################################
     ### SET CUDA FLAGS
@@ -57,8 +64,8 @@ if __name__ == '__main__':
         else:
             parser.error("Please, choose precision for CUDA building: 'single' or 'double'")
         options.use_cuda = True
-        CUDA_OPTIONS = CUDA_OPTIONS +" -D"+CUDA_PRECISION_FLAG
-        DEFINE_USE_CUDA = DEFINE_USE_CUDA +" -D"+CUDA_PRECISION_FLAG
+        CUDA_OPTIONS = conf["CUDA_OPTIONS"] +" -D"+CUDA_PRECISION_FLAG
+        DEFINE_USE_CUDA = conf["DEFINE_USE_CUDA"] +" -D"+CUDA_PRECISION_FLAG
     else:
         options.use_cuda = False
     ######################################
@@ -99,20 +106,20 @@ if __name__ == '__main__':
         files_to_link = collections.defaultdict(str)
         
         if options.use_cuda:
-            PYTHON_EXTENSION_OPTIONS = PYTHON_EXTENSION_OPTIONS+" "+DEFINE_USE_CUDA
+            PYTHON_EXTENSION_OPTIONS = conf["PYTHON_EXTENSION_OPTIONS"]+" "+conf["DEFINE_USE_CUDA"]
         
-        compile_a_file_collection(BASE_DIR, files_to_compile_with_gcc, "gcc", PYTHON_EXTENSION_OPTIONS, [PYTHON_INCLUDE_FOLDER, NUMPY_INCLUDE], ".o",files_to_link)
+        compile_a_file_collection(conf["BASE_DIR"], files_to_compile_with_gcc, "gcc", conf["PYTHON_EXTENSION_OPTIONS"], [conf["PYTHON_INCLUDE_FOLDER"], conf["NUMPY_INCLUDE"]], ".o",files_to_link)
             
-        compile_a_file_collection(BASE_DIR, files_to_compile_with_gcc_and_openmp, "gcc", PYTHON_EXTENSION_OPTIONS+" "+OPENMP_OPTION, [PYTHON_INCLUDE_FOLDER, NUMPY_INCLUDE], ".o",files_to_link)
+        compile_a_file_collection(conf["BASE_DIR"], files_to_compile_with_gcc_and_openmp, "gcc", PYTHON_EXTENSION_OPTIONS+" "+conf["OPENMP_OPTION"], [conf["PYTHON_INCLUDE_FOLDER"], conf["NUMPY_INCLUDE"]], ".o",files_to_link)
         
         if options.use_cuda:
-            compile_a_file_collection(BASE_DIR, files_to_compile_with_nvcc, "nvcc", CUDA_OPTIONS, [CUDA_INCLUDE_FOLDER], ".o",files_to_link)
+            compile_a_file_collection(conf["BASE_DIR"], files_to_compile_with_nvcc, "nvcc", CUDA_OPTIONS, [conf["CUDA_INCLUDE"]], ".o",files_to_link)
         
         linkDSL = Link().\
                         using("g++").\
-                        with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
-                        using_libs([PYTHON_LIBRARY]).\
-                        using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
+                        with_options([conf["PYTHON_EXTENSION_LINKING_OPTIONS"],conf["OPENMP_OPTION"]]).\
+                        using_libs([conf["PYTHON_LIBRARY"]]).\
+                        using_lib_locations([conf["PYTHON_LIBRARY_FOLDER"]]).\
                         this_object_files([files_to_link["Matrix"],files_to_link["Statistics"]]).\
                         to_produce("condensedMatrix.so")
         
@@ -121,9 +128,9 @@ if __name__ == '__main__':
         
         linkDSL = Link().\
                         using("g++").\
-                        with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
-                        using_libs([PYTHON_LIBRARY]).\
-                        using_lib_locations([PYTHON_LIBRARY_FOLDER]).\
+                        with_options([conf["PYTHON_EXTENSION_LINKING_OPTIONS"],conf["OPENMP_OPTION"]]).\
+                        using_libs([conf["PYTHON_LIBRARY"]]).\
+                        using_lib_locations([conf["PYTHON_LIBRARY_FOLDER"]]).\
                         this_object_files([files_to_link["PDBReaderObject"],files_to_link["PDBReader"]]).\
                         to_produce("pdbReader.so")
         
@@ -146,16 +153,16 @@ if __name__ == '__main__':
         ]
         if options.use_cuda:
             calculator_obj_files.extend([files_to_link["QCPCUDAKernel"],files_to_link["QCPCUDAMemKernel"],files_to_link["kernel_functions_cuda"]])
-            calculator_libraries = [PYTHON_LIBRARY,CUDA_LIBRARY]
-            calculator_library_locations  = [PYTHON_LIBRARY_FOLDER, CUDA_LIBRARIES_FOLDER]
+            calculator_libraries = [conf["PYTHON_LIBRARY"],conf["CUDA_LIBRARY"]]
+            calculator_library_locations  = [conf["PYTHON_LIBRARY_FOLDER"], conf["CUDA_LIBRARIES"]]
             
         else:
-            calculator_libraries = [PYTHON_LIBRARY]
-            calculator_library_locations  = [PYTHON_LIBRARY_FOLDER]
+            calculator_libraries = [conf["PYTHON_LIBRARY"]]
+            calculator_library_locations  = [conf["PYTHON_LIBRARY_FOLDER"]]
         
         linkDSL = Link().\
                         using("g++").\
-                        with_options([PYTHON_EXTENSION_LINKING_OPTIONS,OPENMP_OPTION]).\
+                        with_options([conf["PYTHON_EXTENSION_LINKING_OPTIONS"],conf["OPENMP_OPTION"]]).\
                         using_libs(calculator_libraries).\
                         using_lib_locations(calculator_library_locations).\
                         this_object_files(calculator_obj_files).\
@@ -169,7 +176,7 @@ if __name__ == '__main__':
         test_obj_files.extend([files_to_link["main"], files_to_link["test_tools"], files_to_link["tests"]])
         linkDSL = Link().\
                         using("g++").\
-                        with_options([OPENMP_OPTION]).\
+                        with_options([conf["OPENMP_OPTION"]]).\
                         using_libs(calculator_libraries).\
                         using_lib_locations(calculator_library_locations).\
                         this_object_files(test_obj_files).\
@@ -181,7 +188,7 @@ if __name__ == '__main__':
         test_obj_files.extend([files_to_link["check_mem"]])
         linkDSL = Link().\
                         using("g++").\
-                        with_options([OPENMP_OPTION]).\
+                        with_options([conf["OPENMP_OPTION"]]).\
                         using_libs(calculator_libraries).\
                         using_lib_locations(calculator_library_locations).\
                         this_object_files(test_obj_files).\
