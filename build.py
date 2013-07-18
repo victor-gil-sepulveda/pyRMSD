@@ -231,5 +231,4 @@ def availableCalculators():
         os.system("rm pyRMSD/condensedMatrix.so")
         os.system("rm pyRMSD/pdbReader.so")
         os.system("rm src/calculators/test/test_rmsdtools_main")
-        os.system("rm src/calculators/test/check_memory")
     ######################################

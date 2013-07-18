@@ -16,11 +16,11 @@ def get_config_options_for(default_conf_file, this_conf_file):
     
     # Override 
     if this_conf_file != None:
-        file_handler = open(default_conf_file,"r")
+        file_handler = open(this_conf_file,"r")
         extra_conf = json.loads("".join(file_handler.readlines()))
         file_handler.close()
         for key in extra_conf:
-            base_conf[key] = extra_conf["key"]
+            base_conf[key] = extra_conf[key]
     
     # Process 
     if base_conf["PYTHON_INCLUDE_FOLDER"] == "AUTO":
@@ -28,6 +28,9 @@ def get_config_options_for(default_conf_file, this_conf_file):
         
     if base_conf["PYTHON_LIBRARY_FOLDER"] == "AUTO":
         base_conf["PYTHON_LIBRARY_FOLDER"] = distutils.sysconfig.get_python_lib()
+    elif base_conf["PYTHON_LIBRARY_FOLDER"] =="AUTO_ALT":
+        import sysconfig
+        base_conf["PYTHON_LIBRARY_FOLDER"] =  os.path.dirname(sysconfig.get_paths()['stdlib'])
         
     if base_conf["NUMPY_INCLUDE"] == "AUTO":
         base_conf["NUMPY_INCLUDE"] = numpy.get_include()
