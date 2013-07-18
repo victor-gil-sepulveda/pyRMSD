@@ -197,13 +197,12 @@ class TestRMSDCalculators(unittest.TestCase):
         number_of_coordsets = 5;
         number_of_atoms = 3239;
         number_of_CAs = 224;
-        
 
 #      load_vector(not_aligned_CA, "../../src/calculators/test/data/ligand_mini_CAs");
-        not_aligned_CA = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_CAs"),(number_of_coordsets,number_of_CAs,3))
+        not_aligned_CA = numpy.reshape(numpy.loadtxt("data/ligand_mini_CAs"),(number_of_coordsets,number_of_CAs,3))
         
 #       load_vector(aligned_coordinates, "data/ligand_mini_all_aligned");
-        aligned_coordinates = numpy.reshape(numpy.loadtxt("../../src/calculators/test/data/ligand_mini_all_aligned"),(number_of_coordsets,number_of_atoms,3))
+        aligned_coordinates = numpy.reshape(numpy.loadtxt("data/ligand_mini_all_aligned"),(number_of_coordsets,number_of_atoms,3))
 
         reference_copy = numpy.copy(not_aligned_CA[0])
         target_copy = numpy.copy(not_aligned_CA[4])

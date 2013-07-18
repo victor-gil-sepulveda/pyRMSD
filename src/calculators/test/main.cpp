@@ -190,44 +190,44 @@ int main(int argc, char **argv){
 	for(unsigned int i = 0; i < available_calculators.size();++i){
 
 		test_superposition_with_fit(available_calculators[i],
-				"test_data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.CA.coords",
-				"test_data/Superpose_Fit_CA_similar/prot_plus_ligand_similar.aligned_CA.coords",
-				"test_data/Superpose_Fit_CA_similar/prot_plus_ligand_similar.aligned_CA.rmsd",
+				"data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.CA.coords",
+				"data/Superpose_Fit_CA_similar/prot_plus_ligand_similar.aligned_CA.coords",
+				"data/Superpose_Fit_CA_similar/prot_plus_ligand_similar.aligned_CA.rmsd",
 				get_precision(available_calculators[i], TEST_SUPERPOSITION_WITH_FIT));
 
 		test_superposition_with_fit(available_calculators[i],
-				"test_data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.CA.coords",
-				"test_data/Superpose_Fit_CA_very_diff/prot_plus_ligand.aligned_CA.coords",
-				"test_data/Superpose_Fit_CA_very_diff/prot_plus_ligand.aligned_CA.rmsd",
+				"data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.CA.coords",
+				"data/Superpose_Fit_CA_very_diff/prot_plus_ligand.aligned_CA.coords",
+				"data/Superpose_Fit_CA_very_diff/prot_plus_ligand.aligned_CA.rmsd",
 				get_precision(available_calculators[i], TEST_SUPERPOSITION_WITH_FIT_DIFF));
 
 		test_superposition_with_fit_and_calc(available_calculators[i],
-				"test_data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.CA.coords",
-				"test_data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_CA.coords",
-				"test_data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.ligand.coords",
-				"test_data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_BEN.coords",
-				"test_data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_BEN.rmsd",
+				"data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.CA.coords",
+				"data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_CA.coords",
+				"data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.ligand.coords",
+				"data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_BEN.coords",
+				"data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_BEN.rmsd",
 				get_precision(available_calculators[i], TEST_SUPERPOSITION_WITH_FIT_AND_CALC));
 
 		test_superposition_with_fit_and_calc(available_calculators[i],
-				"test_data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.CA.coords",
-				"test_data/Superpose_Fit_CA_Calc_BEN_very_different/prot_plus_ligand_similar.aligned_CA.coords",
-				"test_data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.ligand.coords",
-				"test_data/Superpose_Fit_CA_Calc_BEN_very_different/prot_plus_ligand_similar.aligned_BEN.coords",
-				"test_data/Superpose_Fit_CA_Calc_BEN_very_different/prot_plus_ligand_similar.aligned_BEN.rmsd",
+				"data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.CA.coords",
+				"data/Superpose_Fit_CA_Calc_BEN_very_different/prot_plus_ligand_similar.aligned_CA.coords",
+				"data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.ligand.coords",
+				"data/Superpose_Fit_CA_Calc_BEN_very_different/prot_plus_ligand_similar.aligned_BEN.coords",
+				"data/Superpose_Fit_CA_Calc_BEN_very_different/prot_plus_ligand_similar.aligned_BEN.rmsd",
 				get_precision(available_calculators[i], TEST_SUPERPOSITION_WITH_FIT_AND_CALC_DIFF));
 
 		test_step_by_step_iterative_superposition_with_fit(available_calculators[i],
-				"test_data/Iterpose_Fit_CA/steps",
-				"test_data/Iterpose_Fit_CA/mean",
-				"test_data/Iterpose_Fit_CA/stretching_trajectory_offset_ligand.initial_CA.coords",
+				"data/Iterpose_Fit_CA/steps",
+				"data/Iterpose_Fit_CA/mean",
+				"data/Iterpose_Fit_CA/stretching_trajectory_offset_ligand.initial_CA.coords",
 				get_precision(available_calculators[i], TEST_STEP_BY_STEP_ITERATIVE_SUPERPOSITION_WITH_FIT),
 				9);
 
 		test_iterative_superposition_with_fit(available_calculators[i],
-				"test_data/Iterpose_Fit_CA/stretching_trajectory_offset_ligand.initial_CA.coords",
-				"test_data/Iterpose_Fit_CA/stretching_trajectory_offset_ligand.iterposed_CA.coords",
-				"test_data/Iterpose_Fit_CA/step_rmsd_diff.rmsd",
+				"data/Iterpose_Fit_CA/stretching_trajectory_offset_ligand.initial_CA.coords",
+				"data/Iterpose_Fit_CA/stretching_trajectory_offset_ligand.iterposed_CA.coords",
+				"data/Iterpose_Fit_CA/step_rmsd_diff.rmsd",
 				get_precision(available_calculators[i], TEST_ITERATIVE_SUPERPOSITION_WITH_FIT),
 				get_itsuper_iterations(available_calculators[i], TEST_ITERATIVE_SUPERPOSITION_WITH_FIT));
 #ifdef CUDA_PRECISION_SINGLE
@@ -235,23 +235,23 @@ int main(int argc, char **argv){
 				available_calculators[i] != QCP_CUDA_MEM_CALCULATOR)
 #endif
 			test_iterative_superposition_with_fit_and_calc_rotation(available_calculators[i],
-					"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_all.coords",
-					"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_BEN.coords",
-					"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.iterposed_all.coords",
-					"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.iterposed_BEN.coords",
-					"test_data/Iterpose_Fit_CA_Rot_BEN/step_rmsd_diff.rmsd",
+					"data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_all.coords",
+					"data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_BEN.coords",
+					"data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.iterposed_all.coords",
+					"data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.iterposed_BEN.coords",
+					"data/Iterpose_Fit_CA_Rot_BEN/step_rmsd_diff.rmsd",
 					get_precision(available_calculators[i], TEST_ITERATIVE_SUPERPOSITION_WITH_FIT_AND_CALC_ROTATION),
 					get_itsuper_iterations(available_calculators[i], TEST_ITERATIVE_SUPERPOSITION_WITH_FIT_AND_CALC_ROTATION));
 
 		test_matrix_with_fit_coordinates(available_calculators[i],
-				"test_data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.CA.coords",
-				"test_data/Matrix_Fit_CA/prot_plus_ligand_offset_very_different.CA.rmsd_matrix",
+				"data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.CA.coords",
+				"data/Matrix_Fit_CA/prot_plus_ligand_offset_very_different.CA.rmsd_matrix",
 				get_precision(available_calculators[i], TEST_MATRIX_WITH_FIT_COORDINATES));
 
 		test_matrix_with_fit_and_calculation_coordinates(available_calculators[i],
-				"test_data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.CA.coords",
-				"test_data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.ligand.coords",
-				"test_data/Matrix_Fit_CA_Calc_BEN/prot_plus_ligand_offset_very_different.CA.rmsd_matrix",
+				"data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.CA.coords",
+				"data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.ligand.coords",
+				"data/Matrix_Fit_CA_Calc_BEN/prot_plus_ligand_offset_very_different.CA.rmsd_matrix",
 				get_precision(available_calculators[i], TEST_MATRIX_WITH_FIT_AND_CALCULATION_COORDINATES));
 	}
 
@@ -259,8 +259,8 @@ int main(int argc, char **argv){
 	// Test CUDA (float version) vs serial (float version). Discrepancies are too large and that's the only
 	// way of ensuring that errors are due to code and not to precision.
 	test_iterative_superposition_with_fit_and_calc_rotation_comparing_QCP_serial_and_QCP_CUDA(
-			"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_all.coords",
-			"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_BEN.coords");
+			"data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_all.coords",
+			"data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_BEN.coords");
 #endif
 	return 0;
 }

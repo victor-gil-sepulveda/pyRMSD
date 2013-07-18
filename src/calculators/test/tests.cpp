@@ -247,7 +247,7 @@ void test_center_coordinates(){
 	// Not centered coordinates
 	load_pdb_coords(	coordinates,
 						shape,
-						"test_data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.CA.coords");
+						"data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.CA.coords");
 
 	for (int i = 0; i < shape[0]; ++i){
 		RMSDTools::geometricCenter(shape[1], TOPOINTER(coordinates)+(i*shape[1]*3) , calculated_centers+(i*3));
@@ -264,7 +264,7 @@ void test_center_coordinates(){
 	// Load the coordinates centered with Python and center them
 	load_pdb_coords(centered_coordinates,
 						centered_shape,
-						"test_data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.CA.centered.coords");
+						"data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.CA.centered.coords");
 
 	RMSDTools::centerAllAtOrigin(shape[1],shape[0],TOPOINTER(coordinates));
 
