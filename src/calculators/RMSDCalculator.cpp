@@ -286,9 +286,7 @@ void RMSDCalculator::iterativeSuperposition(double rmsd_diff_to_stop, double* it
 	double* mean_coords = new double[this->rmsdData->fittingConformationLength];
 	double rmsd_difference = 0.0;
 	int current_iteration = 0;
-//	cout<< std::fixed<<setprecision(4)<<this->rmsdData->fittingCoordinates[0]<<" "
-//					<<this->rmsdData->fittingCoordinates[1]<<" "
-//					<<this->rmsdData->fittingCoordinates[2]<<" "<<endl;
+
 	// In the first step, reference is the first conformation
 	// reference = coordinates[0]
 	RMSDTools::copyArrays(reference_coords,
@@ -302,17 +300,12 @@ void RMSDCalculator::iterativeSuperposition(double rmsd_diff_to_stop, double* it
 			iteration_rmsd[current_iteration] = rmsd_difference;
 		}
 		current_iteration++;
-//		cout<< std::fixed<<setprecision(4)<<this->rmsdData->fittingCoordinates[0]<<" "
-//				<<this->rmsdData->fittingCoordinates[1]<<" "
-//				<<this->rmsdData->fittingCoordinates[2]<<" "<<endl;
 	}
 	while(rmsd_difference > rmsd_diff_to_stop and current_iteration < MAX_ITERATIONS);
 
 	// One last superposition is performed, and the other rotation coordinates are moved here
 	superposition_with_external_reference(reference_coords);
-//	cout<< std::fixed<<setprecision(4)<<this->rmsdData->fittingCoordinates[0]<<" "
-//					<<this->rmsdData->fittingCoordinates[1]<<" "
-//					<<this->rmsdData->fittingCoordinates[2]<<" ";
+
 	// Some cleaning
 	delete [] reference_coords;
 	delete [] mean_coords;

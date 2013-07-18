@@ -260,9 +260,7 @@ int main(int argc, char **argv){
 	// way of ensuring that errors are due to code and not to precision.
 	test_iterative_superposition_with_fit_and_calc_rotation_comparing_QCP_serial_and_QCP_CUDA(
 			"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_all.coords",
-			"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_BEN.coords",
-			1e-4, // Proper precision for floats
-			50);
+			"test_data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_BEN.coords");
 #endif
 	return 0;
 }

@@ -731,9 +731,7 @@ void test_matrix_with_fit_and_calculation_coordinates(RMSDCalculatorType type,
 
 void test_iterative_superposition_with_fit_and_calc_rotation_comparing_QCP_serial_and_QCP_CUDA(
 						const char* initial_prot_coords_file,
-						const char* initial_lig_coords_file,
-						double precision_of_check,
-						int expected_number_of_iterations){
+						const char* initial_lig_coords_file){
 
 	print_test_tittle(__FUNCTION__);
 	cout<<"Comparing QCP_SERIAL_FLOAT_CALCULATOR and QCP_CUDA_CALCULATOR (float)"<<endl;
@@ -760,6 +758,7 @@ void test_iterative_superposition_with_fit_and_calc_rotation_comparing_QCP_seria
 			lig_coords_shape,
 			initial_lig_coords_file);
 
+	int expected_number_of_iterations = 50;
 
 	calculated_serial_by_step_rmsds.resize(expected_number_of_iterations,0);
 	calculated_cuda_by_step_rmsds.resize(expected_number_of_iterations,0);
@@ -799,21 +798,21 @@ void test_iterative_superposition_with_fit_and_calc_rotation_comparing_QCP_seria
 					fit_coords_shape[0] *
 					fit_coords_shape[1] *
 					fit_coords_shape[2],
-				precision_of_check);
+				1e-3);
 
 	compareVectors("\tFinal calculation coordinates of serial (float) and CUDA (float) versions coincide: ",
 					TOPOINTER(initial_qcp_serial_lig_coordinates),
 					TOPOINTER(initial_qcp_cuda_lig_coordinates),
-						fit_coords_shape[0] *
-						fit_coords_shape[1] *
-						fit_coords_shape[2],
-					precision_of_check);
+						lig_coords_shape[0] *
+						lig_coords_shape[1] *
+						lig_coords_shape[2],
+					1e-4);
 
 	compareVectors("\tPer-step rmsd values are the same for both: ",
 					TOPOINTER(calculated_serial_by_step_rmsds),
 					TOPOINTER(calculated_cuda_by_step_rmsds),
 					expected_number_of_iterations,
-					precision_of_check);
+					1e-5);
 
 	cout<<"ENDING"<<endl<<flush;
 	delete serial_calculator;

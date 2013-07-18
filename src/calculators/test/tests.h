@@ -67,8 +67,6 @@
 
 	void test_iterative_superposition_with_fit_and_calc_rotation_comparing_QCP_serial_and_QCP_CUDA(
 			const char* initial_prot_coords_file,
-			const char* initial_lig_coords_file,
-			double precision_of_check,
-			int expected_number_of_iterations);
+			const char* initial_lig_coords_file);
 
 #endif /* TESTS_H_ */
