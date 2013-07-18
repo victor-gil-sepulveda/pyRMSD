@@ -728,3 +728,94 @@ void test_matrix_with_fit_and_calculation_coordinates(RMSDCalculatorType type,
 
 }
 
+
+void test_iterative_superposition_with_fit_and_calc_rotation_comparing_QCP_serial_and_QCP_CUDA(
+						const char* initial_prot_coords_file,
+						const char* initial_lig_coords_file,
+						double precision_of_check,
+						int expected_number_of_iterations){
+
+	print_test_tittle(__FUNCTION__);
+	cout<<"Comparing QCP_SERIAL_FLOAT_CALCULATOR and QCP_CUDA_CALCULATOR (float)"<<endl;
+
+	vector<double> 		initial_qcp_serial_fit_coordinates, initial_qcp_serial_lig_coordinates,
+						initial_qcp_cuda_fit_coordinates, initial_qcp_cuda_lig_coordinates,
+						calculated_serial_by_step_rmsds, calculated_cuda_by_step_rmsds;
+
+	vector<int> fit_coords_shape, lig_coords_shape;
+
+	load_pdb_coords(initial_qcp_serial_fit_coordinates,
+			fit_coords_shape,
+			initial_prot_coords_file);
+
+	load_pdb_coords(initial_qcp_serial_lig_coordinates,
+			lig_coords_shape,
+			initial_lig_coords_file);
+
+	load_pdb_coords(initial_qcp_cuda_fit_coordinates,
+			fit_coords_shape,
+			initial_prot_coords_file);
+
+	load_pdb_coords(initial_qcp_cuda_lig_coordinates,
+			lig_coords_shape,
+			initial_lig_coords_file);
+
+
+	calculated_serial_by_step_rmsds.resize(expected_number_of_iterations,0);
+	calculated_cuda_by_step_rmsds.resize(expected_number_of_iterations,0);
+
+	RMSDCalculator* serial_calculator = RMSDCalculatorFactory::createCalculator(
+			QCP_SERIAL_FLOAT_CALCULATOR,
+			fit_coords_shape[0],
+			fit_coords_shape[1],
+			TOPOINTER(initial_qcp_serial_fit_coordinates),
+			lig_coords_shape[1],
+			TOPOINTER(initial_qcp_serial_lig_coordinates));
+
+	serial_calculator->iterativeSuperposition(1e-4,
+			TOPOINTER(calculated_serial_by_step_rmsds));
+
+	RMSDCalculator* cuda_calculator = RMSDCalculatorFactory::createCalculator(
+			QCP_CUDA_CALCULATOR,
+			fit_coords_shape[0],
+			fit_coords_shape[1],
+			TOPOINTER(initial_qcp_cuda_fit_coordinates),
+			lig_coords_shape[1],
+			TOPOINTER(initial_qcp_cuda_lig_coordinates));
+
+	cuda_calculator->iterativeSuperposition(1e-4,
+			TOPOINTER(calculated_cuda_by_step_rmsds));
+
+//		print_vector("calculated RMSD: ", TODOUBLEP(calculated_by_step_rmsds), calculated_by_step_rmsds.size(),12);
+//		print_vector("expected RMSD: ", TODOUBLEP(expected_by_step_rmsds), expected_by_step_rmsds.size(),12);
+//		print_vector("initial_pfit_coordinates_shape: ", TOPOINTER(initial_fit_coordinates_shape), initial_fit_coordinates_shape.size(),1);
+//		print_vector("expected_final_fit_coordinates_shape: ", TOPOINTER(expected_final_fit_coordinates_shape), expected_final_fit_coordinates_shape.size(),1);
+//		print_vector("initial_lig_coordinates_shape: ", TOPOINTER(initial_lig_coordinates_shape), initial_lig_coordinates_shape.size(),1);
+//		print_vector("expected_final_lig_coordinates_shape: ", TOPOINTER(expected_final_lig_coordinates_shape), expected_final_lig_coordinates_shape.size(),1);
+
+	compareVectors("\tFinal fitting coordinates of serial (float) and CUDA (float) versions coincide: ",
+				TOPOINTER(initial_qcp_serial_fit_coordinates),
+				TOPOINTER(initial_qcp_cuda_fit_coordinates),
+					fit_coords_shape[0] *
+					fit_coords_shape[1] *
+					fit_coords_shape[2],
+				precision_of_check);
+
+	compareVectors("\tFinal calculation coordinates of serial (float) and CUDA (float) versions coincide: ",
+					TOPOINTER(initial_qcp_serial_lig_coordinates),
+					TOPOINTER(initial_qcp_cuda_lig_coordinates),
+						fit_coords_shape[0] *
+						fit_coords_shape[1] *
+						fit_coords_shape[2],
+					precision_of_check);
+
+	compareVectors("\tPer-step rmsd values are the same for both: ",
+					TOPOINTER(calculated_serial_by_step_rmsds),
+					TOPOINTER(calculated_cuda_by_step_rmsds),
+					expected_number_of_iterations,
+					precision_of_check);
+
+	cout<<"ENDING"<<endl<<flush;
+	delete serial_calculator;
+	delete cuda_calculator;
+}

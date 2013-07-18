@@ -34,9 +34,15 @@ namespace RMSDTools{
 	
 	void rotate3D(unsigned int n, double * const x, double*);
 
+	void rotate3D(unsigned int n, float * const x, float*);
+
 	void rotate3D(unsigned int n, double * const x, double u[3][3]);
 	
+	void rotate3D(unsigned int n, float * const x, float u[3][3]);
+
 	double calcRMS(const double * const x, const double * const y, unsigned int num_atoms);
+
+	double calcRMS(const float * const x, const float * const y, unsigned int num_atoms);
 
 	void jacobi(double a[4][4], double d[4], double v[4][4], int nrot = 30);
 
@@ -47,6 +53,8 @@ namespace RMSDTools{
 	bool diagonalize_symmetric(double matrix[3][3], double eigen_vec[3][3], double eigenval[3]);
 
 	void initializeTo(double*, double, int);
+
+	void initializeTo(float*, float, int);
 
 	void copyArrays(double*, double*, int);
 

@@ -18,6 +18,7 @@
 #include "../QTRFIT/QTRFITOmpKernel.h"
 #include "../QCP/QCPSerialKernel.h"
 #include "../QCP/QCPOmpKernel.h"
+#include "../QCP/QCPSerialFloatKernel.h"
 
 #ifdef USE_CUDA
 	#include "../QCP/QCPCUDAKernel.h"
@@ -64,6 +65,10 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 
 		case QCP_SERIAL_CALCULATOR:
 					kernelFunctions = new QCPSerialKernel;
+					break;
+
+		case QCP_SERIAL_FLOAT_CALCULATOR:
+					kernelFunctions = new QCPSerialFloatKernel;
 					break;
 
 		case QCP_OMP_CALCULATOR:

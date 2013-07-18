@@ -118,6 +118,21 @@ void RMSDTools::rotate3D(unsigned int n, double * const x, double* rot_matrix){
 	u[2][2] = rot_matrix[8];
 	rotate3D(n, x, u);
 }
+
+void RMSDTools::rotate3D(unsigned int n, float * const x, float* rot_matrix){
+	float u[3][3];
+	u[0][0] = rot_matrix[0];
+	u[0][1] = rot_matrix[1];
+	u[0][2] = rot_matrix[2];
+	u[1][0] = rot_matrix[3];
+	u[1][1] = rot_matrix[4];
+	u[1][2] = rot_matrix[5];
+	u[2][0] = rot_matrix[6];
+	u[2][1] = rot_matrix[7];
+	u[2][2] = rot_matrix[8];
+	rotate3D(n, x, u);
+}
+
 void RMSDTools::rotate3D(unsigned int number_of_atoms, double * const coords, double u[3][3]){
 	// We go through all selected atoms
 	for(unsigned int i=0; i<number_of_atoms; ++i){
@@ -134,6 +149,23 @@ void RMSDTools::rotate3D(unsigned int number_of_atoms, double * const coords, do
 	}
 }
 
+void RMSDTools::rotate3D(unsigned int number_of_atoms, float * const coords, float u[3][3]){
+	// We go through all selected atoms
+	for(unsigned int i=0; i<number_of_atoms; ++i){
+		int offset = i*3;
+		float x_tmp_0,x_tmp_1,x_tmp_2;
+		x_tmp_0 = coords[offset];
+		x_tmp_1 = coords[offset+1];
+		x_tmp_2 = coords[offset+2];
+
+		// An rotate each of them
+		coords[offset] 	= u[0][0] * x_tmp_0 + u[0][1] * x_tmp_1 + u[0][2] * x_tmp_2;
+		coords[offset+1] = u[1][0] * x_tmp_0 + u[1][1] * x_tmp_1 + u[1][2] * x_tmp_2;
+		coords[offset+2] = u[2][0] * x_tmp_0 + u[2][1] * x_tmp_1 + u[2][2] * x_tmp_2;
+	}
+}
+
+
 double RMSDTools::calcRMS(const double * const x, const double * const y, unsigned int num_atoms){
 	double sum_res = 0.0;
 
@@ -144,7 +176,21 @@ double RMSDTools::calcRMS(const double * const x, const double * const y, unsign
 	return sqrt(sum_res/num_atoms);
 }
 
+double RMSDTools::calcRMS(const float * const x, const float * const y, unsigned int num_atoms){
+	float sum_res = 0.0;
+
+	for(unsigned int i=0; i<num_atoms*3; ++i){
+		sum_res += (x[i] - y[i]) * (x[i] - y[i]);
+	}
+
+	return sqrt(sum_res/num_atoms);
+}
+
 void RMSDTools::initializeTo(double* array, double value, int array_len){
+	fill(array, array+array_len, value);
+}
+
+void RMSDTools::initializeTo(float* array, float value, int array_len){
 	fill(array, array+array_len, value);
 }
 
