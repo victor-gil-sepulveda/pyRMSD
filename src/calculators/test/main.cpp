@@ -124,30 +124,14 @@ double get_precision(RMSDCalculatorType calctype, TestType test){
 			break;
 #else
 			switch (test){
-					case TEST_SUPERPOSITION_WITH_FIT:
-					case TEST_SUPERPOSITION_WITH_FIT_AND_CALC_DIFF:
-						return 1e-4;
+				case TEST_STEP_BY_STEP_ITERATIVE_SUPERPOSITION_WITH_FIT:
+				case TEST_ITERATIVE_SUPERPOSITION_WITH_FIT_AND_CALC_ROTATION:
+						return 1e-11;
 						break;
-					case TEST_SUPERPOSITION_WITH_FIT_DIFF:
-						return 1e-3; // Really low precision for this one!
-						break;
-					case TEST_SUPERPOSITION_WITH_FIT_AND_CALC:
-						return 1e-5;
-						break;
-					case TEST_STEP_BY_STEP_ITERATIVE_SUPERPOSITION_WITH_FIT:
-						return 1e-2; // Really low precision for this one!
-						break;
-					case TEST_MATRIX_WITH_FIT_AND_CALCULATION_COORDINATES:
-						return 1e-4;
-						break;
-					//case TEST_ITERATIVE_SUPERPOSITION_WITH_FIT:
-					case TEST_MATRIX_WITH_FIT_COORDINATES:
-						return 1e-3; // Really low precision for this one!
-						break;
-					default:
+				default:
 						return 1e-12;
-				}
-				break;
+			}
+			break;
 #endif
 		default:
 			return 1e-12;
