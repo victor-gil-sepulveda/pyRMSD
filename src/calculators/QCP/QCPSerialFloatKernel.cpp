@@ -2,6 +2,7 @@
 #include <iostream>
 #include "QCPSerialFloatKernel.h"
 #include "../RMSDTools.h"
+#include "../RMSDCalculationData.h"
 
 using namespace std;
 /**
@@ -309,25 +310,21 @@ void QCPSerialFloatKernel::oneVsFollowingFitEqualCalcCoords(
 		double* reference,
 		int reference_conformation_number,
 		double* rmsd,
-		int numberOfConformations,
-		int coordinatesPerConformation,
-		int atomsPerConformation,
-		double *allCoordinates){
+		RMSDCalculationData* data){
 
-	int coordinates_per_conformation = atomsPerConformation * 3;
 	float rot_matrix[9];
 
-	float* reference_tmp = new float[coordinates_per_conformation];
-	float* second_conf_tmp = new float[coordinates_per_conformation];
-	for(int i =0; i < coordinates_per_conformation;++i){
+	float* reference_tmp = new float[data->fittingConformationLength];
+	float* second_conf_tmp = new float[data->fittingConformationLength];
+	for(int i =0; i < data->fittingConformationLength;++i){
 		reference_tmp[i] = (float) reference[i];
 	}
 
-	for (int second_conformation_id = reference_conformation_number + 1;
-			second_conformation_id < numberOfConformations; ++second_conformation_id){
+	for (int second_conformation_index = reference_conformation_number + 1;
+			second_conformation_index < data->numberOfConformations; ++second_conformation_index){
 
-		double* second_conformation_coords = &(allCoordinates[second_conformation_id*coordinates_per_conformation]);
-		for(int i =0; i < coordinates_per_conformation;++i){
+		double* second_conformation_coords = data->getFittingConformationAt(second_conformation_index);
+		for(int i =0; i < data->fittingConformationLength;++i){
 			second_conf_tmp[i] = (float) second_conformation_coords[i];
 		}
 
@@ -335,14 +332,14 @@ void QCPSerialFloatKernel::oneVsFollowingFitEqualCalcCoords(
 
 		float rmsd_val = calcRMSDOfTwoConformations(	reference_tmp,
 														second_conf_tmp,
-														atomsPerConformation,
+														data->atomsPerFittingConformation,
 														rot_matrix);
 		if(rmsd!=NULL){
-			rmsd[second_conformation_id-(reference_conformation_number+1)] = (double) rmsd_val;
+			rmsd[second_conformation_index-(reference_conformation_number+1)] = (double) rmsd_val;
 		}
 
-		RMSDTools::rotate3D(atomsPerConformation, second_conf_tmp, rot_matrix);
-		for(int i =0; i < coordinates_per_conformation;++i){
+		RMSDTools::rotate3D(data->atomsPerFittingConformation, second_conf_tmp, rot_matrix);
+		for(int i =0; i < data->fittingConformationLength;++i){
 			second_conformation_coords[i] = (float) second_conf_tmp[i];
 		}
 	}
@@ -356,41 +353,34 @@ void QCPSerialFloatKernel::oneVsFollowingFitDiffersCalcCoords(
 		double* calcReference,
 		int reference_conformation_number,
 		double* rmsd,
-		int numberOfConformations,
-		int coordinatesPerConformation,
-		int atomsPerConformation,
-		double *allCoordinates,
-		int coordinatesPerRMSDConformation,
-		int atomsPerRMSDConformation,
-		double *allRMSDCoordinates){
+		RMSDCalculationData* data){
 
-	int coordinates_per_fit_conformation = atomsPerConformation * 3;
-	int coordinates_per_calc_conformation = atomsPerRMSDConformation * 3;
 	float rot_matrix[9];
 
-	float* fit_reference_tmp = new float[coordinates_per_fit_conformation];
-	float* calc_reference_tmp = new float[coordinates_per_calc_conformation];
-	for(int i =0; i < coordinates_per_fit_conformation;++i){
+	float* fit_reference_tmp = new float[data->fittingConformationLength];
+	float* calc_reference_tmp = new float[data->calculationConformationLength];
+	for(int i =0; i < data->fittingConformationLength;++i){
 		fit_reference_tmp[i] = (float) fitReference[i];
 	}
 	if (calcReference!=NULL){
-		for(int i =0; i < coordinates_per_calc_conformation;++i){
+		for(int i =0; i < data->calculationConformationLength;++i){
 			calc_reference_tmp[i] = (float) calcReference[i];
 		}
 	}
 
-	float* fit_second_conf_tmp = new float[coordinates_per_fit_conformation];
-	float* calc_second_conf_tmp = new float[coordinates_per_calc_conformation];
+	float* fit_second_conf_tmp = new float[data->fittingConformationLength];
+	float* calc_second_conf_tmp = new float[data->calculationConformationLength];
 
-	for (int second_conformation_id = reference_conformation_number + 1;
-			second_conformation_id < numberOfConformations; ++second_conformation_id){
+	for (int second_conformation_index = reference_conformation_number + 1;
+			second_conformation_index < data->numberOfConformations; ++second_conformation_index){
 
-		double* fit_conformation_coords = &(allCoordinates[second_conformation_id*coordinates_per_fit_conformation]);
-		double* calc_conformation_coords =  &(allRMSDCoordinates[second_conformation_id*coordinates_per_calc_conformation]);
-		for(int i =0; i < coordinates_per_fit_conformation;++i){
+		double* fit_conformation_coords = data->getFittingConformationAt(second_conformation_index);
+		for(int i =0; i < data->fittingConformationLength;++i){
 			fit_second_conf_tmp[i] = (float) fit_conformation_coords[i];
 		}
-		for(int i =0; i < coordinates_per_calc_conformation;++i){
+
+		double* calc_conformation_coords =  data->getCalculationConformationAt(second_conformation_index);
+		for(int i =0; i < data->calculationConformationLength;++i){
 			calc_second_conf_tmp[i] = (float) calc_conformation_coords[i];
 		}
 
@@ -398,24 +388,28 @@ void QCPSerialFloatKernel::oneVsFollowingFitDiffersCalcCoords(
 
 		calcRMSDOfTwoConformations(	fit_reference_tmp,
 									fit_second_conf_tmp,
-									atomsPerConformation,
+									data->atomsPerFittingConformation,
 									rot_matrix);
 
-		RMSDTools::rotate3D(atomsPerConformation, fit_second_conf_tmp, rot_matrix);
-		RMSDTools::rotate3D(atomsPerRMSDConformation, calc_second_conf_tmp, rot_matrix);
+		RMSDTools::rotate3D(data->atomsPerFittingConformation,
+				fit_second_conf_tmp,
+				rot_matrix);
+		RMSDTools::rotate3D(data->atomsPerCalculationConformation,
+				calc_second_conf_tmp,
+				rot_matrix);
 
 		if(rmsd!=NULL){
-			rmsd[second_conformation_id-(reference_conformation_number+1)] = RMSDTools::calcRMS(
+			rmsd[second_conformation_index-(reference_conformation_number+1)] = RMSDTools::calcRMS(
 					calc_reference_tmp,
 					calc_second_conf_tmp,
-					atomsPerRMSDConformation);
+					data->atomsPerCalculationConformation);
 		}
 
-		for(int i =0; i < coordinates_per_fit_conformation;++i){
+		for(int i =0; i < data->fittingConformationLength;++i){
 			fit_conformation_coords[i] = (float) fit_second_conf_tmp[i];
 		}
 
-		for(int i =0; i < coordinates_per_calc_conformation;++i){
+		for(int i =0; i < data->calculationConformationLength;++i){
 			calc_conformation_coords[i] = (float) calc_second_conf_tmp[i];
 		}
 	}

@@ -27,19 +27,13 @@
 class QCPCUDAKernel: public KernelFunctions{
 
 	public:
-		QCPCUDAKernel(double* coordinates,
-				int atomsPerConformation,
-				int coordinatesPerConformation,
-				int numberOfConformations,
-				int threads_per_block,
-				int blocks_per_grid);
+		QCPCUDAKernel(RMSDCalculationData* data,
+						int threads_per_block,
+						int blocks_per_grid);
 
 		virtual ~QCPCUDAKernel();
 
-		virtual void setCalculationCoords(
-				double* calcCoords,
-				int number_of_atoms,
-				int numberOfConformations);
+		virtual void setCalculationCoords(RMSDCalculationData* data);
 
 
 		void updateDeviceCoordinates(
@@ -67,52 +61,29 @@ class QCPCUDAKernel: public KernelFunctions{
 					double* reference,
 					int reference_conformation_number,
 					double* rmsd,
-					int numberOfConformations,
-					int coordinatesPerConformation,
-					int atomsPerConformation,
-					double *allCoordinates);
+					RMSDCalculationData* data);
 
 		virtual void oneVsFollowingFitDiffersCalcCoords(
 					double* fitReference,
 					double* calcReference,
 					int reference_conformation_number,
 					double* rmsd,
-					int numberOfConformations,
-					int coordinatesPerConformation,
-					int atomsPerConformation,
-					double *allCoordinates,
-					int coordinatesPerRMSDConformation,
-					int atomsPerRMSDConformation,
-					double *allRMSDCoordinates);
+					RMSDCalculationData* data);
 
-		virtual void matrixInit(
-				double* allFittingCoordinates,
-				int coordinatesPerFittingConformation,
-				double* allCalculationCoordinates,
-				int coordinatesPerCalculationConformation,
-				int numberOfConformations);
+		virtual void matrixInit(RMSDCalculationData* data);
 
 		virtual void matrixOneVsFollowingFitEqualCalc(
 													double* reference,
 													int reference_conformation_number,
 													double* rmsd,
-													int numberOfConformations,
-													int coordinatesPerConformation,
-													int atomsPerConformation,
-													double *allCoordinates);
+													RMSDCalculationData* data);
 
 		virtual void matrixOneVsFollowingFitDiffersCalc(
 														double* fitReference,
 														double* calcReference,
 														int reference_conformation_number,
 														double* rmsd,
-														int numberOfConformations,
-														int coordinatesPerConformation,
-														int atomsPerConformation,
-														double *allCoordinates,
-														int coordinatesPerRMSDConformation,
-														int atomsPerRMSDConformation,
-														double *allRMSDCoordinates);
+														RMSDCalculationData* data);
 		int threads_per_block;
 		int blocks_per_grid;
 

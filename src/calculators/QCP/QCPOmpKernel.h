@@ -12,23 +12,14 @@ class QCPOmpKernel: public QCPSerialKernel{
 					double* reference,
 					int reference_conformation_number,
 					double* rmsd,
-					int numberOfConformations,
-					int coordinatesPerConformation,
-					int atomsPerConformation,
-					double *allCoordinates);
+					RMSDCalculationData* data);
 
 		virtual void oneVsFollowingFitDiffersCalcCoords(
 					double* fitReference,
 					double* calcReference,
 					int reference_conformation_number,
 					double* rmsd,
-					int numberOfConformations,
-					int coordinatesPerConformation,
-					int atomsPerConformation,
-					double *allCoordinates,
-					int coordinatesPerRMSDConformation,
-					int atomsPerRMSDConformation,
-					double *allRMSDCoordinates);
+					RMSDCalculationData* data);
 
 		int number_of_threads;
 

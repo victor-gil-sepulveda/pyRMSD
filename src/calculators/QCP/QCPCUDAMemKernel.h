@@ -13,47 +13,26 @@
 class QCPCUDAMemKernel: public QCPCUDAKernel {
 	public:
 		QCPCUDAMemKernel(
-				double* coordinates,
-				int atomsPerConformation,
-				int coordinatesPerConformation,
-				int numberOfConformations,
+				RMSDCalculationData* data,
 				int threads_per_block,
 				int blocks_per_grid);
 
 		virtual ~QCPCUDAMemKernel();
 
-		void matrixInit(
-						double* allFittingCoordinates,
-						int coordinatesPerFittingConformation,
-						double* allCalculationCoordinates,
-						int coordinatesPerCalculationConformation,
-						int numberOfConformations);
+		void matrixInit(RMSDCalculationData* data);
 
-		void matrixEnd(
-				int rmsds_tmp_len,
-				std::vector<double>& rmsds);
+		void matrixEnd(int , std::vector<double>& );
 
-		void matrixOneVsFollowingFitEqualCalc(
-													double* reference,
+		void matrixOneVsFollowingFitEqualCalc(double* reference,
 													int reference_conformation_number,
 													double* rmsd,
-													int numberOfConformations,
-													int coordinatesPerConformation,
-													int atomsPerConformation,
-													double *allCoordinates);
+													RMSDCalculationData* data);
 
-		void matrixOneVsFollowingFitDiffersCalc(
-														double* fitReference,
-														double* calcReference,
-														int reference_conformation_number,
-														double* rmsd,
-														int numberOfConformations,
-														int coordinatesPerConformation,
-														int atomsPerConformation,
-														double *allCoordinates,
-														int coordinatesPerRMSDConformation,
-														int atomsPerRMSDConformation,
-														double *allRMSDCoordinates);
+		void matrixOneVsFollowingFitDiffersCalc(double* fitReference,
+													   double* calcReference,
+													   int reference_conformation_number,
+													   double* rmsd,
+													   RMSDCalculationData* data);
 		floating_point_type* allDeviceRMSDs;
 };
 

@@ -43,6 +43,12 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 		int blocks_per_grid) {
 
 	KernelFunctions* kernelFunctions;
+	// Package input data
+	RMSDCalculationData* rmsdData = new RMSDCalculationData(numberOfConformations,
+															atomsPerFittingConformation,
+															allFittingCoordinates,
+															atomsPerCalculationConformation,
+															allCalculationCoordinates);
 
 
 	switch (type) {
@@ -86,19 +92,13 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 
 		case QCP_CUDA_CALCULATOR:
 					kernelFunctions = new QCPCUDAKernel(
-											allFittingCoordinates,
-											atomsPerFittingConformation,
-											atomsPerFittingConformation*3,
-											numberOfConformations,
+							rmsdData,
 											threads_per_block,
 											blocks_per_grid);
 					break;
 		case QCP_CUDA_MEM_CALCULATOR:
 					kernelFunctions = new QCPCUDAMemKernel(
-											allFittingCoordinates,
-											atomsPerFittingConformation,
-											atomsPerFittingConformation*3,
-											numberOfConformations,
+											rmsdData,
 											threads_per_block,
 											blocks_per_grid);
 					break;
@@ -109,13 +109,6 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 			exit(-1);
 	}
 
-
-	// Package input data
-	RMSDCalculationData* rmsdData = new RMSDCalculationData(	numberOfConformations,
-															atomsPerFittingConformation,
-															allFittingCoordinates,
-															atomsPerCalculationConformation,
-															allCalculationCoordinates);
 
 	RMSDCalculator* calculator = new RMSDCalculator(rmsdData, kernelFunctions);
 

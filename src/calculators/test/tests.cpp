@@ -8,6 +8,7 @@
 #include "../QTRFIT/QTRFITOmpKernel.h"
 #include "../factory/RMSDCalculatorFactory.h"
 #include "../KABSCH/KABSCHSerialKernel.h"
+#include "../RMSDCalculationData.h"
 
 using namespace std;
 
@@ -152,14 +153,13 @@ void test_QCP_Kernel(){
 	// Using the function modifying coords
 	RMSDTools::copyArrays(frag_b_copy,frag_b,atoms_len*3);
 	RMSDTools::centerAllAtOrigin(atoms_len,1,frag_b_copy,translations);
+	RMSDCalculationData data(1,atoms_len,frag_b_copy,0,NULL);
+
 	kernel.oneVsFollowingFitEqualCalcCoords(
 			frag_a,
 			-1,
 			&rmsd,
-			1,
-			atoms_len*3,
-			atoms_len,
-			frag_b_copy);
+			&data);
 
 	compareVectors("\tTesting rotated coordinates: ", expected_rotated_coordinates, frag_b_copy, atoms_len*3, 1e-14);
 }
@@ -214,14 +214,13 @@ void test_KABSCH_Kernel(){
 		// Using the function modifying coords
 		RMSDTools::copyArrays(frag_b_copy,frag_b,atoms_len*3);
 		RMSDTools::centerAllAtOrigin(atoms_len,1,frag_b_copy,translations);
+
+		RMSDCalculationData data(1,atoms_len,frag_b_copy,0,NULL);
 		kernel.oneVsFollowingFitEqualCalcCoords(
 				frag_a,
 				-1,
 				&rmsd,
-				1,
-				atoms_len*3,
-				atoms_len,
-				frag_b_copy);
+				&data);
 
 		compareVectors("\tTesting rotated coordinates: ", expected_rotated_coordinates, frag_b_copy, atoms_len*3, 1e-14);
 }
@@ -814,7 +813,6 @@ void test_iterative_superposition_with_fit_and_calc_rotation_comparing_QCP_seria
 					expected_number_of_iterations,
 					1e-5);
 
-	cout<<"ENDING"<<endl<<flush;
 	delete serial_calculator;
 	delete cuda_calculator;
 }

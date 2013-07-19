@@ -22,10 +22,7 @@ RMSDCalculator::RMSDCalculator(RMSDCalculationData* rmsdData, KernelFunctions* k
 	this->rmsdData = rmsdData;
 	this->kernelFunctions = kernelFunctions;
 	if(this->rmsdData->hasCalculationCoordinatesSet()){
-		this->kernelFunctions->setCalculationCoords(
-				this->rmsdData->calculationCoordinates,
-				this->rmsdData->atomsPerCalculationConformation,
-				this->rmsdData->numberOfConformations);
+		this->kernelFunctions->setCalculationCoords(rmsdData);
 	}
 }
 
@@ -112,11 +109,7 @@ void RMSDCalculator::calculate_rmsd_condensed_matrix_with_fitting_coordinates(ve
 									this->rmsdData->numberOfConformations,
 									this->rmsdData->fittingCoordinates);
 
-	this->kernelFunctions->matrixInit(this->rmsdData->fittingCoordinates,
-										this->rmsdData->fittingConformationLength,
-										this->rmsdData->calculationCoordinates,
-										this->rmsdData->calculationConformationLength,
-										this->rmsdData->numberOfConformations);
+	this->kernelFunctions->matrixInit(rmsdData);
 
 	for(int reference_index = 0; reference_index < this->rmsdData->numberOfConformations; ++reference_index){
 			int offset = reference_index*(this->rmsdData->numberOfConformations-1)- (((reference_index-1)*reference_index)/2) ;
@@ -125,10 +118,7 @@ void RMSDCalculator::calculate_rmsd_condensed_matrix_with_fitting_coordinates(ve
 					reference_conformation,
 					reference_index,
 					&(rmsd[offset]),
-					this->rmsdData->numberOfConformations,
-					this->rmsdData->fittingConformationLength,
-					this->rmsdData->atomsPerFittingConformation,
-					this->rmsdData->fittingCoordinates);
+					rmsdData);
 	}
 
 }
@@ -156,11 +146,7 @@ void RMSDCalculator::calculate_rmsd_condensed_matrix_with_fitting_and_calculatio
 
 	delete [] fit_centers;
 
-	this->kernelFunctions->matrixInit(this->rmsdData->fittingCoordinates,
-										this->rmsdData->fittingConformationLength,
-										this->rmsdData->calculationCoordinates,
-										this->rmsdData->calculationConformationLength,
-										this->rmsdData->numberOfConformations);
+	this->kernelFunctions->matrixInit(rmsdData);
 
 	for(int reference_index = 0; reference_index<this->rmsdData->numberOfConformations; ++reference_index){
 		int offset = reference_index*(this->rmsdData->numberOfConformations-1)- (((reference_index-1)*reference_index)/2) ;
@@ -171,13 +157,7 @@ void RMSDCalculator::calculate_rmsd_condensed_matrix_with_fitting_and_calculatio
 															calc_reference_conformation,
 															reference_index,
 															&(rmsd[offset]),
-															this->rmsdData->numberOfConformations,
-															this->rmsdData->fittingConformationLength,
-															this->rmsdData->atomsPerFittingConformation,
-															this->rmsdData->fittingCoordinates,
-															this->rmsdData->calculationConformationLength,
-															this->rmsdData->atomsPerCalculationConformation,
-															this->rmsdData->calculationCoordinates);
+															rmsdData);
 	}
 
 }
@@ -204,10 +184,7 @@ void RMSDCalculator::_one_vs_following_fit_equals_calc_coords(
 			reference,
 			reference_index,
 			rmsd,
-			this->rmsdData->numberOfConformations,
-			this->rmsdData->fittingConformationLength,
-			this->rmsdData->atomsPerFittingConformation,
-			this->rmsdData->fittingCoordinates);
+			rmsdData);
 }
 
 /**
@@ -247,13 +224,7 @@ void RMSDCalculator::_one_vs_following_fit_differs_calc_coords(
 			calcReference,
 			reference_index,
 			rmsd,
-			this->rmsdData->numberOfConformations,
-			this->rmsdData->fittingConformationLength,
-			this->rmsdData->atomsPerFittingConformation,
-			this->rmsdData->fittingCoordinates,
-			this->rmsdData->calculationConformationLength,
-			this->rmsdData->atomsPerCalculationConformation,
-			this->rmsdData->calculationCoordinates);
+			rmsdData);
 }
 
 /**
@@ -382,10 +353,7 @@ void RMSDCalculator::superposition_with_external_reference_without_calc_coords(d
 			reference,
 			-1,
 			NULL,
-			this->rmsdData->numberOfConformations,
-			this->rmsdData->fittingConformationLength,
-			this->rmsdData->atomsPerFittingConformation,
-			this->rmsdData->fittingCoordinates);
+			rmsdData);
 }
 
 /**
@@ -421,11 +389,5 @@ void RMSDCalculator::superposition_with_external_reference_rotating_calc_coords(
 			NULL,
 			-1,
 			NULL,
-			this->rmsdData->numberOfConformations,
-			this->rmsdData->fittingConformationLength,
-			this->rmsdData->atomsPerFittingConformation,
-			this->rmsdData->fittingCoordinates,
-			this->rmsdData->calculationConformationLength,
-			this->rmsdData->atomsPerCalculationConformation,
-			this->rmsdData->calculationCoordinates);
+			rmsdData);
 }

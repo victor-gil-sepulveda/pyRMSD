@@ -19,23 +19,14 @@ class QCPSerialFloatKernel: public KernelFunctions {
 					double* reference,
 					int reference_conformation_number,
 					double* rmsd,
-					int numberOfConformations,
-					int coordinatesPerConformation,
-					int atomsPerConformation,
-					double *allCoordinates);
+					RMSDCalculationData* data);
 
 		virtual void oneVsFollowingFitDiffersCalcCoords(
 					double* fitReference,
 					double* calcReference,
 					int reference_conformation_number,
 					double* rmsd,
-					int numberOfConformations,
-					int coordinatesPerConformation,
-					int atomsPerConformation,
-					double *allCoordinates,
-					int coordinatesPerRMSDConformation,
-					int atomsPerRMSDConformation,
-					double *allRMSDCoordinates);
+					RMSDCalculationData* data);
 
 		float calcRMSDOfTwoConformations( float* first_conformation_coords,
 												float* second_conformation_coords,

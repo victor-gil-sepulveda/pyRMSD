@@ -15,35 +15,18 @@ class KABSCHSerialKernel: public KernelFunctions {
 		KABSCHSerialKernel();
 		virtual ~KABSCHSerialKernel();
 
-		virtual void init(
-						double* coordinates,
-						int atomsPerConformation,
-						int coordinatesPerConformation,
-						int numberOfConformations){}
-
-		virtual void changeCalculationCoords(double*){}
-
 		virtual void oneVsFollowingFitEqualCalcCoords(
 				double* reference,
 				int reference_conformation_number,
 				double* rmsd,
-				int numberOfConformations,
-				int coordinatesPerConformation,
-				int atomsPerConformation,
-				double *allCoordinates);
+				RMSDCalculationData* data);
 
 		virtual void oneVsFollowingFitDiffersCalcCoords(
 				double* fitReference,
 				double* calcReference,
 				int reference_conformation_number,
 				double* rmsd,
-				int numberOfConformations,
-				int coordinatesPerConformation,
-				int atomsPerConformation,
-				double *allCoordinates,
-				int coordinatesPerRMSDConformation,
-				int atomsPerRMSDConformation,
-				double *allRMSDCoordinates);
+				RMSDCalculationData* data);
 
 		virtual double calculate_rotation_rmsd(
 				const double* const referenceCoords,

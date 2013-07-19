@@ -7,72 +7,46 @@
 
 #ifndef KERNELFUNCTIONS_H_
 #define KERNELFUNCTIONS_H_
-
 #include <vector>
+
+class RMSDCalculationData;
+
 
 class KernelFunctions{
 	public:
 		KernelFunctions(){}
 		virtual ~KernelFunctions(){}
 
-		virtual void setCalculationCoords(
-				double* calcCoords,
-				int number_of_atoms,
-				int numberOfConformations){}
+		virtual void setCalculationCoords(RMSDCalculationData* data){}
 
 		virtual void oneVsFollowingFitEqualCalcCoords(
 				double* reference,
 				int reference_conformation_number,
 				double* rmsd,
-				int numberOfConformations,
-				int coordinatesPerConformation,
-				int atomsPerConformation,
-				double *allCoordinates) = 0;
+				RMSDCalculationData* data) = 0;
 
 		virtual void oneVsFollowingFitDiffersCalcCoords(
 				double* fitReference,
 				double* calcReference,
 				int reference_conformation_number,
 				double* rmsd,
-				int numberOfConformations,
-				int coordinatesPerConformation,
-				int atomsPerConformation,
-				double *allCoordinates,
-				int coordinatesPerRMSDConformation,
-				int atomsPerRMSDConformation,
-				double *allRMSDCoordinates) = 0;
+				RMSDCalculationData* data) = 0;
 
-		virtual void matrixInit(
-				double* allFittingCoordinates,
-				int coordinatesPerFittingConformation,
-				double* allCalculationCoordinates,
-				int coordinatesPerCalculationConformation,
-				int numberOfConformations){
+		virtual void matrixInit(RMSDCalculationData* data){}
 
-		}
-
-		virtual void matrixEnd(
-						int rmsds_tmp_len,
-						std::vector<double>& rmsds){
-		}
+		virtual void matrixEnd(int , std::vector<double>& ){}
 
 		virtual void matrixOneVsFollowingFitEqualCalc(
 													double* reference,
 													int reference_conformation_number,
 													double* rmsd,
-													int numberOfConformations,
-													int coordinatesPerConformation,
-													int atomsPerConformation,
-													double *allCoordinates){
+													RMSDCalculationData* data){
 
 			oneVsFollowingFitEqualCalcCoords(
 									reference,
 									reference_conformation_number,
 									rmsd,
-									numberOfConformations,
-									coordinatesPerConformation,
-									atomsPerConformation,
-									allCoordinates);
+									data);
 		}
 
 		virtual void matrixOneVsFollowingFitDiffersCalc(
@@ -80,25 +54,13 @@ class KernelFunctions{
 														double* calcReference,
 														int reference_conformation_number,
 														double* rmsd,
-														int numberOfConformations,
-														int coordinatesPerConformation,
-														int atomsPerConformation,
-														double *allCoordinates,
-														int coordinatesPerRMSDConformation,
-														int atomsPerRMSDConformation,
-														double *allRMSDCoordinates){
+														RMSDCalculationData* data){
 			oneVsFollowingFitDiffersCalcCoords(
 												fitReference,
 												calcReference,
 												reference_conformation_number,
 												rmsd,
-												numberOfConformations,
-												coordinatesPerConformation,
-												atomsPerConformation,
-												allCoordinates,
-												coordinatesPerRMSDConformation,
-												atomsPerRMSDConformation,
-												allRMSDCoordinates);
+												data);
 		}
 };
 

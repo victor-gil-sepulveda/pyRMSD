@@ -3,6 +3,7 @@
 #include "QCPOmpKernel.h"
 #include "../RMSDTools.h"
 #include <omp.h>
+#include "../RMSDCalculationData.h"
 using namespace std;
 
 QCPOmpKernel::QCPOmpKernel(int number_of_threads){
@@ -36,31 +37,28 @@ void QCPOmpKernel::oneVsFollowingFitEqualCalcCoords(
 		double* reference,
 		int reference_conformation_number,
 		double* rmsd,
-		int numberOfConformations,
-		int coordinatesPerConformation,
-		int atomsPerConformation,
-		double *allCoordinates){
-
-	int coordinates_per_conformation = atomsPerConformation * 3;
+		RMSDCalculationData* data){
 
 	#pragma omp parallel for shared(rmsd)
-	for (int second_conformation_id = reference_conformation_number + 1;
-			second_conformation_id < numberOfConformations; ++second_conformation_id){
+	for (int second_conformation_index = reference_conformation_number + 1;
+			second_conformation_index < data->numberOfConformations; ++second_conformation_index){
 		double rot_matrix[9];
 
-		double* second_conformation_coords = &(allCoordinates[second_conformation_id*coordinates_per_conformation]);
+		double* second_conformation_coords = data->getFittingConformationAt(second_conformation_index);
 
 		RMSDTools::initializeTo(rot_matrix, 0.0, 9);
 
 		double rmsd_val = calcRMSDOfTwoConformations(	reference,
 													  	second_conformation_coords,
-														atomsPerConformation,
+														data->atomsPerFittingConformation,
 														rot_matrix);
 		if(rmsd!=NULL){
-			rmsd[second_conformation_id-(reference_conformation_number+1)] = rmsd_val;
+			rmsd[second_conformation_index-(reference_conformation_number+1)] = rmsd_val;
 		}
 
-		RMSDTools::rotate3D(atomsPerConformation, second_conformation_coords, rot_matrix);
+		RMSDTools::rotate3D(data->atomsPerFittingConformation,
+				second_conformation_coords,
+				rot_matrix);
 	}
 }
 
@@ -70,39 +68,37 @@ void QCPOmpKernel::oneVsFollowingFitDiffersCalcCoords(
 		double* calcReference,
 		int reference_conformation_number,
 		double* rmsd,
-		int numberOfConformations,
-		int coordinatesPerConformation,
-		int atomsPerConformation,
-		double *allCoordinates,
-		int coordinatesPerRMSDConformation,
-		int atomsPerRMSDConformation,
-		double *allRMSDCoordinates){
-
-	int coordinates_per_fit_conformation = atomsPerConformation * 3;
-	int coordinates_per_calc_conformation = atomsPerRMSDConformation * 3;
+		RMSDCalculationData* data){
 
 	#pragma omp parallel for shared(rmsd)
-	for (int second_conformation_id = reference_conformation_number + 1;
-			second_conformation_id < numberOfConformations; ++second_conformation_id){
+	for (int second_conformation_index = reference_conformation_number + 1;
+			second_conformation_index < data->numberOfConformations; ++second_conformation_index){
 
 		double rot_matrix[9];
 
-		double* fit_conformation_coords = &(allCoordinates[second_conformation_id*coordinates_per_fit_conformation]);
+		double* fit_conformation_coords = data->getFittingConformationAt(second_conformation_index);
+		double* calc_conformation_coords =  data->getCalculationConformationAt(second_conformation_index);
+
 		RMSDTools::initializeTo(rot_matrix, 0.0, 9);
 
 		calcRMSDOfTwoConformations(	fitReference,
 									fit_conformation_coords,
-									atomsPerConformation,
+									data->atomsPerFittingConformation,
 									rot_matrix);
 
-		double* calc_conformation_coords =  &(allRMSDCoordinates[second_conformation_id*coordinates_per_calc_conformation]);
 
-		RMSDTools::rotate3D(atomsPerConformation, fit_conformation_coords, rot_matrix);
-		RMSDTools::rotate3D(atomsPerRMSDConformation, calc_conformation_coords, rot_matrix);
+		RMSDTools::rotate3D(data->atomsPerFittingConformation,
+				fit_conformation_coords,
+				rot_matrix);
+
+		RMSDTools::rotate3D(data->atomsPerCalculationConformation,
+				calc_conformation_coords,
+				rot_matrix);
 
 		if(rmsd!=NULL){
-			rmsd[second_conformation_id-(reference_conformation_number+1)] = RMSDTools::calcRMS(calcReference,
-					calc_conformation_coords, atomsPerRMSDConformation);
+			rmsd[second_conformation_index-(reference_conformation_number+1)] = RMSDTools::calcRMS(calcReference,
+					calc_conformation_coords,
+					data->atomsPerCalculationConformation);
 		}
 	}
 }
