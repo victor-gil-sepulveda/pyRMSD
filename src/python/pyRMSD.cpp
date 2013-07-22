@@ -10,24 +10,34 @@ using namespace std;
 void parse_params_for_one_vs_others(
 		PyObject *args,
 		RMSDCalculatorType& calculatorType,
-		double*& coords_list, int& number_of_atoms,
-		double*& calc_coords_list, int& number_of_calc_atoms,
-		int& conformation_number, int& number_of_conformations,
-    	int& number_of_threads,	int& threads_per_block,	int& blocks_per_grid,
-    	int& modify_coordinates){
+		double*& coords_list,
+		int& number_of_atoms,
+		double*& calc_coords_list,
+		int& number_of_calc_atoms,
+		int& conformation_number,
+		int& number_of_conformations,
+    	int& number_of_threads,
+    	int& threads_per_block,
+    	int& blocks_per_grid){
 	
 	PyArrayObject* coords_list_obj,
 				 * calc_coords_list_obj;
 
 	if (!PyArg_ParseTuple(
 			args,
-			"iO!iO!iiiiiii",
+			"iO!iO!iiiiii",
 			&calculatorType,
-			&PyArray_Type, &coords_list_obj, &number_of_atoms,
-			&PyArray_Type, &calc_coords_list_obj, &number_of_calc_atoms,
-			&conformation_number, &number_of_conformations,
-			&number_of_threads, &threads_per_block, &blocks_per_grid,
-			&modify_coordinates)){
+			&PyArray_Type,
+			&coords_list_obj,
+			&number_of_atoms,
+			&PyArray_Type,
+			&calc_coords_list_obj,
+			&number_of_calc_atoms,
+			&conformation_number,
+			&number_of_conformations,
+			&number_of_threads,
+			&threads_per_block,
+			&blocks_per_grid)){
 
 		PyErr_SetString(
 				PyExc_RuntimeError,
@@ -123,7 +133,6 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 	int number_of_threads;
 	int threads_per_block;
 	int blocks_per_grid;
-	int modify_coordinates;
 
 	RMSDCalculatorType calculatorType;
 	double* all_coordinates;
@@ -136,8 +145,7 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 			all_coordinates, atoms_per_conformation,
 			all_calc_coordinates, atoms_per_calc_conformation,
 			conformation_number, number_of_conformations,
-			number_of_threads, threads_per_block, blocks_per_grid,
-			modify_coordinates);
+			number_of_threads, threads_per_block, blocks_per_grid);
 
 	rmsd.resize(number_of_conformations-conformation_number-1);
 
