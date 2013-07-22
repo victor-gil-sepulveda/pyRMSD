@@ -10,14 +10,14 @@ import numpy
 class TestRMSDCalculators(unittest.TestCase):
     
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):
         
-        self.expected_rmsd = {0:[ 0.60179184,  0.70814575,  0.88785042,  0.92862096,  0.69024252,  0.59267699,  0.66596155,  0.81180133,  0.87438831,  1.00465129],
+        cls.expected_rmsd = {0:[ 0.60179184,  0.70814575,  0.88785042,  0.92862096,  0.69024252,  0.59267699,  0.66596155,  0.81180133,  0.87438831,  1.00465129],
                               1:[ 0.61473279,  0.82416178,  0.96955624,  0.71842781,  0.5359385,   0.68621908,  0.90540226,  0.83185205,  0.96145774],
                               2:[ 1.02156795,  1.16059055,  0.80778577,  0.72752425,  0.80478222,  0.98594799,  1.04869932,  1.01149253],
                               3:[ 0.69628994,  1.04059251,  0.77859792,  0.74962628,  0.73856698,  0.70444404,  0.92168545]}
         
-        self.expected_serial_matrix = [0.60179184,0.70814575,0.88785042,0.92862096,0.69024252,0.59267699,
+        cls.expected_serial_matrix = [0.60179184,0.70814575,0.88785042,0.92862096,0.69024252,0.59267699,
                                        0.66596155,0.81180133,0.87438831,1.00465129,0.61473279,0.82416178,
                                        0.96955624,0.71842781,0.5359385, 0.68621908,0.90540226,0.83185205,
                                        0.96145774,1.02156795,1.16059055,0.80778577,0.72752425,0.80478222,
@@ -27,7 +27,10 @@ class TestRMSDCalculators(unittest.TestCase):
                                        1.00029474,1.01622641,1.10694473,0.68347196,0.83819283,0.7589582,
                                        0.93694602,0.76944618,0.82288799,0.91196003,0.75938856,0.68278426,
                                        0.76302383]
-        
+    def setUp(self):
+#         print "In method", self._testMethodName
+        # Each test gets a fresh coordinates set, as they will modify the coordinates
+        # QCP is specially sensitive to variations in input coordinates and results can vary
         self.coordsets_mini =  numpy.load("data/coordsets_mini.npy")
         self.coordsets =  numpy.load("data/coordsets.npy")
         self.number_of_conformations = self.coordsets.shape[0]
@@ -177,7 +180,7 @@ class TestRMSDCalculators(unittest.TestCase):
         """
         Calculates the whole matrix.
         """
-        calculator = pyRMSD.RMSDCalculator.RMSDCalculator(self.coordsets, "QCP_CUDA_CALCULATOR")
+        calculator = pyRMSD.RMSDCalculator.RMSDCalculator("QCP_CUDA_CALCULATOR", self.coordsets)
         rmsd = calculator.pairwiseRMSDMatrix()
         numpy.testing.assert_array_almost_equal(rmsd, self.expected_serial_matrix, 4)
      
@@ -332,7 +335,37 @@ class TestRMSDCalculators(unittest.TestCase):
         numpy.testing.assert_almost_equal(expected_rmsds[1], rmsd, 12)
 
     def test_C_test_replication__iterative_superposition_with_fit_and_calc_rotation(self):
+        # Loading initial conformations
+        initial_fitting_coords = self.read_coords_file( "../../src/calculators/test/data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_all.coords")
+        initial_rotating_coords = self.read_coords_file( "../../src/calculators/test/data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_BEN.coords" )
         
+        final_fitting_coords = self.read_coords_file("../../src/calculators/test/data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.iterposed_all.coords")
+        final_rotating_coords = self.read_coords_file("../../src/calculators/test/data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.iterposed_BEN.coords")
+        # Center
+        centers = [ numpy.mean(conf,0) for conf in final_fitting_coords]
+        final_fitting_coords = [ conf - centers[i] for i, conf in enumerate(final_fitting_coords)]
+        final_rotating_coords = [ conf - centers[i] for i, conf in enumerate(final_rotating_coords)]
+        
+        calculator = pyRMSD.RMSDCalculator.RMSDCalculator("QTRFIT_SERIAL_CALCULATOR", 
+                                                          initial_fitting_coords, 
+                                                          initial_rotating_coords)
+        
+        calculator.iterativeSuperposition()
+        
+        # Coordinates MUST be modified
+        numpy.testing.assert_almost_equal(final_fitting_coords, initial_fitting_coords, 9) # Decrease of precision also noted in C version
+        numpy.testing.assert_almost_equal(final_rotating_coords, initial_rotating_coords,9)
+    
+    def test_C_test_replication__matrix_with_fit_and_calculation_coordinates(self):
+        # Loading initial conformations
+        initial_fitting_coords = self.read_coords_file( "../../src/calculators/test/data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.CA.coords")
+        initial_rotating_coords = self.read_coords_file( "../../src/calculators/test/data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.ligand.coords")
+        calculator = pyRMSD.RMSDCalculator.RMSDCalculator("QTRFIT_SERIAL_CALCULATOR", 
+                                                          initial_fitting_coords, 
+                                                          initial_rotating_coords)
+        
+        expected_rmsds = self.read_rmsd_file("../../src/calculators/test/data/Matrix_Fit_CA_Calc_BEN/prot_plus_ligand_offset_very_different.CA.rmsd_matrix")
+        numpy.testing.assert_almost_equal(expected_rmsds, calculator.pairwiseRMSDMatrix(), 12)
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
