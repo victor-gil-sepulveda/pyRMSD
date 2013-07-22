@@ -8,21 +8,24 @@ class RMSDCalculator(object):
     input coordinates, the best way would be to save them to disk and recover them after the operation (i.e. numpy.save or 
     similar functions).
     """
-    def __init__(self, calculatorType, fittingCoordsets, calculationCoordsets = None, symmetryGroups = ()):
+    def __init__(self, calculatorType, 
+                 fittingCoordsets, 
+                 calculationCoordsets = None, 
+                 symmetryGroups = []):
         """
-        Class constructor
+        Class constructor.
         
         @param calculatorType: One of the calculators returned by 'availableCalculators()'. i.e. KABSCH_OMP_CALCULATOR
-
+        
         @param fittingCoordsets: An array containing the used coordinates of each conformation. It has the following form:
-            coordsets: [Conformation 1, Conformation 2, ..., Conformation N]  
-            Conformation: [Atom 1, Atom 2,..., Atom M]  
+            coordsets: [Conformation 1, Conformation 2, ..., Conformation N]
+            Conformation: [Atom 1, Atom 2,..., Atom M]
             Atom: [x,y,z]
             
             This coordinates will be used for both structural superposition and RMSD calculation if the 'calculation 
             coordinates' parameter is not defined.
             
-            The array type is constrained to be a numpy.array object with dtype = numpy.float64  (dtype will not be always double
+            The array type is constrained to be a numpy.array object with dtype = numpy.float64 (dtype will not be always double
             by default).
             
             Input coordinates are modified after each operation (usually centered and superposed into reference conformation).
@@ -30,8 +33,24 @@ class RMSDCalculator(object):
         @param calculationCoordsets: An array containing the coordinates used to calculate the RMSD. Must have the same structure 
             than 'fittingCoordinates'.
         
-        @param symmetryGroups: 
- 
+        @param symmetryGroups: List of symmetry groups. Each symmetry group is a 2-Tuple of n-tuples defining interchangeable positions
+            of current calculation coordinates (which will be the fitting coordinates, or the calculation coordinates if defined). 
+            For instance, given a calculator with this fitting coordinates (without calculation coordinates):
+                 a,  b,  c,  d,  e , f ;  for conf1
+                 a1, b1, c3, d4, e5, f6 ; for conf2
+                 a2, b2, c3, d4, e5, f6 ; for conf3
+            
+            and a symmetry group ((1,3),(2,4)). The final RMSDs would be the minimum RMSDs of:
+                a,  b,  c,  d,  e , f ;  for conf1 (original)
+                a,  c,  b,  e,  d , f ;  for conf1 (applying symmetry group)
+            
+            with:
+                a1, b1, c3, d4, e5, f6 ; for conf2
+                a2, b2, c3, d4, e5, f6 ; for conf3
+                
+            This is a low level description of the type of symmetries that can be found in some ligands, i.e. in rotating
+            benzene groups, but can also be used in symmetries of bigger selections. 
+            
         @author: vgil
         @date: 26/11/2012
         """
