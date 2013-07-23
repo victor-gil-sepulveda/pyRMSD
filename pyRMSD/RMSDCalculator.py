@@ -70,6 +70,8 @@ class RMSDCalculator(object):
                     print "Calculation coordinates must hold the same number of conformations than fitting coordinates."
                     raise ValueError
                 self.number_of_calculation_atoms = self.calculation_coordinates.shape[1]
+            else:
+                self.number_of_calculation_atoms = 0
             
             # Default values for openMP and CUDA flags
             self.__threads_per_block = 32
@@ -167,6 +169,15 @@ class RMSDCalculator(object):
         else:
             return rmsd_array
     
+    def __coords_reshaping(self):
+        # This kind of reshaping should not do a copy
+        np_coords_fit = numpy.reshape(self.fitting_coordinates, self.number_of_conformations*self.number_of_fitting_atoms*3)
+        np_coords_calc = numpy.array([])
+        if (self.calculation_coordinates is not None):
+            np_coords_calc = numpy.reshape(self.calculation_coordinates, self.number_of_conformations*self.number_of_calculation_atoms*3)
+        
+        return np_coords_fit, np_coords_calc
+    
     def oneVsFollowing(self, conformation_number):
         """
         Calculates the RMSD between a reference conformation and all other conformations with an id greater than it.
@@ -178,36 +189,19 @@ class RMSDCalculator(object):
         @author: vgil
         @date: 26/11/2012
         """
-        rmsds = None
+        np_coords_fit, np_coords_calc = self.__coords_reshaping()
         
-        # This kind of reshaping must do it locally (without copy)
-        np_coords_fit = numpy.reshape(self.fitting_coordinates, self.number_of_conformations*self.number_of_fitting_atoms*3)
-        
-        if (self.calculation_coordinates is None):
-            rmsds =  pyRMSD.calculators.oneVsFollowing(
-                             availableCalculators()[self.calculator_type], 
-                             np_coords_fit, 
-                             self.number_of_fitting_atoms, 
-                             numpy.array([]), 
-                             0,
-                             conformation_number, 
-                             self.number_of_conformations,
-                             self.__number_of_threads, 
-                             self.__threads_per_block, 
-                             self.__blocks_per_grid)
-        else:
-            np_coords_calc = numpy.reshape(self.calculation_coordinates, self.number_of_conformations*self.number_of_calculation_atoms*3)
-            rmsds =  pyRMSD.calculators.oneVsFollowing(
-                             availableCalculators()[self.calculator_type], 
-                             np_coords_fit, 
-                             self.number_of_fitting_atoms, 
-                             np_coords_calc, 
-                             self.number_of_calculation_atoms,
-                             conformation_number, 
-                             self.number_of_conformations,
-                             self.__number_of_threads, 
-                             self.__threads_per_block, 
-                             self.__blocks_per_grid)
+        rmsds =  pyRMSD.calculators.oneVsFollowing(
+                         availableCalculators()[self.calculator_type], 
+                         np_coords_fit, 
+                         self.number_of_fitting_atoms, 
+                         np_coords_calc, 
+                         self.number_of_calculation_atoms,
+                         conformation_number, 
+                         self.number_of_conformations,
+                         self.__number_of_threads, 
+                         self.__threads_per_block, 
+                         self.__blocks_per_grid)
         return rmsds
         
     def pairwiseRMSDMatrix(self):
@@ -219,28 +213,18 @@ class RMSDCalculator(object):
         @author: vgil
         @date: 26/11/2012
         """
-        np_coords = numpy.reshape(self.fitting_coordinates,self.number_of_conformations*self.number_of_fitting_atoms*3)
+        np_coords_fit, np_coords_calc = self.__coords_reshaping()
         
-        if self.calculation_coordinates is None:
-            return pyRMSD.calculators.calculateRMSDCondensedMatrix(availableCalculators()[self.calculator_type], 
-                                                                   np_coords, 
-                                                                   self.number_of_fitting_atoms, 
-                                                                   numpy.array([]), 0,
-                                                                   self.number_of_conformations,
-                                                                   self.__number_of_threads, 
-                                                                   self.__threads_per_block, 
-                                                                   self.__blocks_per_grid)
-        else:
-            np_coords_calc = numpy.reshape(self.calculation_coordinates,self.number_of_conformations*self.number_of_calculation_atoms*3)
-            return pyRMSD.calculators.calculateRMSDCondensedMatrix(availableCalculators()[self.calculator_type], 
-                                                                   np_coords, 
-                                                                   self.number_of_fitting_atoms, 
-                                                                   np_coords_calc, 
-                                                                   self.number_of_calculation_atoms,
-                                                                   self.number_of_conformations,
-                                                                   self.__number_of_threads, 
-                                                                   self.__threads_per_block, 
-                                                                   self.__blocks_per_grid)
+        rmsd_values = pyRMSD.calculators.calculateRMSDCondensedMatrix(availableCalculators()[self.calculator_type], 
+                                                               np_coords_fit, 
+                                                               self.number_of_fitting_atoms, 
+                                                               np_coords_calc, 
+                                                               self.number_of_calculation_atoms,
+                                                               self.number_of_conformations,
+                                                               self.__number_of_threads, 
+                                                               self.__threads_per_block, 
+                                                               self.__blocks_per_grid)
+        return rmsd_values
     
     def iterativeSuperposition(self):
         """
@@ -253,27 +237,17 @@ class RMSDCalculator(object):
         @author: vgil
         @date: 27/03/2013
         """
-        np_coords = numpy.reshape(self.fitting_coordinates,self.number_of_conformations*self.number_of_fitting_atoms*3)
-        if self.calculation_coordinates is None:
-            pyRMSD.calculators.iterativeSuperposition(availableCalculators()[self.calculator_type], 
-                               np_coords, self.number_of_fitting_atoms, 
-                               numpy.array([]), 
-                               0,
-                               self.number_of_conformations,
-                               self.__number_of_threads, 
-                               self.__threads_per_block, 
-                               self.__blocks_per_grid)
-        else:
-            np_coords_calc = numpy.reshape(self.calculation_coordinates,self.number_of_conformations*self.number_of_calculation_atoms*3)
-            pyRMSD.calculators.iterativeSuperposition(availableCalculators()[self.calculator_type], 
-                               np_coords, 
-                               self.number_of_fitting_atoms, 
-                               np_coords_calc, 
-                               self.number_of_calculation_atoms,
-                               self.number_of_conformations,
-                               self.__number_of_threads, 
-                               self.__threads_per_block, 
-                               self.__blocks_per_grid)
+        np_coords_fit, np_coords_calc = self.__coords_reshaping()
+        
+        pyRMSD.calculators.iterativeSuperposition(availableCalculators()[self.calculator_type], 
+                           np_coords_fit, 
+                           self.number_of_fitting_atoms, 
+                           np_coords_calc, 
+                           self.number_of_calculation_atoms,
+                           self.number_of_conformations,
+                           self.__number_of_threads, 
+                           self.__threads_per_block, 
+                           self.__blocks_per_grid)
     
     def setNumberOfOpenMPThreads(self, number_of_threads):
         """
