@@ -9,6 +9,7 @@
 #define RMSDCALCULATIONDATA_H_
 
 #include "symmGroups.h"
+#include <cstddef>
 
 class RMSDCalculationData {
 	public:
@@ -21,7 +22,13 @@ class RMSDCalculationData {
 
 		virtual ~RMSDCalculationData();
 
-		bool hasCalculationCoordinatesSet();
+		inline bool hasCalculationCoordinatesSet(){
+			return this->calculationCoordinates != NULL;
+		}
+
+		inline bool hasSymmetryGroups(){
+			return this->symmetryGroups != NULL;
+		}
 
 		inline double* getFittingConformationAt(int index){
 			return &(this->fittingCoordinates[index*this->fittingConformationLength]);

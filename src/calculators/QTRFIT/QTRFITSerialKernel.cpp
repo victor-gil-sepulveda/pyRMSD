@@ -172,7 +172,6 @@ void QTRFITSerialKernel::computeFittedQuaternionFromUpperQuadraticMatrix(double 
 	q[1] = eigvec[1][3];
 	q[2] = eigvec[2][3];
 	q[3] = eigvec[3][3];
-
 }
 
 void QTRFITSerialKernel::generateLeftRotationMatrixFromNormalizedQuaternion(double q[4], double u[3][3])

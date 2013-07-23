@@ -227,8 +227,7 @@ bool KABSCHSerialKernel::calculate_rotation_matrix(
 						 - (double) sqrt(fabs(eigenval[1]))
 						 - sigma * (double) sqrt(fabs(eigenval[2]));
 
-	//cout<<"Residual/E0 "<<*residual<<" "<<E0<<endl;
-	return (true);
+	return true;
 }
 
 double KABSCHSerialKernel::calculate_rotation_rmsd(
@@ -252,13 +251,4 @@ double KABSCHSerialKernel::calculate_rotation_rmsd(
 	residual = fabs(residual); /* avoids the awkward case of -0.0 */
 
 	return sqrt(fabs((double) (residual)*2.0/((double) numberOfAtoms)));
-}
-
-double KABSCHSerialKernel::calculate_rmsd(
-		const double* const referenceCoords,
-		const double* const fitCoords,
-		int numberOfAtoms){
-	double U[3][3];
-
-	return calculate_rotation_rmsd(referenceCoords,fitCoords,numberOfAtoms,U);
 }

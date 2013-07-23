@@ -47,12 +47,6 @@ class KABSCHSerialKernel: public KernelFunctions {
 				double (*const U)[3],
 				double E0,
 				double* residual);
-
-
-		virtual double calculate_rmsd(
-				const double* const referenceCoords,
-				const double* const fitCoords,
-				int numberOfAtoms);
 };
 
 #endif /* KABSCHSERIALKERNEL_H_ */

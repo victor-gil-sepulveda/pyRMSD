@@ -6,7 +6,6 @@
  */
 
 #include "RMSDCalculationData.h"
-#include <stdlib.h>
 
 RMSDCalculationData::RMSDCalculationData(int numberOfConformations,
 											int atomsPerFittingConformation,
@@ -37,6 +36,3 @@ RMSDCalculationData::~RMSDCalculationData(){
 	}
 }
 
-bool RMSDCalculationData::hasCalculationCoordinatesSet(){
-	return this->calculationCoordinates != NULL;
-}

@@ -10,6 +10,6 @@ def availableCalculators():
             "QCP_SERIAL_CALCULATOR":6,
             #"QCP_SERIAL_FLOAT_CALCULATOR":7,
             "QCP_OMP_CALCULATOR":8,
-            #"QCP_CUDA_CALCULATOR":9,
-            #"QCP_CUDA_MEM_CALCULATOR":10
+            "QCP_CUDA_CALCULATOR":9,
+            "QCP_CUDA_MEM_CALCULATOR":10
     }
