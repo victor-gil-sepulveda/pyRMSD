@@ -4,6 +4,7 @@
 #include <iostream>
 #include "../calculators/factory/RMSDCalculatorFactory.h"
 #include "../calculators/RMSDCalculator.h"
+#include "../calculators/symmGroups.h"
 using namespace std;
 
 struct Params{
@@ -17,21 +18,73 @@ struct Params{
 	int number_of_threads;
 	int threads_per_block;
 	int blocks_per_grid;
+	symmGroups* symmetry_groups;
 };
 
+/**
+ * Parses an (int) n-ary tuple, storing its contents into a vector.
+ *
+ * \param tuple An integer n-ary tuple.
+ *
+ * \param v  Vector to store the elements of the tuple.
+ *
+ */
+void parse_tuple(PyTupleObject* tuple, vector<int>& v){
+	int number_of_elements = PyTuple_Size((PyObject*) tuple);
+	for (int i =0; i < number_of_elements; ++i){
+		v.push_back(PyInt_AsLong(PyTuple_GetItem((PyObject*) tuple, i)));
+	}
+}
+
+/**
+ * Parses a 'symmetry groups' structure to recreate its homologous C structure using vectors.
+ *
+ * \param list_obj Is the python structure (python array of pairs (also tuples) of n-ary tuples.
+ *
+ * \param symmetry_groups C conversion of this structure using STL objects.
+ */
+void parse_symmetry_groups(PyListObject* list_obj, symmGroups& symmetry_groups){
+	// Precondition: symmetry_groups is an empty vector
+	// and symmetry groups have the correct structure and size
+	int number_of_symmetry_groups = PyList_Size((PyObject*) list_obj);
+	for (int i =0; i < number_of_symmetry_groups; ++i){
+		PyTupleObject* sg_pair = (PyTupleObject*) PyList_GetItem((PyObject*) list_obj, i);
+		PyTupleObject* first_tuple = (PyTupleObject*) PyTuple_GetItem((PyObject*) sg_pair, 0);
+		PyTupleObject* second_tuple = (PyTupleObject*) PyTuple_GetItem((PyObject*) sg_pair, 1);
+		vector<int> v1, v2;
+//		Py_INCREF((PyObject *) first_tuple);
+//		Py_INCREF((PyObject *) second_tuple);
+		parse_tuple(first_tuple,v1);
+		parse_tuple(second_tuple,v2);
+//		Py_DECREF((PyObject *) first_tuple);
+//		Py_DECREF((PyObject *) second_tuple);
+		symmetry_groups.push_back(pair<vector<int>, vector<int> > (v1,v2));
+	}
+}
+
+/**
+ * Parses the parameters given to any of the Python functions and fills a C parameters structure.
+ *
+ * \params args Python tuple containing function arguments.
+ *
+ * \params params C structure which will store the parameters.
+ *
+ */
 void parse_params(PyObject *args, Params* params){
 
-	PyArrayObject * fit_coords_list_obj,
-				  * calc_coords_list_obj;
+	PyArrayObject *fit_coords_list_obj,
+				  *calc_coords_list_obj;
+
+	PyListObject* symmetry_groups_list_obj;
 
 	// We can discriminate the type of function by the number of parameters
 	int num_params = PyTuple_Size(args);
 	bool parsing_ok = false;
 
 	switch (num_params){
-		case 10: // one vs following
+		case 11: // one vs following
 			parsing_ok = (bool) PyArg_ParseTuple(		args,
-														"iO!iO!iiiiii",
+														"iO!iO!iiiO!iii",
 														&(params->calculator_type),
 														&PyArray_Type,
 														&fit_coords_list_obj,
@@ -41,13 +94,15 @@ void parse_params(PyObject *args, Params* params){
 														&(params->number_of_calc_atoms),
 														&(params->conformation_number),
 														&(params->number_of_conformations),
+														&PyList_Type,
+														&symmetry_groups_list_obj,
 														&(params->number_of_threads),
 														&(params->threads_per_block),
 														&(params->blocks_per_grid));
 			break;
-		case 9: // matrix and iterative superposition
+		case 10: // matrix and iterative superposition
 			parsing_ok = (bool) PyArg_ParseTuple(		args,
-														"iO!iO!iiiii",
+														"iO!iO!iiO!iii",
 														&(params->calculator_type),
 														&PyArray_Type,
 														&fit_coords_list_obj,
@@ -56,6 +111,8 @@ void parse_params(PyObject *args, Params* params){
 														&calc_coords_list_obj,
 														&(params->number_of_calc_atoms),
 														&(params->number_of_conformations),
+														&PyList_Type,
+														&symmetry_groups_list_obj,
 														&(params->number_of_threads),
 														&(params->threads_per_block),
 														&(params->blocks_per_grid));
@@ -85,6 +142,9 @@ void parse_params(PyObject *args, Params* params){
 		params->calc_coords_list = NULL;
 	}
 
+	// Parsing symmetry groups
+	params->symmetry_groups = new symmGroups;
+	parse_symmetry_groups(symmetry_groups_list_obj, *(params->symmetry_groups));
 }
 
 PyArrayObject* embed_rmsd_data(vector<double>& rmsd){
@@ -115,6 +175,7 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 									params.fitting_coords_list,
 									params.number_of_calc_atoms,
 									params.calc_coords_list,
+									params.symmetry_groups,
 									params.number_of_threads,
 									params.threads_per_block,
 									params.blocks_per_grid);
@@ -141,6 +202,7 @@ static PyObject* iterativeSuperposition(PyObject *self, PyObject *args){
 									params.fitting_coords_list,
 									params.number_of_calc_atoms,
 									params.calc_coords_list,
+									params.symmetry_groups,
 									params.number_of_threads,
 									params.threads_per_block,
 									params.blocks_per_grid);
@@ -166,6 +228,7 @@ static PyObject* calculateRMSDCondensedMatrix(PyObject *self, PyObject *args){
 									params.fitting_coords_list,
 									params.number_of_calc_atoms,
 									params.calc_coords_list,
+									params.symmetry_groups,
 									params.number_of_threads,
 									params.threads_per_block,
 									params.blocks_per_grid);

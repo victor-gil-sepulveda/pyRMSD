@@ -20,12 +20,14 @@
 #include "../QCP/QCPOmpKernel.h"
 #include "../QCP/QCPSerialFloatKernel.h"
 
+
 #ifdef USE_CUDA
 	#include "../QCP/QCPCUDAKernel.h"
 	#include "../QCP/QCPCUDAMemKernel.h"
 #endif
 
 using namespace std;
+
 
 RMSDCalculatorFactory::RMSDCalculatorFactory() {}
 
@@ -38,6 +40,7 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 		double* allFittingCoordinates,
 		int atomsPerCalculationConformation,
 		double* allCalculationCoordinates,
+		symmGroups* symmetryGroups,
 		int number_of_threads,
 		int threads_per_block,
 		int blocks_per_grid) {
@@ -48,7 +51,8 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 															atomsPerFittingConformation,
 															allFittingCoordinates,
 															atomsPerCalculationConformation,
-															allCalculationCoordinates);
+															allCalculationCoordinates,
+															symmetryGroups);
 
 
 	switch (type) {

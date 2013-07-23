@@ -8,13 +8,16 @@
 #ifndef RMSDCALCULATIONDATA_H_
 #define RMSDCALCULATIONDATA_H_
 
+#include "symmGroups.h"
+
 class RMSDCalculationData {
 	public:
 		RMSDCalculationData(int numberOfConformations,
 							int atomsPerFittingConformation,
 							double* fittingCoordinates,
 							int atomsPerCalculationConformation,
-							double* calculationCoordinates);
+							double* calculationCoordinates,
+							symmGroups* symmetryGroups);
 
 		virtual ~RMSDCalculationData();
 
@@ -39,5 +42,7 @@ class RMSDCalculationData {
 		int calculationConformationLength;
 		int calculationCoordinatesLength;
 		double* calculationCoordinates;
+
+		symmGroups* symmetryGroups;
 };
 #endif /* RMSDCALCULATIONDATA_H_ */

@@ -7,7 +7,6 @@
 #include "RMSDCalculationData.h"
 using namespace std;
 
-
 /**
  * Class constructor. It receives a data package for the RMSD calculation and the implementation
  * of the RMSD calculation functions into the KernelFucntions object. This two objects are from now

@@ -153,7 +153,7 @@ void test_QCP_Kernel(){
 	// Using the function modifying coords
 	RMSDTools::copyArrays(frag_b_copy,frag_b,atoms_len*3);
 	RMSDTools::centerAllAtOrigin(atoms_len,1,frag_b_copy,translations);
-	RMSDCalculationData data(1,atoms_len,frag_b_copy,0,NULL);
+	RMSDCalculationData data(1,atoms_len,frag_b_copy,0,NULL,NULL);
 
 	kernel.oneVsFollowingFitEqualCalcCoords(
 			frag_a,
@@ -215,7 +215,7 @@ void test_KABSCH_Kernel(){
 		RMSDTools::copyArrays(frag_b_copy,frag_b,atoms_len*3);
 		RMSDTools::centerAllAtOrigin(atoms_len,1,frag_b_copy,translations);
 
-		RMSDCalculationData data(1,atoms_len,frag_b_copy,0,NULL);
+		RMSDCalculationData data(1,atoms_len,frag_b_copy,0,NULL,NULL);
 		kernel.oneVsFollowingFitEqualCalcCoords(
 				frag_a,
 				-1,
@@ -640,7 +640,6 @@ void test_iterative_superposition_with_fit_and_calc_rotation(RMSDCalculatorType 
 					expected_number_of_iterations,
 					precision_of_check);
 
-	cout<<"ENDING"<<endl<<flush;
 	delete calculator;
 }
 

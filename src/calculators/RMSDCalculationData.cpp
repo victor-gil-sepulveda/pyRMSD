@@ -12,7 +12,8 @@ RMSDCalculationData::RMSDCalculationData(int numberOfConformations,
 											int atomsPerFittingConformation,
 											double* fittingCoordinates,
 											int atomsPerCalculationConformation,
-											double* calculationCoordinates){
+											double* calculationCoordinates,
+											symmGroups* symmetryGroups){
 
 	this->numberOfConformations = numberOfConformations;
 
@@ -25,9 +26,16 @@ RMSDCalculationData::RMSDCalculationData(int numberOfConformations,
 	this->calculationConformationLength = atomsPerCalculationConformation*3;
 	this->calculationCoordinatesLength = atomsPerCalculationConformation*numberOfConformations*3;
 	this->calculationCoordinates = calculationCoordinates;
+
+	this->symmetryGroups = symmetryGroups;
+
 }
 
-RMSDCalculationData::~RMSDCalculationData(){}
+RMSDCalculationData::~RMSDCalculationData(){
+	if(this->symmetryGroups != NULL){
+		delete this->symmetryGroups;
+	}
+}
 
 bool RMSDCalculationData::hasCalculationCoordinatesSet(){
 	return this->calculationCoordinates != NULL;

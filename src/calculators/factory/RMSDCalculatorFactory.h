@@ -7,12 +7,15 @@
 
 #ifndef RMSDCALCULATORFACTORY_H_
 #define RMSDCALCULATORFACTORY_H_
+
+#include "../symmGroups.h"
 #include "RMSDCalculatorTypes.h"
 
 class RMSDCalculator;
 
 class RMSDCalculatorFactory {
 	public:
+
 		RMSDCalculatorFactory();
 		virtual ~RMSDCalculatorFactory();
 
@@ -23,6 +26,7 @@ class RMSDCalculatorFactory {
 				double* allCoordinates,
 				int atomsPerCalculationConformation = 0,
 				double* allCalculationCoordinates = NULL,
+				symmGroups* symmetryGroups = NULL,
 				int number_of_threads = 4,
 				int threads_per_block = 8,
 				int blocks_per_grid = 16);

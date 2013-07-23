@@ -208,17 +208,17 @@ class RMSDCalculator(object):
         """
         np_coords_fit, np_coords_calc = self.__coords_reshaping()
         
-        rmsds =  pyRMSD.calculators.oneVsFollowing(
-                         availableCalculators()[self.calculator_type], 
-                         np_coords_fit, 
-                         self.number_of_fitting_atoms, 
-                         np_coords_calc, 
-                         self.number_of_calculation_atoms,
-                         conformation_number, 
-                         self.number_of_conformations,
-                         self.__number_of_threads, 
-                         self.__threads_per_block, 
-                         self.__blocks_per_grid)
+        rmsds =  pyRMSD.calculators.oneVsFollowing(availableCalculators()[self.calculator_type], 
+                                                     np_coords_fit, 
+                                                     self.number_of_fitting_atoms, 
+                                                     np_coords_calc, 
+                                                     self.number_of_calculation_atoms,
+                                                     conformation_number, 
+                                                     self.number_of_conformations,
+                                                     self.symmetry_groups,
+                                                     self.__number_of_threads, 
+                                                     self.__threads_per_block, 
+                                                     self.__blocks_per_grid)
         return rmsds
         
     def pairwiseRMSDMatrix(self):
@@ -238,6 +238,7 @@ class RMSDCalculator(object):
                                                                np_coords_calc, 
                                                                self.number_of_calculation_atoms,
                                                                self.number_of_conformations,
+                                                               self.symmetry_groups,
                                                                self.__number_of_threads, 
                                                                self.__threads_per_block, 
                                                                self.__blocks_per_grid)
@@ -262,6 +263,7 @@ class RMSDCalculator(object):
                            np_coords_calc, 
                            self.number_of_calculation_atoms,
                            self.number_of_conformations,
+                           self.symmetry_groups,
                            self.__number_of_threads, 
                            self.__threads_per_block, 
                            self.__blocks_per_grid)
@@ -278,8 +280,7 @@ class RMSDCalculator(object):
         if ("OMP" in self.calculator_type):
             self.__number_of_threads = number_of_threads
         else:
-            print "Cannot set any OpenMP related parameter using this calculator: ", self.calculator_type
-            raise KeyError
+            raise KeyError("Cannot set any OpenMP related parameter using this calculator: "+str( self.calculator_type))
     
     def setCUDAKernelThreadsPerBlock(self, number_of_threads, number_of_blocks):
         """
@@ -296,5 +297,4 @@ class RMSDCalculator(object):
             self.__threads_per_block = number_of_threads
             self.__blocks_per_grid = number_of_blocks
         else:
-            print "Cannot set any CUDA related parameter using this calculator: ", self.calculator_type
-            raise KeyError
+            raise KeyError("Cannot set any CUDA related parameter using this calculator: "+str(self.calculator_type))
