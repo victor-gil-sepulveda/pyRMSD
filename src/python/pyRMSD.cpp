@@ -6,110 +6,85 @@
 #include "../calculators/RMSDCalculator.h"
 using namespace std;
 
+struct Params{
+	RMSDCalculatorType calculator_type;
+	double* fitting_coords_list;
+	int number_of_fitting_atoms;
+	double* calc_coords_list;
+	int number_of_calc_atoms;
+	int conformation_number;
+	int number_of_conformations;
+	int number_of_threads;
+	int threads_per_block;
+	int blocks_per_grid;
+};
 
-void parse_params_for_one_vs_others(
-		PyObject *args,
-		RMSDCalculatorType& calculatorType,
-		double*& coords_list,
-		int& number_of_atoms,
-		double*& calc_coords_list,
-		int& number_of_calc_atoms,
-		int& conformation_number,
-		int& number_of_conformations,
-    	int& number_of_threads,
-    	int& threads_per_block,
-    	int& blocks_per_grid){
-	
-	PyArrayObject* coords_list_obj,
-				 * calc_coords_list_obj;
+void parse_params(PyObject *args, Params* params){
 
-	if (!PyArg_ParseTuple(
-			args,
-			"iO!iO!iiiiii",
-			&calculatorType,
-			&PyArray_Type,
-			&coords_list_obj,
-			&number_of_atoms,
-			&PyArray_Type,
-			&calc_coords_list_obj,
-			&number_of_calc_atoms,
-			&conformation_number,
-			&number_of_conformations,
-			&number_of_threads,
-			&threads_per_block,
-			&blocks_per_grid)){
+	PyArrayObject * fit_coords_list_obj,
+				  * calc_coords_list_obj;
 
-		PyErr_SetString(
-				PyExc_RuntimeError,
-				"Error parsing parameters"
-		);
-    }
+	// We can discriminate the type of function by the number of parameters
+	int num_params = PyTuple_Size(args);
+	bool parsing_ok = false;
 
-	if (coords_list_obj->descr->type_num != NPY_DOUBLE || coords_list_obj->nd != 1){
-    	PyErr_SetString(PyExc_RuntimeError, "First parameters must be a double array.");
-    }
-
-    // Get the data pointer
-    coords_list = (double *) (coords_list_obj->data);
-
-    if(number_of_calc_atoms != 0){
-    	calc_coords_list = (double *) (calc_coords_list_obj->data);
-    }
-    else{
-    	calc_coords_list = NULL;
-    }
-
-    // Length of the vector
-    int coords_list_len = coords_list_obj->dimensions[0];
-
-    // Check the length
-    if (coords_list_len == 0 || coords_list_len%3 != 0){
-		PyErr_SetString(PyExc_RuntimeError, "Invalid size for the coordinates parameter.");
+	switch (num_params){
+		case 10: // one vs following
+			parsing_ok = (bool) PyArg_ParseTuple(		args,
+														"iO!iO!iiiiii",
+														&(params->calculator_type),
+														&PyArray_Type,
+														&fit_coords_list_obj,
+														&(params->number_of_fitting_atoms),
+														&PyArray_Type,
+														&calc_coords_list_obj,
+														&(params->number_of_calc_atoms),
+														&(params->conformation_number),
+														&(params->number_of_conformations),
+														&(params->number_of_threads),
+														&(params->threads_per_block),
+														&(params->blocks_per_grid));
+			break;
+		case 9: // matrix and iterative superposition
+			parsing_ok = (bool) PyArg_ParseTuple(		args,
+														"iO!iO!iiiii",
+														&(params->calculator_type),
+														&PyArray_Type,
+														&fit_coords_list_obj,
+														&(params->number_of_fitting_atoms),
+														&PyArray_Type,
+														&calc_coords_list_obj,
+														&(params->number_of_calc_atoms),
+														&(params->number_of_conformations),
+														&(params->number_of_threads),
+														&(params->threads_per_block),
+														&(params->blocks_per_grid));
+			break;
+		default:
+			PyErr_SetString(PyExc_RuntimeError,
+							"Unexpected number of parameters.");
 	}
-    //TODO check length of calc coordinates
-}
 
-void parse_params_for_condensed_matrix(
-		PyObject *args,
-		RMSDCalculatorType& calculatorType,
-		double*& coords_list, int& number_of_atoms,
-		double*& calc_coords_list, int& number_of_calc_atoms,
-		int& number_of_conformations,
-		int& number_of_threads,	int& threads_per_block,	int& blocks_per_grid){
+	if (!parsing_ok){
+		PyErr_SetString(PyExc_RuntimeError,
+						"Error parsing parameters.");
+	}
 
-	PyArrayObject* coords_list_obj,
-	 	 	 	 * calc_coords_list_obj;
+	if (fit_coords_list_obj->descr->type_num != NPY_DOUBLE || fit_coords_list_obj->nd != 1){
+		PyErr_SetString(PyExc_RuntimeError,
+						"First parameters must be a double array.");
+	}
 
-	if (!PyArg_ParseTuple(
-			args,
-			"iO!iO!iiiii",
-			&calculatorType,
-			&PyArray_Type, &coords_list_obj, &number_of_atoms,
-			&PyArray_Type, &calc_coords_list_obj, &number_of_calc_atoms,
-			&number_of_conformations,
-			&number_of_threads, &threads_per_block, &blocks_per_grid)){
-    	PyErr_SetString(PyExc_RuntimeError, "Error parsing parameters");
-    }
+	// Get the data pointer
+	params->fitting_coords_list = (double *) (fit_coords_list_obj->data);
 
-    if (coords_list_obj->descr->type_num != NPY_DOUBLE || coords_list_obj->nd != 1){
-    	PyErr_SetString(PyExc_RuntimeError, "First parameters must be a double array.");
-    }
-    // Get the data pointer
-    coords_list = (double *) (coords_list_obj->data);
-    if(number_of_calc_atoms != 0){
-		calc_coords_list = (double *) (calc_coords_list_obj->data);
+	if(params->number_of_calc_atoms != 0){
+		params->calc_coords_list = (double *) (calc_coords_list_obj->data);
 	}
 	else{
-		calc_coords_list = NULL;
+		params->calc_coords_list = NULL;
 	}
-    coords_list = (double *) (coords_list_obj->data);
-    // Length of the vector
-    int coords_list_len = coords_list_obj->dimensions[0];
 
-    // Check the length
-    if (coords_list_len == 0 || coords_list_len%3 != 0){
-		PyErr_SetString(PyExc_RuntimeError, "Invalid size for the coordinates parameter.");
-	}
 }
 
 PyArrayObject* embed_rmsd_data(vector<double>& rmsd){
@@ -126,41 +101,25 @@ PyArrayObject* embed_rmsd_data(vector<double>& rmsd){
 
 static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 
-	int conformation_number;
-	int atoms_per_conformation;
-	int atoms_per_calc_conformation;
-	int number_of_conformations;
-	int number_of_threads;
-	int threads_per_block;
-	int blocks_per_grid;
-
-	RMSDCalculatorType calculatorType;
-	double* all_coordinates;
-	double* all_calc_coordinates;
+	Params params;
 	vector<double> rmsd;
 
-	parse_params_for_one_vs_others(
-			args,
-			calculatorType,
-			all_coordinates, atoms_per_conformation,
-			all_calc_coordinates, atoms_per_calc_conformation,
-			conformation_number, number_of_conformations,
-			number_of_threads, threads_per_block, blocks_per_grid);
+	parse_params(args, &params);
 
-	rmsd.resize(number_of_conformations-conformation_number-1);
+	rmsd.resize(params.number_of_conformations-params.conformation_number-1);
 
 	RMSDCalculator* rmsdCalculator = RMSDCalculatorFactory::createCalculator(
-					calculatorType,
-					number_of_conformations,
-					atoms_per_conformation,
-					all_coordinates,
-					atoms_per_calc_conformation,
-					all_calc_coordinates,
-					number_of_threads,
-					threads_per_block,
-					blocks_per_grid);
+									params.calculator_type,
+									params.number_of_conformations,
+									params.number_of_fitting_atoms,
+									params.fitting_coords_list,
+									params.number_of_calc_atoms,
+									params.calc_coords_list,
+									params.number_of_threads,
+									params.threads_per_block,
+									params.blocks_per_grid);
 
-    rmsdCalculator->oneVsFollowing(conformation_number,&(rmsd[0]));
+	rmsdCalculator->oneVsFollowing(params.conformation_number,&(rmsd[0]));
 
 	PyArrayObject* rmsds_list_obj = embed_rmsd_data(rmsd);
 
@@ -170,37 +129,21 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 }
 
 static PyObject* iterativeSuperposition(PyObject *self, PyObject *args){
-	int atoms_per_conformation;
-	int atoms_per_calc_conformation;
-	int number_of_conformations;
-	int number_of_threads;
-	int threads_per_block;
-	int blocks_per_grid;
-	double* all_coordinates;
-	double* all_calc_coordinates;
+	Params params;
 	vector<double> rmsd;
-	RMSDCalculatorType calculatorType;
 
-
-	parse_params_for_condensed_matrix(
-			args,
-			calculatorType,
-			all_coordinates, atoms_per_conformation,
-			all_calc_coordinates, atoms_per_calc_conformation,
-			number_of_conformations,
-			number_of_threads, threads_per_block,blocks_per_grid
-	);
+	parse_params(args, &params);
 
 	RMSDCalculator* rmsdCalculator = RMSDCalculatorFactory::createCalculator(
-				calculatorType,
-				number_of_conformations,
-				atoms_per_conformation,
-				all_coordinates,
-				atoms_per_calc_conformation,
-				all_calc_coordinates,
-				number_of_threads,
-				threads_per_block,
-				blocks_per_grid);
+									params.calculator_type,
+									params.number_of_conformations,
+									params.number_of_fitting_atoms,
+									params.fitting_coords_list,
+									params.number_of_calc_atoms,
+									params.calc_coords_list,
+									params.number_of_threads,
+									params.threads_per_block,
+									params.blocks_per_grid);
 
 	rmsdCalculator->iterativeSuperposition(1e-4);
 
@@ -211,41 +154,26 @@ static PyObject* iterativeSuperposition(PyObject *self, PyObject *args){
 }
 
 static PyObject* calculateRMSDCondensedMatrix(PyObject *self, PyObject *args){
-	int atoms_per_conformation;
-	int atoms_per_calc_conformation;
-	int number_of_conformations;
-	int number_of_threads;
-	int threads_per_block;
-	int blocks_per_grid;
-	double* all_coordinates;
-	double* all_calc_coordinates;
+	Params params;
 	vector<double> rmsd;
-	RMSDCalculatorType calculatorType;
 
-
-	parse_params_for_condensed_matrix(
-			args,
-			calculatorType,
-			all_coordinates, atoms_per_conformation,
-			all_calc_coordinates, atoms_per_calc_conformation,
-			number_of_conformations,
-			number_of_threads, threads_per_block,blocks_per_grid
-	);
+	parse_params(args, &params);
 
 	RMSDCalculator* rmsdCalculator = RMSDCalculatorFactory::createCalculator(
-			calculatorType,
-			number_of_conformations,
-			atoms_per_conformation,
-			all_coordinates,
-			atoms_per_calc_conformation,
-			all_calc_coordinates,
-			number_of_threads,
-			threads_per_block,
-			blocks_per_grid);
+									params.calculator_type,
+									params.number_of_conformations,
+									params.number_of_fitting_atoms,
+									params.fitting_coords_list,
+									params.number_of_calc_atoms,
+									params.calc_coords_list,
+									params.number_of_threads,
+									params.threads_per_block,
+									params.blocks_per_grid);
 
 	rmsdCalculator->calculateRMSDCondensedMatrix(rmsd);
 
 	PyArrayObject* rmsds_list_obj = embed_rmsd_data(rmsd);
+
 	delete rmsdCalculator;
 
 	return PyArray_Return(rmsds_list_obj);

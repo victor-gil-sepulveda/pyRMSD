@@ -42,7 +42,6 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 		int threads_per_block,
 		int blocks_per_grid) {
 
-	cout<<"type:"<<type<<endl;
 	KernelFunctions* kernelFunctions;
 	// Package input data
 	RMSDCalculationData* rmsdData = new RMSDCalculationData(numberOfConformations,
