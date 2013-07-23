@@ -40,7 +40,7 @@ class RMSDCalculator(object):
                  a1, b1, c3, d4, e5, f6 ; for conf2
                  a2, b2, c3, d4, e5, f6 ; for conf3
             
-            and a symmetry group ((1,3),(2,4)). The final RMSDs would be the minimum RMSDs of:
+            and a symmetry group definition [((1,3),(2,4)),]. The final RMSDs would be the minimum RMSDs of:
                 a,  b,  c,  d,  e , f ;  for conf1 (original)
                 a,  c,  b,  e,  d , f ;  for conf1 (applying symmetry group)
             
@@ -48,8 +48,8 @@ class RMSDCalculator(object):
                 a1, b1, c3, d4, e5, f6 ; for conf2
                 a2, b2, c3, d4, e5, f6 ; for conf3
                 
-            This is a low level description (specially because is structure agnostic) of the type of symmetries that can be found in 
-            some ligands, i.e. in rotating benzene groups. It can also be used in symmetries of bigger selections though. 
+            Symm. groups are a low-level structure-agnostic of the type of symmetries that can be found in some ligands, 
+            i.e. in rotating benzene groups. It can also be used in symmetries of bigger selections though. 
             
         @author: vgil
         @date: 26/11/2012
@@ -77,7 +77,22 @@ class RMSDCalculator(object):
             self.__threads_per_block = 32
             self.__blocks_per_grid = 8
             self.__number_of_threads = 8
+            
+            # Symmetry group handling
+            self.__check_symm_groups(symmetryGroups)
+            self.symmetry_groups = symmetryGroups
     
+    def __check_symm_groups(self, symm_groups):
+        """
+        Checks that symmetry groups are well defined (each n-tuple has a correspondent symmetric n-tuple) 
+        """
+        try:
+            for sg in symm_groups:
+                if len(sg[0]) != len(sg[1]):
+                    raise Exception
+        except Exception:
+            raise ValueError('Symmetry groups are not well defined')
+         
     def pairwise(self, first_conformation_number, second_conformation_number, get_superposed_coordinates = False):
         """
         Calculates the rmsd of two conformations. As it must create a copy of the conformations, it does not modify the
@@ -89,14 +104,13 @@ class RMSDCalculator(object):
         
         @param get_superposed_coordinates: If true, the function will also return the superposed coordinates.
     
-        @return: The RMSD value or a tuple consisting of the RMSD of both conformations, the superposed fitting coordinates (copy), and the
-        superposed calculation coordinates (copy, this last only if calculation coordinates were defined). Superposed fitting and 
-        calculation resulting coordinates is a 2 conformation array.
+        @return: The RMSD value or, if get_superposed_coordinates is True, a tuple consisting of the RMSD of both conformations 
+        along with the superposed fitting coordinates (copy), and superposed calculation coordinates if defined (also an unbound 
+        copy). Superposed fitting and calculation resulting coordinates is a 2 conformation array.
         
         @author: vgil
         @date: 26/11/2012
         """
-        
         # Working with fitting coordinates
         first_coords = self.fitting_coordinates[first_conformation_number]
         second_coords = self.fitting_coordinates[second_conformation_number]
@@ -170,6 +184,9 @@ class RMSDCalculator(object):
             return rmsd_array
     
     def __coords_reshaping(self):
+        """
+        Flattens the coordinates.
+        """
         # This kind of reshaping should not do a copy
         np_coords_fit = numpy.reshape(self.fitting_coordinates, self.number_of_conformations*self.number_of_fitting_atoms*3)
         np_coords_calc = numpy.array([])
