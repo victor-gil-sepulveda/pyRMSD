@@ -474,8 +474,8 @@ void RMSDTools::applySymmetryGroup(double* coordinates, pair<vector<int>, vector
 	vector<int>& first_atoms = symm_group.first;
 	vector<int>& second_atoms = symm_group.second;
 
-	for (int i = 0; i < first_atoms.size(); ++i){
-		RMSDTools::swap_atoms(coordinates, first_atoms[i],first_atoms[j]);
+	for (unsigned int i = 0; i < first_atoms.size(); ++i){
+		RMSDTools::swap_atoms(coordinates, first_atoms[i],second_atoms[i]);
 	}
 
 }
@@ -506,15 +506,15 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
 											vector<double>& rmsds){
 
 	// Keep doing recursive calls until the binary tree is constructed
-	if (applied_symm_group < symm_groups.size()){
+	if (applied_symm_group < (int) symm_groups->size()){
 		// We apply the change in one branch
 		RMSDTools::applySymmetryGroup(superposed_conformation,
 							symm_groups->at(applied_symm_group));
 
 		RMSDTools::calcRecursiveSymmGroupApplication(reference,
 				superposed_conformation,
-				symm_groups,
 				number_of_atoms,
+				symm_groups,
 				applied_symm_group+1,
 				rmsds);
 
@@ -523,8 +523,8 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
 							symm_groups->at(applied_symm_group));
 		RMSDTools::calcRecursiveSymmGroupApplication(reference,
 				superposed_conformation,
-				symm_groups,
 				number_of_atoms,
+				symm_groups,
 				applied_symm_group+1,
 				rmsds);
 	}
@@ -536,7 +536,7 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
 }
 
 /**
- * Calculates rmsds for all applications of symmetry groups and
+ * Calculates rmsds for all applications of symmetry groups and returns the minimum value
  *
  * \param reference The reference conformation.
  *
@@ -546,12 +546,9 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
  *
  * \param symm_groups A description of symmetries.
  *
- * \param applied_symm_group The symmetry group that will be applied in this call (0 if it
- * 	is the first call)
- *
  * \param rmsds Array that will contain calculated rmsds for all permutations.
  */
-void calcMinRMSDOfAllSymmetryGroups(	double* reference,
+double RMSDTools::calcMinRMSDOfAllSymmetryGroups(	double* reference,
 											double* superposed_conformation,
 											int number_of_atoms,
 											symmGroups* symm_groups){
@@ -566,4 +563,5 @@ void calcMinRMSDOfAllSymmetryGroups(	double* reference,
 													symm_groups,
 													0, // We start with the 0th symm group
 													rmsds);
+	return *min_element(rmsds.begin(), rmsds.end());
 }

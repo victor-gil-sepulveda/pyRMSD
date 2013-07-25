@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <utility>
+#include "symmGroups.h"
 
 namespace RMSDTools{
 
@@ -71,7 +72,17 @@ namespace RMSDTools{
 
 	bool jacobi3(double a[3][3], double d[3], double v[3][3], int n_rot = 50);
 
-	void applySymmetryGroup(double* , std::pair<std::vector<int>, std::vector<int> >&);
+	void swap_atoms(double* coordinates, int atom_i, int atom_j);
+
+	void applySymmetryGroup(double* coordinates, std::pair<std::vector<int>, std::vector<int> >& symm_group);
+
+	void calcRecursiveSymmGroupApplication(double* reference, double* superposed_conformation,
+												int number_of_atoms, symmGroups* symm_groups,
+												int applied_symm_group, std::vector<double>& rmsds);
+
+	double calcMinRMSDOfAllSymmetryGroups(	double* reference, double* superposed_conformation,
+												int number_of_atoms, symmGroups* symm_groups);
+
 }
 
 #endif
