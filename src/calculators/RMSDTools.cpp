@@ -457,9 +457,9 @@ void RMSDTools::cross(double* a, double* b, double* c)	{
 void RMSDTools::swap_atoms(double* coordinates, int atom_i, int atom_j){
 	int offset_i = atom_i*3;
 	int offset_j = atom_j*3;
-	coordinates[offset_i] = coordinates[offset_j];
-	coordinates[offset_i+1] = coordinates[offset_j+1];
-	coordinates[offset_i+2] = coordinates[offset_j+2];
+	swap(coordinates[offset_i], coordinates[offset_j]);
+	swap(coordinates[offset_i+1], coordinates[offset_j+1]);
+	swap(coordinates[offset_i+2], coordinates[offset_j+2]);
 }
 
 /**
@@ -531,6 +531,12 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
 	else{
 		// We have reached a leave, so we calc. the RMSD for this permutation
 		rmsds.push_back(RMSDTools::calcRMS(reference, superposed_conformation, number_of_atoms));
+//		for (int i = 0; i < number_of_atoms; ++i){
+//			cout<<superposed_conformation[i*3]<<","
+//					<<superposed_conformation[i*3+1]<<","
+//					<<superposed_conformation[i*3+2]<<", ";
+//		}
+//		cout<<"["<<rmsds[rmsds.size()-1]<<"]"<<endl;
 	}
 
 }

@@ -9,6 +9,7 @@
 #include "../factory/RMSDCalculatorFactory.h"
 #include "../KABSCH/KABSCHSerialKernel.h"
 #include "../RMSDCalculationData.h"
+#include "../symmGroups.h"
 
 using namespace std;
 
@@ -102,6 +103,93 @@ void test_translations(){
 }
 
 
+void test_swap_atoms(){
+	print_test_tittle(__FUNCTION__);
+
+	double coordinates [] = 	{1,2,3,  4,5,6,   7,8,9, 10,11,12, 13,14,15, 16,17,18, 19,20,21, 22,23,24};
+	double swapped_coords [] = {1,2,3, 	16,17,18, 7,8,9, 22,23,24, 13,14,15,  4,5,6,   19,20,21, 10,11,12};
+
+	RMSDTools::swap_atoms(coordinates, 1, 5);
+	RMSDTools::swap_atoms(coordinates, 3, 7);
+
+	compareVectors("\tAtoms coordinates have been swapped: ", swapped_coords, coordinates, 8*3, 1e-16);
+}
+
+void test_apply_symm_group(){
+	print_test_tittle(__FUNCTION__);
+	double coordinates [] = 	{1,2,3,  4,5,6,   7,8,9, 10,11,12, 13,14,15, 16,17,18, 19,20,21, 22,23,24};
+	double swapped_coords [] = {1,2,3, 	16,17,18, 7,8,9, 22,23,24, 13,14,15,  4,5,6,   19,20,21, 10,11,12};
+
+	pair<vector<int>, vector<int> > symm_group;
+	symm_group.first.push_back(1);
+	symm_group.first.push_back(3);
+	symm_group.second.push_back(5);
+	symm_group.second.push_back(7);
+
+	RMSDTools::applySymmetryGroup(coordinates, symm_group);
+
+	compareVectors("\tSymm group was correctly applied: ", swapped_coords, coordinates, 8*3, 1e-16);
+
+}
+
+void test_apply_all_symmetries(){
+	print_test_tittle(__FUNCTION__);
+
+	double reference [] = 	{ 1,2,3,    4,5,6,
+							  7,8,9, 10,11,12,
+						   13,14,15, 16,17,18,
+						   19,20,21, 22,23,24,
+						   25,26,27, 28,29,30};
+
+	// Permutation of the first with one atom changed (negated) (rmsd = 13.1453 )
+	// This forces a search to get the best value
+	double superposed_conformation [] = {  1,2,3,   16,17,18,
+											7,8,9,   22,23,24,
+											-13,-14,-15,   4,5,6,
+											19,20,21, 10,11,12,
+											25,26,27, 28,29,30,};
+
+	pair<vector<int>, vector<int> > symm_group_1;
+	symm_group_1.first.push_back(1);
+	symm_group_1.first.push_back(3);
+	symm_group_1.second.push_back(5);
+	symm_group_1.second.push_back(7);
+
+	pair<vector<int>, vector<int> > symm_group_2;
+	symm_group_2.first.push_back(2);
+	symm_group_2.first.push_back(4);
+	symm_group_2.second.push_back(6);
+	symm_group_2.second.push_back(8);
+
+	pair<vector<int>, vector<int> > symm_group_3;
+	symm_group_3.first.push_back(5);
+	symm_group_3.second.push_back(9);
+
+	symmGroups symm_groups;
+	symm_groups.push_back(symm_group_1);
+	symm_groups.push_back(symm_group_2);
+	symm_groups.push_back(symm_group_3);
+
+//	This generates:
+//	1,2,3,    4,5,6, 19,20,21, 10,11,12,    25,26,27, 28,29,30,    7,8,9, 22,23,24, -13,-14,-15, 16,17,18, [26.397]
+//	1,2,3,    4,5,6, 19,20,21, 10,11,12,    25,26,27, 16,17,18,    7,8,9, 22,23,24, -13,-14,-15, 28,29,30, [24.7063]
+//	1,2,3,    4,5,6,    7,8,9, 10,11,12, -13,-14,-15, 28,29,30, 19,20,21, 22,23,24,    25,26,27, 16,17,18, [17.9555]
+//	1,2,3,    4,5,6,    7,8,9, 10,11,12, -13,-14,-15, 16,17,18, 19,20,21, 22,23,24,    25,26,27, 28,29,30, [15.3623]
+//	1,2,3, 16,17,18, 19,20,21, 22,23,24,    25,26,27, 28,29,30,    7,8,9, 10,11,12, -13,-14,-15,    4,5,6, [30.9192]
+//	1,2,3, 16,17,18, 19,20,21, 22,23,24,    25,26,27,    4,5,6,    7,8,9, 10,11,12, -13,-14,-15, 28,29,30, [27.9857]
+//	1,2,3, 16,17,18,    7,8,9, 22,23,24, -13,-14,-15, 28,29,30, 19,20,21, 10,11,12,    25,26,27,    4,5,6, [24.1164]
+//	1,2,3, 16,17,18,    7,8,9, 22,23,24, -13,-14,-15,    4,5,6, 19,20,21, 10,11,12,    25,26,27, 28,29,30, [20.2188]
+
+	double rmsd = RMSDTools::calcMinRMSDOfAllSymmetryGroups(reference,
+												superposed_conformation,
+												10,
+												&symm_groups);
+	double expected_min_rmsd = 15.3623;
+
+	compareVectors("\tMinimum RMSD must be the expected one: ",
+			&expected_min_rmsd, &rmsd, 1, 1e-4);
+
+}
 
 // Fine grain test of qcp with data from the original files in http://theobald.brandeis.edu/qcp/
 void test_QCP_Kernel(){

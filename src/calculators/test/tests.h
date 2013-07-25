@@ -14,6 +14,10 @@
 	void test_translations();
 	void test_center_coordinates();
 
+	void test_swap_atoms();
+	void test_apply_symm_group();
+	void test_apply_all_symmetries();
+
 	void test_QCP_Kernel();
 	void test_KABSCH_Kernel();
 
