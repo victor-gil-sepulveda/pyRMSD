@@ -54,6 +54,13 @@ void RMSDCalculator::oneVsFollowing(int reference_conformation_index, double* rm
 					reference_conformation,
 					reference_conformation_index,
 					rmsd);
+
+			if(this->rmsdData->hasSymmetryGroups()){
+				this->kernelFunctions->handleSymmetriesWithFitCoords(
+						reference_conformation_index,
+						rmsd,
+						this->rmsdData);
+			}
 		}
 		else{
 
@@ -65,6 +72,14 @@ void RMSDCalculator::oneVsFollowing(int reference_conformation_index, double* rm
 					calc_reference_conformation,
 					reference_conformation_index,
 					rmsd);
+
+			if(this->rmsdData->hasSymmetryGroups()){
+				this->kernelFunctions->handleSymmetriesWithCalcCoords(
+						reference_conformation_index,
+						rmsd,
+						this->rmsdData);
+			}
+
 		}
 	}
 }
@@ -175,6 +190,7 @@ void RMSDCalculator::_one_vs_following_fit_equals_calc_coords(
 		double* reference,
 		int reference_index,
 		double *rmsd){
+
 	RMSDTools::centerAllAtOrigin(this->rmsdData->atomsPerFittingConformation,
 			this->rmsdData->numberOfConformations,
 			this->rmsdData->fittingCoordinates);

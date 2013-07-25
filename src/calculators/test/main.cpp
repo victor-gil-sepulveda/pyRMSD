@@ -177,7 +177,7 @@ int main(int argc, char **argv){
 
 	test_KABSCH_Kernel();
 
-	/*for(unsigned int i = 0; i < available_calculators.size();++i){
+	for(unsigned int i = 0; i < available_calculators.size();++i){
 
 		test_superposition_with_fit(available_calculators[i],
 				"data/Models/prot_plus_ligand_similar/prot_plus_ligand_offset.CA.coords",
@@ -252,7 +252,7 @@ int main(int argc, char **argv){
 			"data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_all.coords",
 			"data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_BEN.coords");
 #endif
-*/
+
 	return 0;
 }
 

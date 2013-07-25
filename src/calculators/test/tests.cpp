@@ -170,6 +170,8 @@ void test_apply_all_symmetries(){
 	symm_groups.push_back(symm_group_2);
 	symm_groups.push_back(symm_group_3);
 
+	symmGroups empty_symm_group;
+
 //	This generates:
 //	1,2,3,    4,5,6, 19,20,21, 10,11,12,    25,26,27, 28,29,30,    7,8,9, 22,23,24, -13,-14,-15, 16,17,18, [26.397]
 //	1,2,3,    4,5,6, 19,20,21, 10,11,12,    25,26,27, 16,17,18,    7,8,9, 22,23,24, -13,-14,-15, 28,29,30, [24.7063]
@@ -188,6 +190,15 @@ void test_apply_all_symmetries(){
 
 	compareVectors("\tMinimum RMSD must be the expected one: ",
 			&expected_min_rmsd, &rmsd, 1, 1e-4);
+
+	rmsd = RMSDTools::calcMinRMSDOfAllSymmetryGroups(reference,
+													superposed_conformation,
+													10,
+													&empty_symm_group);
+	double expected_empty_rmsd = 20.2188;
+
+	compareVectors("\tAnd if the symm group is empty, it calculates the normal RMSD: ",
+				&expected_empty_rmsd, &rmsd, 1, 1e-4);
 
 }
 

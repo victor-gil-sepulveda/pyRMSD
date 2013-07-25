@@ -32,8 +32,12 @@ class KernelFunctions{
 				double* rmsd,
 				RMSDCalculationData* data) = 0;
 
-		virtual void handleSymmetries(
-				double* reference,
+		virtual void handleSymmetriesWithFitCoords(
+				int reference_conformation_number,
+				double* rmsd,
+				RMSDCalculationData* data);
+
+		virtual void handleSymmetriesWithCalcCoords(
 				int reference_conformation_number,
 				double* rmsd,
 				RMSDCalculationData* data);
