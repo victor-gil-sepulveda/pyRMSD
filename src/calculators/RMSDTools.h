@@ -1,6 +1,9 @@
 #ifndef _MATH_TOOLS_H
 #define _MATH_TOOLS_H
 
+#include <vector>
+#include <utility>
+
 namespace RMSDTools{
 
 	void superpose(unsigned int n, double * const coord_fit, double* const coord_ref);
@@ -67,6 +70,8 @@ namespace RMSDTools{
 	void cross(double* , double*, double*);
 
 	bool jacobi3(double a[3][3], double d[3], double v[3][3], int n_rot = 50);
+
+	void applySymmetryGroup(double* , std::pair<std::vector<int>, std::vector<int> >&);
 }
 
 #endif

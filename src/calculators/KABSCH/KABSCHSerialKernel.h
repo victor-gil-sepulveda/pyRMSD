@@ -28,6 +28,19 @@ class KABSCHSerialKernel: public KernelFunctions {
 				double* rmsd,
 				RMSDCalculationData* data);
 
+		virtual void oneVsFollowingFitEqualCalcCoordsWithSymmetry(
+				double* reference,
+				int reference_conformation_number,
+				double* rmsd,
+				RMSDCalculationData* data);
+
+		virtual void oneVsFollowingFitDiffersCalcCoordsWithSymmetry(
+				double* fitReference,
+				double* calcReference,
+				int reference_conformation_number,
+				double* rmsd,
+				RMSDCalculationData* data);
+
 		virtual double calculate_rotation_rmsd(
 				const double* const referenceCoords,
 				const double* const fitCoords,

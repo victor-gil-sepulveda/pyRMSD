@@ -23,7 +23,7 @@ void QTRFITSerialKernel::oneVsFollowingFitEqualCalcCoords(
 		double* rmsd,
 		RMSDCalculationData* data) {
 
-	for (int i = reference_conformation_number + 1; i < data->numberOfConformations;	++i) {
+	for (int i = reference_conformation_number + 1; i < data->numberOfConformations; ++i) {
 		// Real conformation coordinates are used, so they are modified
 		double* conformation_coords = data->getFittingConformationAt(i);
 

@@ -32,6 +32,33 @@ class KernelFunctions{
 				double* rmsd,
 				RMSDCalculationData* data) = 0;
 
+		virtual void oneVsFollowingFitEqualCalcCoordsWithSymmetry(
+				double* reference,
+				int reference_conformation_number,
+				double* rmsd,
+				RMSDCalculationData* data){
+			oneVsFollowingFitEqualCalcCoords(
+							reference,
+							reference_conformation_number,
+							rmsd,
+							data);
+		}
+
+		virtual void oneVsFollowingFitDiffersCalcCoordsWithSymmetry(
+				double* fitReference,
+				double* calcReference,
+				int reference_conformation_number,
+				double* rmsd,
+				RMSDCalculationData* data){
+			oneVsFollowingFitDiffersCalcCoords(
+							fitReference,
+							calcReference,
+							reference_conformation_number,
+							rmsd,
+							data);
+		}
+
+
 		virtual void matrixInit(RMSDCalculationData* data){}
 
 		virtual void matrixEnd(int , std::vector<double>& ){}
