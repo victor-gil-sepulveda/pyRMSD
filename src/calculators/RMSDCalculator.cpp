@@ -57,9 +57,9 @@ void RMSDCalculator::oneVsFollowing(int reference_conformation_index, double* rm
 
 			if(this->rmsdData->hasSymmetryGroups()){
 				this->kernelFunctions->handleSymmetriesWithFitCoords(
-						reference_conformation_index,
-						rmsd,
-						this->rmsdData);
+													reference_conformation_index,
+													rmsd,
+													this->rmsdData);
 			}
 		}
 		else{
@@ -75,9 +75,9 @@ void RMSDCalculator::oneVsFollowing(int reference_conformation_index, double* rm
 
 			if(this->rmsdData->hasSymmetryGroups()){
 				this->kernelFunctions->handleSymmetriesWithCalcCoords(
-						reference_conformation_index,
-						rmsd,
-						this->rmsdData);
+												reference_conformation_index,
+												rmsd,
+												this->rmsdData);
 			}
 
 		}
@@ -107,7 +107,6 @@ void RMSDCalculator::calculateRMSDCondensedMatrix(std::vector<double>& rmsd){
 
 	// Post processing (for CUDA based, for instance)
 	this->kernelFunctions->matrixEnd(num_of_rmsds,rmsd);
-
 }
 
 /**
@@ -133,6 +132,13 @@ void RMSDCalculator::calculate_rmsd_condensed_matrix_with_fitting_coordinates(ve
 					reference_index,
 					&(rmsd[offset]),
 					rmsdData);
+
+			if(this->rmsdData->hasSymmetryGroups()){
+				this->kernelFunctions->handleSymmetriesWithFitCoords(
+													reference_index,
+													&(rmsd[offset]),
+													this->rmsdData);
+			}
 	}
 
 }
@@ -172,6 +178,13 @@ void RMSDCalculator::calculate_rmsd_condensed_matrix_with_fitting_and_calculatio
 															reference_index,
 															&(rmsd[offset]),
 															rmsdData);
+
+		if(this->rmsdData->hasSymmetryGroups()){
+			this->kernelFunctions->handleSymmetriesWithCalcCoords(
+											reference_index,
+											&(rmsd[offset]),
+											this->rmsdData);
+		}
 	}
 
 }
