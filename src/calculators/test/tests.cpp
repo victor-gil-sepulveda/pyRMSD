@@ -833,7 +833,7 @@ void test_iterative_superposition_with_fit_and_calc_rotation_comparing_QCP_seria
 	print_test_tittle(__FUNCTION__);
 	cout<<"Comparing QCP_SERIAL_FLOAT_CALCULATOR and QCP_CUDA_CALCULATOR (float)"<<endl;
 
-	vector<double> 		initial_qcp_serial_fit_coordinates, initial_qcp_serial_lig_coordinates,
+	vector<double>		initial_qcp_serial_fit_coordinates, initial_qcp_serial_lig_coordinates,
 						initial_qcp_cuda_fit_coordinates, initial_qcp_cuda_lig_coordinates,
 						calculated_serial_by_step_rmsds, calculated_cuda_by_step_rmsds;
 
@@ -915,6 +915,143 @@ void test_iterative_superposition_with_fit_and_calc_rotation_comparing_QCP_seria
 	delete cuda_calculator;
 }
 
-void test_rmsd_calculation_fit_and_calc_with_symmetry(){
+void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 	print_test_tittle(__FUNCTION__);
+
+	// Coordinates
+	vector<double> native_0_plus_coords_CA,
+					native_1_plus_coords_CA,
+					native_2_plus_coords_CA,
+					native_3_plus_coords_CA,
+					calculated_rmsds;
+
+	vector<int> trajectory_with_native_CA_size;
+
+	vector<double> native_0_plus_coords_lig,
+					native_1_plus_coords_lig,
+					native_2_plus_coords_lig,
+					native_3_plus_coords_lig;
+
+	vector<int> trajectory_with_native_lig_size;
+
+	// Load natives+trajectories (CA)
+	load_and_merge(native_0_plus_coords_CA,
+			trajectory_with_native_CA_size,
+			"data/Symmetry/Models/Natives/Native_0.CA.coords",
+			"data/Symmetry/Models/Trajectory/traj_testset.CA.coords");
+
+	load_and_merge(native_1_plus_coords_CA,
+			trajectory_with_native_CA_size,
+			"data/Symmetry/Models/Natives/Native_1.CA.coords",
+			"data/Symmetry/Models/Trajectory/traj_testset.CA.coords");
+
+	load_and_merge(native_2_plus_coords_CA,
+			trajectory_with_native_CA_size,
+			"data/Symmetry/Models/Natives/Native_2.CA.coords",
+			"data/Symmetry/Models/Trajectory/traj_testset.CA.coords");
+
+	load_and_merge(native_3_plus_coords_CA,
+			trajectory_with_native_CA_size,
+			"data/Symmetry/Models/Natives/Native_3.CA.coords",
+			"data/Symmetry/Models/Trajectory/traj_testset.CA.coords");
+
+	// Load natives+trajectories (lig)
+	load_and_merge(native_0_plus_coords_lig,
+			trajectory_with_native_lig_size,
+			"data/Symmetry/Models/Natives/Native_0.ligand.coords",
+			"data/Symmetry/Models/Trajectory/traj_testset.ligand.coords");
+
+	load_and_merge(native_1_plus_coords_lig,
+			trajectory_with_native_lig_size,
+			"data/Symmetry/Models/Natives/Native_1.ligand.coords",
+			"data/Symmetry/Models/Trajectory/traj_testset.ligand.coords");
+
+	load_and_merge(native_2_plus_coords_lig,
+			trajectory_with_native_lig_size,
+			"data/Symmetry/Models/Natives/Native_2.ligand.coords",
+			"data/Symmetry/Models/Trajectory/traj_testset.ligand.coords");
+
+	load_and_merge(native_3_plus_coords_lig,
+			trajectory_with_native_lig_size,
+			"data/Symmetry/Models/Natives/Native_3.ligand.coords",
+			"data/Symmetry/Models/Trajectory/traj_testset.ligand.coords");
+
+	save_pdb_coords(native_0_plus_coords_CA, trajectory_with_native_CA_size, "CA0.coords");
+	save_pdb_coords(native_0_plus_coords_lig, trajectory_with_native_lig_size, "lig0.coords");
+
+	calculated_rmsds.resize(trajectory_with_native_CA_size[0],0);
+	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
+									type,
+									trajectory_with_native_CA_size[0],
+									trajectory_with_native_CA_size[1],
+									TOPOINTER(native_0_plus_coords_CA),
+									trajectory_with_native_lig_size[1],
+									TOPOINTER(native_0_plus_coords_lig));
+
+	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
+	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),6);
+	delete calculator;
+
+	calculator = RMSDCalculatorFactory::createCalculator(
+									type,
+									trajectory_with_native_CA_size[0],
+									trajectory_with_native_CA_size[1],
+									TOPOINTER(native_1_plus_coords_CA),
+									trajectory_with_native_lig_size[1],
+									TOPOINTER(native_1_plus_coords_lig));
+
+	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
+	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),6);
+	delete calculator;
+
+	calculator = RMSDCalculatorFactory::createCalculator(
+									type,
+									trajectory_with_native_CA_size[0],
+									trajectory_with_native_CA_size[1],
+									TOPOINTER(native_2_plus_coords_CA),
+									trajectory_with_native_lig_size[1],
+									TOPOINTER(native_2_plus_coords_lig));
+
+	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
+	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),6);
+	delete calculator;
+
+	calculator = RMSDCalculatorFactory::createCalculator(
+									type,
+									trajectory_with_native_CA_size[0],
+									trajectory_with_native_CA_size[1],
+									TOPOINTER(native_3_plus_coords_CA),
+									trajectory_with_native_lig_size[1],
+									TOPOINTER(native_3_plus_coords_lig));
+
+	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
+	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),6);
+	delete calculator;
+
+	// Now let's do the same defining the symmetry groups for the ligand
+	symmGroups symm_groups;
+	vector<int> group1_first, group1_second;
+	group1_first.push_back(0);group1_first.push_back(3);
+	group1_second.push_back(2);group1_second.push_back(5);
+	symm_groups.push_back(pair<vector<int>, vector<int> >(group1_first, group1_second));
+
+	vector<int> group2_first, group2_second;
+	group2_first.push_back(7);
+	group2_second.push_back(8);
+	symm_groups.push_back(pair<vector<int>, vector<int> >(group2_first, group2_second));
+
+	calculator = RMSDCalculatorFactory::createCalculator(
+									type,
+									trajectory_with_native_CA_size[0],
+									trajectory_with_native_CA_size[1],
+									TOPOINTER(native_3_plus_coords_CA),
+									trajectory_with_native_lig_size[1],
+									TOPOINTER(native_3_plus_coords_lig),
+									&symm_groups);
+
+	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
+	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),6);
+	delete calculator;
+
+
 }

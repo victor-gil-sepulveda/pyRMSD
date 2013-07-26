@@ -73,4 +73,6 @@
 			const char* initial_prot_coords_file,
 			const char* initial_lig_coords_file);
 
+	void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type);
+
 #endif /* TESTS_H_ */
