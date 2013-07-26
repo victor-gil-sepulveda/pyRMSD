@@ -364,6 +364,7 @@ void QCPCUDAKernel::matrixOneVsFollowingFitDiffersCalc(
 		
 	floating_point_type* tmpFitDeviceReference = &(this->deviceCoords[reference_conformation_number*
 	                                                                  data->fittingConformationLength]);
+
 	floating_point_type* tmpCalcDeviceReference = &(this->deviceCalcCoords[reference_conformation_number*
 	                                                                       data->calculationConformationLength]);
 	

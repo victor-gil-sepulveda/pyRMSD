@@ -914,3 +914,7 @@ void test_iterative_superposition_with_fit_and_calc_rotation_comparing_QCP_seria
 	delete serial_calculator;
 	delete cuda_calculator;
 }
+
+void test_rmsd_calculation_fit_and_calc_with_symmetry(){
+	print_test_tittle(__FUNCTION__);
+}
