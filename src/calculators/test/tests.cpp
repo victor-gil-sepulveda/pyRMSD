@@ -976,9 +976,6 @@ void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 			"data/Symmetry/Models/Natives/Native_3.ligand.coords",
 			"data/Symmetry/Models/Trajectory/traj_testset.ligand.coords");
 
-	save_pdb_coords(native_0_plus_coords_CA, trajectory_with_native_CA_size, "CA0.coords");
-	save_pdb_coords(native_0_plus_coords_lig, trajectory_with_native_lig_size, "lig0.coords");
-
 	calculated_rmsds.resize(trajectory_with_native_CA_size[0],0);
 	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
 									type,
@@ -1028,7 +1025,10 @@ void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),6);
 	delete calculator;
 
-	// Now let's do the same defining the symmetry groups for the ligand
+	// Now let's do the same defining the symmetry groups for the ligand.
+	// We will create two groups, one to substitute the symmetric Cs of the bezene ring
+	// and the other for the Ns.
+
 	symmGroups symm_groups;
 	vector<int> group1_first, group1_second;
 	group1_first.push_back(0);group1_first.push_back(3);
@@ -1052,6 +1052,4 @@ void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
 	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),6);
 	delete calculator;
-
-
 }

@@ -30,9 +30,5 @@ RMSDCalculationData::RMSDCalculationData(int numberOfConformations,
 
 }
 
-RMSDCalculationData::~RMSDCalculationData(){
-	if(this->symmetryGroups != NULL){
-		delete this->symmetryGroups;
-	}
-}
+RMSDCalculationData::~RMSDCalculationData(){}
 

@@ -52,12 +52,8 @@ void parse_symmetry_groups(PyListObject* list_obj, symmGroups& symmetry_groups){
 		PyTupleObject* first_tuple = (PyTupleObject*) PyTuple_GetItem((PyObject*) sg_pair, 0);
 		PyTupleObject* second_tuple = (PyTupleObject*) PyTuple_GetItem((PyObject*) sg_pair, 1);
 		vector<int> v1, v2;
-//		Py_INCREF((PyObject *) first_tuple);
-//		Py_INCREF((PyObject *) second_tuple);
 		parse_tuple(first_tuple,v1);
 		parse_tuple(second_tuple,v2);
-//		Py_DECREF((PyObject *) first_tuple);
-//		Py_DECREF((PyObject *) second_tuple);
 		symmetry_groups.push_back(pair<vector<int>, vector<int> > (v1,v2));
 	}
 }
@@ -185,6 +181,7 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 	PyArrayObject* rmsds_list_obj = embed_rmsd_data(rmsd);
 
 	delete rmsdCalculator;
+	delete params.symmetry_groups;
 
 	return PyArray_Return(rmsds_list_obj);
 }
@@ -210,6 +207,7 @@ static PyObject* iterativeSuperposition(PyObject *self, PyObject *args){
 	rmsdCalculator->iterativeSuperposition(1e-4);
 
 	delete rmsdCalculator;
+	delete params.symmetry_groups;
 
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -238,6 +236,7 @@ static PyObject* calculateRMSDCondensedMatrix(PyObject *self, PyObject *args){
 	PyArrayObject* rmsds_list_obj = embed_rmsd_data(rmsd);
 
 	delete rmsdCalculator;
+	delete params.symmetry_groups;
 
 	return PyArray_Return(rmsds_list_obj);
 }
