@@ -923,7 +923,13 @@ void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 					native_1_plus_coords_CA,
 					native_2_plus_coords_CA,
 					native_3_plus_coords_CA,
-					calculated_rmsds;
+					calculated_rmsds,
+					calculated_rmsds_0,
+					calculated_rmsds_1,
+					calculated_rmsds_2,
+					calculated_rmsds_3,
+					min_rmsds,
+					expected_rmsds;
 
 	vector<int> trajectory_with_native_CA_size;
 
@@ -933,6 +939,9 @@ void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 					native_3_plus_coords_lig;
 
 	vector<int> trajectory_with_native_lig_size;
+
+	// Load rmsds
+	load_vector(expected_rmsds, "data/Symmetry/OneVsAllFitAndCalc/all.rmsd");
 
 	// Load natives+trajectories (CA)
 	load_and_merge(native_0_plus_coords_CA,
@@ -976,7 +985,7 @@ void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 			"data/Symmetry/Models/Natives/Native_3.ligand.coords",
 			"data/Symmetry/Models/Trajectory/traj_testset.ligand.coords");
 
-	calculated_rmsds.resize(trajectory_with_native_CA_size[0],0);
+	calculated_rmsds_0.resize(trajectory_with_native_CA_size[0]-1,0);
 	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
 									type,
 									trajectory_with_native_CA_size[0],
@@ -985,10 +994,10 @@ void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 									trajectory_with_native_lig_size[1],
 									TOPOINTER(native_0_plus_coords_lig));
 
-	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
-	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),6);
+	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds_0));
 	delete calculator;
 
+	calculated_rmsds_1.resize(trajectory_with_native_CA_size[0]-1,0);
 	calculator = RMSDCalculatorFactory::createCalculator(
 									type,
 									trajectory_with_native_CA_size[0],
@@ -997,10 +1006,10 @@ void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 									trajectory_with_native_lig_size[1],
 									TOPOINTER(native_1_plus_coords_lig));
 
-	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
-	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),6);
+	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds_1));
 	delete calculator;
 
+	calculated_rmsds_2.resize(trajectory_with_native_CA_size[0]-1,0);
 	calculator = RMSDCalculatorFactory::createCalculator(
 									type,
 									trajectory_with_native_CA_size[0],
@@ -1009,10 +1018,10 @@ void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 									trajectory_with_native_lig_size[1],
 									TOPOINTER(native_2_plus_coords_lig));
 
-	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
-	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),6);
+	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds_2));
 	delete calculator;
 
+	calculated_rmsds_3.resize(trajectory_with_native_CA_size[0]-1,0);
 	calculator = RMSDCalculatorFactory::createCalculator(
 									type,
 									trajectory_with_native_CA_size[0],
@@ -1021,14 +1030,18 @@ void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 									trajectory_with_native_lig_size[1],
 									TOPOINTER(native_3_plus_coords_lig));
 
-	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
-	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),6);
+	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds_3));
 	delete calculator;
+
+	// Get the minimum of all the calculated rmsds
+	for(unsigned int i= 0; i< calculated_rmsds_0.size(); i++){
+		min_rmsds.push_back(min(min(calculated_rmsds_0[i],calculated_rmsds_1[i]),
+								min(calculated_rmsds_2[i],calculated_rmsds_3[i])));
+	}
 
 	// Now let's do the same defining the symmetry groups for the ligand.
 	// We will create two groups, one to substitute the symmetric Cs of the bezene ring
 	// and the other for the Ns.
-
 	symmGroups symm_groups;
 	vector<int> group1_first, group1_second;
 	group1_first.push_back(0);group1_first.push_back(3);
@@ -1040,6 +1053,7 @@ void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 	group2_second.push_back(8);
 	symm_groups.push_back(pair<vector<int>, vector<int> >(group2_first, group2_second));
 
+	calculated_rmsds.resize(trajectory_with_native_CA_size[0]-1,0);
 	calculator = RMSDCalculatorFactory::createCalculator(
 									type,
 									trajectory_with_native_CA_size[0],
@@ -1050,6 +1064,21 @@ void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 									&symm_groups);
 
 	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
-	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),6);
 	delete calculator;
+
+	// The hand made calculator has to be equal to the automatic calculation
+	compareVectors("\tHand made calculation is equal to automatic calculation: ",
+						TOPOINTER(min_rmsds),
+						TOPOINTER(calculated_rmsds),
+						min_rmsds.size(),
+						1e-12);
+
+	// The result has to be similar (at least in the same order) than the one got with prody
+
+	compareVectors("\tAnd results are within the safety range: ",
+							TOPOINTER(expected_rmsds),
+							TOPOINTER(calculated_rmsds),
+							expected_rmsds.size(),
+							1e-2); // Qualitative check
+
 }
