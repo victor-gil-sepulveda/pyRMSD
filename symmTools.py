@@ -18,3 +18,7 @@ def symm_group_permutator(symm_groups_left, used, permutations):
         
 def swap_atoms(coordset_reference, atom_i, atom_j):
     coordset_reference[[atom_i,atom_j]] =  coordset_reference[[atom_j,atom_i]]
+    
+def min_rmsd_of_rmsds_list(rmsds_list):
+    return (rmsds_list.T).min(1)
+    

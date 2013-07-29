@@ -1,7 +1,7 @@
 import pyRMSD.calculators
 from pyRMSD.availableCalculators import availableCalculators
 import numpy
-from symmTools import symm_group_permutator, swap_atoms
+from symmTools import symm_group_permutator, swap_atoms, min_rmsd_of_rmsds_list
 
 class RMSDCalculator(object):
     """
@@ -85,7 +85,7 @@ class RMSDCalculator(object):
             # Symmetry group handling
             self.__check_symm_groups(fitSymmetryGroups)
             self.__check_symm_groups(calSymmetryGroups)
-            self.fit_symmetry_froups = fitSymmetryGroups
+            self.fit_symmetry_groups = fitSymmetryGroups
             self.calc_symmetry_groups = calSymmetryGroups
     
     def __check_symm_groups(self, symm_groups):
@@ -204,6 +204,7 @@ class RMSDCalculator(object):
     def oneVsFollowing(self, conformation_number):
         """
         Calculates the RMSD between a reference conformation and all other conformations with an id greater than it.
+        If fitting symmetry groups are used, input coordinates won't be modified (as it works with coordinate copies).
         
         @param conformation_number: The id of the reference structure.
         
@@ -227,21 +228,24 @@ class RMSDCalculator(object):
                                                          self.__threads_per_block, 
                                                          self.__blocks_per_grid)
         else:
-            # If we have fitting symmetry roups, we have to try with all possible combinations
+            # If we have fitting symmetry groups, we have to try with all possible combinations.
+            # Calculation symmetry groups are applied at C level, changing the way RMSD is calculated.
             symm_rmsds = []
             symm_group_permutations = []
             symm_group_permutator(self.fit_symmetry_groups, [], symm_group_permutations)
             for symm_group_permutation in symm_group_permutations:
-                coords_copy = numpy.array(np_coords_fit)
+                coords_copy = numpy.array(np_coords_fit, copy= True, dtype = numpy.float64)
+                coords_copy.shape = (self.number_of_conformations,self.number_of_fitting_atoms,3)
                 # Apply the changes to reference
-                for group in symm_group_permutation:
-                    for i in range(len(group)):
-                        swap_atoms(coords_copy[conformation_number], group[0][i], group[1][i])
+                for symm_group in symm_group_permutation:
+                    for i,j in zip(symm_group[0],symm_group[1]):
+                        swap_atoms(coords_copy[conformation_number], i, j)
+                coords_copy.shape = (self.number_of_conformations*self.number_of_fitting_atoms*3)
                 # Then calculate the rmsd
                 symm_rmsds.append(pyRMSD.calculators.oneVsFollowing(availableCalculators()[self.calculator_type], 
                                                          coords_copy, 
                                                          self.number_of_fitting_atoms, 
-                                                         np_coords_calc, 
+                                                         np_coords_calc,
                                                          self.number_of_calculation_atoms,
                                                          conformation_number, 
                                                          self.number_of_conformations,
@@ -249,6 +253,9 @@ class RMSDCalculator(object):
                                                          self.__number_of_threads, 
                                                          self.__threads_per_block, 
                                                          self.__blocks_per_grid))
+            
+            # Pick the minimum rmsd of all possibilities.
+            rmsds = min_rmsd_of_rmsds_list(numpy.array(symm_rmsds))
                 
         return rmsds
         
