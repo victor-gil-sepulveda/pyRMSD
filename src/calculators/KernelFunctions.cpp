@@ -2,6 +2,9 @@
 #include "RMSDCalculationData.h"
 #include "RMSDTools.h"
 
+#include <iostream>
+using namespace std;
+
 /**
  * Given a set of fitting coordinates which have already been superposed, the function
  * rewrites the RMSD calculation to be the minimum RMSD of all the possible symmetric
@@ -19,18 +22,21 @@ void KernelFunctions::handleSymmetriesWithFitCoords(
 				double* rmsd,
 				RMSDCalculationData* data){
 
+	/*cout<<"Fitting symmetries"<<endl;
 	double* fit_reference = data->getFittingConformationAt(reference_conformation_number);
 
 	for (int i = reference_conformation_number + 1; i < data->numberOfConformations; ++i) {
 
 		double* fit_conformation_coords = data->getFittingConformationAt(i);
-
+		cout<<"Initial value: "<<rmsd[i - (reference_conformation_number + 1)];
 		rmsd[i - (reference_conformation_number + 1)] = RMSDTools::calcMinRMSDOfAllSymmetryGroups(
 				fit_reference,
 				fit_conformation_coords,
 				data->atomsPerFittingConformation,
 				data->symmetryGroups);
-	}
+		cout<<" End value: "<<rmsd[i - (reference_conformation_number + 1)]<<endl;
+	}*/
+
 }
 
 

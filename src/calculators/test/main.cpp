@@ -143,11 +143,11 @@ int main(int argc, char **argv){
 
 	RMSDCalculatorType available_calculators_d [] =  {
 			KABSCH_SERIAL_CALCULATOR,
-			KABSCH_OMP_CALCULATOR,
-			QTRFIT_SERIAL_CALCULATOR,
-			QTRFIT_OMP_CALCULATOR,
-			QCP_SERIAL_CALCULATOR,
-			QCP_OMP_CALCULATOR,
+//			KABSCH_OMP_CALCULATOR,
+//			QTRFIT_SERIAL_CALCULATOR,
+//			QTRFIT_OMP_CALCULATOR,
+//			QCP_SERIAL_CALCULATOR,
+//			QCP_OMP_CALCULATOR,
 #ifdef USE_CUDA
 			QCP_CUDA_CALCULATOR,
 			QCP_CUDA_MEM_CALCULATOR
@@ -246,6 +246,8 @@ int main(int argc, char **argv){
 
 
 		test_rmsd_calculation_fit_and_calc_with_symmetry(available_calculators[i]);
+
+		test_rmsd_calculation_fit_with_symmetry(available_calculators[i]);
 	}
 
 #ifdef CUDA_PRECISION_SINGLE

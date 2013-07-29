@@ -482,7 +482,8 @@ void RMSDTools::applySymmetryGroup(double* coordinates, pair<vector<int>, vector
 
 /**
  * Recursively creates all possible permutations of atoms given by the symmetry groups definition
- * and adds its calculated rmsd to the rmsds vector.
+ * and adds its calculated rmsd to the rmsds vector. Original coordinates remain unchanged after this
+ * operation.
  *
  * \param reference The reference conformation.
  *
@@ -508,7 +509,7 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
 	// Keep doing recursive calls until the binary tree is constructed
 	if (applied_symm_group < (int) symm_groups->size()){
 		// We apply the change in one branch
-		RMSDTools::applySymmetryGroup(superposed_conformation,
+		RMSDTools::applySymmetryGroup(reference,
 							symm_groups->at(applied_symm_group));
 
 		RMSDTools::calcRecursiveSymmGroupApplication(reference,
@@ -519,7 +520,7 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
 				rmsds);
 
 		// But not in the other, so we have to undo the change (another swap will suffice)
-		RMSDTools::applySymmetryGroup(superposed_conformation,
+		RMSDTools::applySymmetryGroup(reference,
 							symm_groups->at(applied_symm_group));
 		RMSDTools::calcRecursiveSymmGroupApplication(reference,
 				superposed_conformation,
@@ -531,12 +532,18 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
 	else{
 		// We have reached a leave, so we calc. the RMSD for this permutation
 		rmsds.push_back(RMSDTools::calcRMS(reference, superposed_conformation, number_of_atoms));
-//		for (int i = 0; i < number_of_atoms; ++i){
-//			cout<<superposed_conformation[i*3]<<","
-//					<<superposed_conformation[i*3+1]<<","
-//					<<superposed_conformation[i*3+2]<<", ";
-//		}
-//		cout<<"["<<rmsds[rmsds.size()-1]<<"]"<<endl;
+		for (int i = 0; i < number_of_atoms; ++i){
+			cout<<reference[i*3]<<","
+					<<reference[i*3+1]<<","
+					<<reference[i*3+2]<<", ";
+		}
+		cout<<endl<<"**"<<endl;
+		for (int i = 0; i < number_of_atoms; ++i){
+			cout<<superposed_conformation[i*3]<<","
+					<<superposed_conformation[i*3+1]<<","
+					<<superposed_conformation[i*3+2]<<", ";
+		}
+		cout<<setprecision(8)<<"["<<rmsds[rmsds.size()-1]<<"]"<<endl;
 	}
 
 }

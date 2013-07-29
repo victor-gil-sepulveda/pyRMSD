@@ -86,46 +86,6 @@ void KABSCHSerialKernel::oneVsFollowingFitDiffersCalcCoords(
 }
 
 
-void KABSCHSerialKernel::oneVsFollowingFitEqualCalcCoordsWithSymmetry(
-				double* reference,
-				int reference_conformation_number,
-				double* rmsd,
-				RMSDCalculationData* data){
-
-	double rot_matrix[3][3];
-
-	for (int second_conformation_index = reference_conformation_number + 1;
-			second_conformation_index < data->numberOfConformations; ++second_conformation_index){
-
-		double* second_conformation_coords = data->getFittingConformationAt(second_conformation_index);
-
-		RMSDTools::initializeTo(rot_matrix[0], 0.0, 9);
-
-		double rmsd_val = this->calculate_rotation_rmsd(
-				reference,
-				second_conformation_coords,
-				data->atomsPerFittingConformation,
-				rot_matrix);
-
-
-		RMSDTools::rotate3D(data->atomsPerFittingConformation,
-				second_conformation_coords,
-				rot_matrix);
-
-		if(rmsd!=NULL){
-			rmsd[second_conformation_index-(reference_conformation_number+1)] = rmsd_val;
-		}
-	}
-}
-
-void KABSCHSerialKernel::oneVsFollowingFitDiffersCalcCoordsWithSymmetry(
-				double* fitReference,
-				double* calcReference,
-				int reference_conformation_number,
-				double* rmsd,
-				RMSDCalculationData* data){
-
-}
 
 //-------------------------------------------
 // Code based on the work of Dr. Bosco K. Ho

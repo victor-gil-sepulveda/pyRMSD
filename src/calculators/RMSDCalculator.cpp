@@ -56,6 +56,7 @@ void RMSDCalculator::oneVsFollowing(int reference_conformation_index, double* rm
 					rmsd);
 
 			if(this->rmsdData->hasSymmetryGroups()){
+				cout<<"Handling fit coords"<<endl;
 				this->kernelFunctions->handleSymmetriesWithFitCoords(
 													reference_conformation_index,
 													rmsd,

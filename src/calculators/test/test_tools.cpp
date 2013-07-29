@@ -180,7 +180,7 @@ void save_pdb_coords(vector<double> & coords, vector<int> & shape, const char * 
 	ofs.setf (std::ios::scientific);
 	ofs<<shape[0]<<" "<<shape[1]<<" "<<shape[2]<<" "<<endl;
 	for(unsigned int i = 0; i < coords.size(); i+=3){
-		ofs<<coords[i]<<" "<<coords[i+1]<<" "<<coords[i+2]<<endl;
+		ofs<<setprecision(16)<<coords[i]<<" "<<coords[i+1]<<" "<<coords[i+2]<<endl;
 	}
 	ofs.close();
 }
