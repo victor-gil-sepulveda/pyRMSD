@@ -1,0 +1,100 @@
+REMARK PDBEnsemble aligned_BEN
+MODEL        1
+HETATM    1  C2  BEN L   1      -2.107  15.653  16.758  1.00 19.86           C
+HETATM    2  C1  BEN L   1      -1.853  14.311  16.658  1.00 19.86           C
+HETATM    3  C6  BEN L   1      -1.257  13.634  17.708  1.00 19.86           C
+HETATM    4  C3  BEN L   1      -1.774  16.341  17.932  1.00 19.86           C
+HETATM    5  C4  BEN L   1      -1.175  15.662  19.005  1.00 19.86           C
+HETATM    6  C5  BEN L   1      -0.914  14.295  18.885  1.00 19.86           C
+HETATM    7  C   BEN L   1      -2.193  13.627  15.496  1.00 19.86           C
+HETATM    8  N1  BEN L   1      -1.762  12.391  15.309  1.00 19.86           N
+HETATM    9  N2  BEN L   1      -2.797  14.235  14.491  1.00 19.86           N
+ENDMDL
+MODEL        2
+HETATM    1  C2  BEN L   1      -2.006  15.715  16.757  1.00 19.86           C
+HETATM    2  C1  BEN L   1      -1.828  14.316  16.662  1.00 19.86           C
+HETATM    3  C6  BEN L   1      -1.328  13.612  17.784  1.00 19.86           C
+HETATM    4  C3  BEN L   1      -1.681  16.399  17.946  1.00 19.86           C
+HETATM    5  C4  BEN L   1      -1.173  15.693  19.052  1.00 19.86           C
+HETATM    6  C5  BEN L   1      -0.999  14.299  18.971  1.00 19.86           C
+HETATM    7  C   BEN L   1      -2.160  13.604  15.417  1.00 19.86           C
+HETATM    8  N1  BEN L   1      -1.640  12.409  15.131  1.00 19.86           N
+HETATM    9  N2  BEN L   1      -3.017  14.102  14.522  1.00 19.86           N
+ENDMDL
+MODEL        3
+HETATM    1  C2  BEN L   1      -1.997  15.716  16.752  1.00 19.86           C
+HETATM    2  C1  BEN L   1      -1.828  14.313  16.663  1.00 19.86           C
+HETATM    3  C6  BEN L   1      -1.319  13.613  17.782  1.00 19.86           C
+HETATM    4  C3  BEN L   1      -1.681  16.401  17.944  1.00 19.86           C
+HETATM    5  C4  BEN L   1      -1.184  15.694  19.055  1.00 19.86           C
+HETATM    6  C5  BEN L   1      -0.999  14.301  18.971  1.00 19.86           C
+HETATM    7  C   BEN L   1      -2.171  13.594  15.425  1.00 19.86           C
+HETATM    8  N1  BEN L   1      -1.640  12.408  15.122  1.00 19.86           N
+HETATM    9  N2  BEN L   1      -3.013  14.109  14.528  1.00 19.86           N
+ENDMDL
+MODEL        4
+HETATM    1  C2  BEN L   1      -1.997  15.716  16.752  1.00 19.86           C
+HETATM    2  C1  BEN L   1      -1.827  14.313  16.663  1.00 19.86           C
+HETATM    3  C6  BEN L   1      -1.319  13.614  17.782  1.00 19.86           C
+HETATM    4  C3  BEN L   1      -1.681  16.401  17.944  1.00 19.86           C
+HETATM    5  C4  BEN L   1      -1.184  15.694  19.055  1.00 19.86           C
+HETATM    6  C5  BEN L   1      -0.999  14.301  18.970  1.00 19.86           C
+HETATM    7  C   BEN L   1      -2.171  13.594  15.425  1.00 19.86           C
+HETATM    8  N1  BEN L   1      -1.640  12.408  15.122  1.00 19.86           N
+HETATM    9  N2  BEN L   1      -3.014  14.109  14.529  1.00 19.86           N
+ENDMDL
+MODEL        5
+HETATM    1  C2  BEN L   1      -1.998  15.716  16.752  1.00 19.86           C
+HETATM    2  C1  BEN L   1      -1.826  14.314  16.663  1.00 19.86           C
+HETATM    3  C6  BEN L   1      -1.318  13.615  17.781  1.00 19.86           C
+HETATM    4  C3  BEN L   1      -1.682  16.401  17.944  1.00 19.86           C
+HETATM    5  C4  BEN L   1      -1.185  15.693  19.055  1.00 19.86           C
+HETATM    6  C5  BEN L   1      -0.999  14.300  18.970  1.00 19.86           C
+HETATM    7  C   BEN L   1      -2.171  13.594  15.425  1.00 19.86           C
+HETATM    8  N1  BEN L   1      -1.641  12.407  15.124  1.00 19.86           N
+HETATM    9  N2  BEN L   1      -3.012  14.110  14.529  1.00 19.86           N
+ENDMDL
+MODEL        6
+HETATM    1  C2  BEN L   1      -2.309  15.626  16.893  1.00 19.86           C
+HETATM    2  C1  BEN L   1      -1.830  14.316  16.662  1.00 19.86           C
+HETATM    3  C6  BEN L   1      -1.026  13.697  17.650  1.00 19.86           C
+HETATM    4  C3  BEN L   1      -1.980  16.310  18.081  1.00 19.86           C
+HETATM    5  C4  BEN L   1      -1.169  15.692  19.052  1.00 19.86           C
+HETATM    6  C5  BEN L   1      -0.695  14.385  18.836  1.00 19.86           C
+HETATM    7  C   BEN L   1      -2.164  13.608  15.416  1.00 19.86           C
+HETATM    8  N1  BEN L   1      -3.229  13.931  14.678  1.00 19.86           N
+HETATM    9  N2  BEN L   1      -1.429  12.585  14.975  1.00 19.86           N
+ENDMDL
+MODEL        7
+HETATM    1  C2  BEN L   1      -2.310  15.626  16.893  1.00 19.86           C
+HETATM    2  C1  BEN L   1      -1.829  14.316  16.662  1.00 19.86           C
+HETATM    3  C6  BEN L   1      -1.026  13.698  17.649  1.00 19.86           C
+HETATM    4  C3  BEN L   1      -1.982  16.310  18.081  1.00 19.86           C
+HETATM    5  C4  BEN L   1      -1.169  15.692  19.051  1.00 19.86           C
+HETATM    6  C5  BEN L   1      -0.695  14.385  18.836  1.00 19.86           C
+HETATM    7  C   BEN L   1      -2.163  13.608  15.416  1.00 19.86           C
+HETATM    8  N1  BEN L   1      -3.230  13.929  14.679  1.00 19.86           N
+HETATM    9  N2  BEN L   1      -1.429  12.587  14.974  1.00 19.86           N
+ENDMDL
+MODEL        8
+HETATM    1  C2  BEN L   1      -2.309  15.625  16.894  1.00 19.86           C
+HETATM    2  C1  BEN L   1      -1.830  14.315  16.662  1.00 19.86           C
+HETATM    3  C6  BEN L   1      -1.026  13.698  17.650  1.00 19.86           C
+HETATM    4  C3  BEN L   1      -1.981  16.310  18.081  1.00 19.86           C
+HETATM    5  C4  BEN L   1      -1.169  15.693  19.051  1.00 19.86           C
+HETATM    6  C5  BEN L   1      -0.695  14.385  18.836  1.00 19.86           C
+HETATM    7  C   BEN L   1      -2.164  13.607  15.416  1.00 19.86           C
+HETATM    8  N1  BEN L   1      -3.230  13.930  14.679  1.00 19.86           N
+HETATM    9  N2  BEN L   1      -1.428  12.586  14.974  1.00 19.86           N
+ENDMDL
+MODEL        9
+HETATM    1  C2  BEN L   1      -2.309  15.626  16.894  1.00 19.86           C
+HETATM    2  C1  BEN L   1      -1.830  14.316  16.662  1.00 19.86           C
+HETATM    3  C6  BEN L   1      -1.025  13.698  17.650  1.00 19.86           C
+HETATM    4  C3  BEN L   1      -1.981  16.310  18.081  1.00 19.86           C
+HETATM    5  C4  BEN L   1      -1.170  15.692  19.051  1.00 19.86           C
+HETATM    6  C5  BEN L   1      -0.695  14.385  18.835  1.00 19.86           C
+HETATM    7  C   BEN L   1      -2.163  13.607  15.415  1.00 19.86           C
+HETATM    8  N1  BEN L   1      -3.230  13.929  14.679  1.00 19.86           N
+HETATM    9  N2  BEN L   1      -1.428  12.587  14.974  1.00 19.86           N
+ENDMDL

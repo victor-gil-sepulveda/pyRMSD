@@ -55,13 +55,6 @@ void RMSDCalculator::oneVsFollowing(int reference_conformation_index, double* rm
 					reference_conformation_index,
 					rmsd);
 
-			if(this->rmsdData->hasSymmetryGroups()){
-				cout<<"Handling fit coords"<<endl;
-				this->kernelFunctions->handleSymmetriesWithFitCoords(
-													reference_conformation_index,
-													rmsd,
-													this->rmsdData);
-			}
 		}
 		else{
 
@@ -133,13 +126,6 @@ void RMSDCalculator::calculate_rmsd_condensed_matrix_with_fitting_coordinates(ve
 					reference_index,
 					&(rmsd[offset]),
 					rmsdData);
-
-			if(this->rmsdData->hasSymmetryGroups()){
-				this->kernelFunctions->handleSymmetriesWithFitCoords(
-													reference_index,
-													&(rmsd[offset]),
-													this->rmsdData);
-			}
 	}
 
 }

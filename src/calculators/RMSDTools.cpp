@@ -532,18 +532,18 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
 	else{
 		// We have reached a leave, so we calc. the RMSD for this permutation
 		rmsds.push_back(RMSDTools::calcRMS(reference, superposed_conformation, number_of_atoms));
-		for (int i = 0; i < number_of_atoms; ++i){
-			cout<<reference[i*3]<<","
-					<<reference[i*3+1]<<","
-					<<reference[i*3+2]<<", ";
-		}
-		cout<<endl<<"**"<<endl;
-		for (int i = 0; i < number_of_atoms; ++i){
-			cout<<superposed_conformation[i*3]<<","
-					<<superposed_conformation[i*3+1]<<","
-					<<superposed_conformation[i*3+2]<<", ";
-		}
-		cout<<setprecision(8)<<"["<<rmsds[rmsds.size()-1]<<"]"<<endl;
+//		for (int i = 0; i < number_of_atoms; ++i){
+//			cout<<reference[i*3]<<","
+//					<<reference[i*3+1]<<","
+//					<<reference[i*3+2]<<", ";
+//		}
+//		cout<<endl<<"**"<<endl;
+//		for (int i = 0; i < number_of_atoms; ++i){
+//			cout<<superposed_conformation[i*3]<<","
+//					<<superposed_conformation[i*3+1]<<","
+//					<<superposed_conformation[i*3+2]<<", ";
+//		}
+//		cout<<setprecision(8)<<"["<<rmsds[rmsds.size()-1]<<"]"<<endl;
 	}
 
 }
