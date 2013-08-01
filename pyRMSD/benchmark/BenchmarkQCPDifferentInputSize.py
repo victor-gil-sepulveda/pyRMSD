@@ -35,7 +35,7 @@ if __name__ == '__main__':
     sys.stdout.flush()
     original_size = coordsets.shape[1]
     for times in range(10):
-        calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_CUDA_CALCULATOR")
+        calculator = pyRMSD.RMSDCalculator.RMSDCalculator(calculatorType="QCP_CUDA_CALCULATOR", fittingCoordsets=coordsets)
         calculator.setCUDAKernelThreadsPerBlock(2, 16)
         t1 = time.time()
         rmsd = calculator.pairwiseRMSDMatrix()
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     print "Coordinates read (%d models, %d atoms)"%(number_of_conformations, number_of_atoms)
     sys.stdout.flush()
     for times in range(10):
-        calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_OMP_CALCULATOR")
+        calculator = pyRMSD.RMSDCalculator.RMSDCalculator( calculatorType="QCP_OMP_CALCULATOR", fittingCoordsets=coordsets)
         calculator.setNumberOfOpenMPThreads(4)
         t1 = time.time()
         rmsd = calculator.pairwiseRMSDMatrix()

@@ -30,7 +30,8 @@ if __name__ == '__main__':
         
         times = []
         for i in range(tries):
-            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_OMP_CALCULATOR")
+            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(calculatorType="QCP_OMP_CALCULATOR",
+                                                              fittingCoordsets=coordsets)
             calculator.setNumberOfOpenMPThreads(6)
             t1 = time.time()
             rmsd = calculator.pairwiseRMSDMatrix()

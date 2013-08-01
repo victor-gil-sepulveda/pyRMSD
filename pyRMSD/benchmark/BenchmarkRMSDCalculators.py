@@ -48,8 +48,8 @@ if __name__ == '__main__':
     for CALC_TYPE in types:
         print "Calculating RMSD with ", CALC_TYPE
         t1 = time.time()
-        pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, CALC_TYPE)
-        rmsds[CALC_TYPE] = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, CALC_TYPE).pairwiseRMSDMatrix()
+        rmsds[CALC_TYPE] = pyRMSD.RMSDCalculator.RMSDCalculator(calculatorType=CALC_TYPE, 
+                                                                fittingCoordsets=coordsets).pairwiseRMSDMatrix()
         t2 = time.time()
         times[CALC_TYPE] = t2-t1
         print "\tRmsd array generated. ", len(rmsds[CALC_TYPE]), " elements."

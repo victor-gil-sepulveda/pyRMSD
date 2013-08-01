@@ -28,10 +28,11 @@ if __name__ == '__main__':
         
         times = []
         for i in range(20):
-            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_CUDA_CALCULATOR")
-#             calculator.setCUDAKernelThreadsPerBlock(2, 16)
-            calculator.setCUDAKernelThreadsPerBlock(128, 64)
-#            calculator.setCUDAKernelThreadsPerBlock(256, 256)
+            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(calculatorType="QCP_CUDA_CALCULATOR", 
+                                                              fittingCoordsets=coordsets)
+            calculator.setCUDAKernelThreadsPerBlock(2, 16)
+#             calculator.setCUDAKernelThreadsPerBlock(128, 64)
+#             calculator.setCUDAKernelThreadsPerBlock(256, 256)
             t1 = time.time()
             rmsd = calculator.pairwiseRMSDMatrix()
             t2 = time.time()

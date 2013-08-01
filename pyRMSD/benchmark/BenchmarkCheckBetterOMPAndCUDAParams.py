@@ -34,15 +34,16 @@ if __name__ == '__main__':
     t2 = time.time()
     print 'Loading took %0.3f s' % (t2-t1)
     
-#    for number_of_threads in range(1,13):
-#        calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_OMP_CALCULATOR")
-#        calculator.setNumberOfOpenMPThreads(number_of_threads)
-#        t1 = time.time()
-#        rmsd = calculator.pairwiseRMSDMatrix()
-#        t2 = time.time()
-#        del rmsd
-#        print 'OpenMP calculation took %0.3fs with number of threads %d' % (t2-t1, number_of_threads)
-#         
+    for number_of_threads in range(1,13):
+        calculator = pyRMSD.RMSDCalculator.RMSDCalculator(calculatorType="QCP_OMP_CALCULATOR", 
+                                                          fittingCoordsets=coordsets)
+        calculator.setNumberOfOpenMPThreads(number_of_threads)
+        t1 = time.time()
+        rmsd = calculator.pairwiseRMSDMatrix()
+        t2 = time.time()
+        del rmsd
+        print 'OpenMP calculation took %0.3fs with number of threads %d' % (t2-t1, number_of_threads)
+         
     # Generate test parameters
     max_n_threads = 512
     max_n_blocks = 512 
@@ -60,7 +61,8 @@ if __name__ == '__main__':
     # Do test
     for number_of_threads in threads:
         for number_of_blocks in blocks:
-            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, "QCP_CUDA_CALCULATOR")
+            calculator = pyRMSD.RMSDCalculator.RMSDCalculator(calculatorType="QCP_CUDA_CALCULATOR",
+                                                              fittingCoordsets=coordsets)
             calculator.setCUDAKernelThreadsPerBlock(number_of_threads, number_of_blocks)
             t1 = time.time()
             rmsd = calculator.pairwiseRMSDMatrix()

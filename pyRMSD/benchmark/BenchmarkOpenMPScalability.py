@@ -20,7 +20,8 @@ if __name__ == '__main__':
         for num_threads in range(1,7):
             times = []
             for i in range(5):
-                calculator = pyRMSD.RMSDCalculator.RMSDCalculator(coordsets, calculator_type)
+                calculator = pyRMSD.RMSDCalculator.RMSDCalculator(calculatorType=calculator_type,
+                                                                  fittingCoordsets=coordsets)
                 calculator.setNumberOfOpenMPThreads(6)
                 t1 = time.time()
                 rmsd = calculator.pairwiseRMSDMatrix()
