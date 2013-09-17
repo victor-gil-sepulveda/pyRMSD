@@ -52,7 +52,7 @@ class MatrixHandler(object):
         @param matrix_file_without_extension: Is the matrix file name without any 
         extension ('.bin' will be added).
         """
-        print "Writing matrix data (in "+matrix_file_without_extension+".bin) ..."
+        print "Writing matrix data (in "+matrix_file_without_extension+".bin) ...",
         MatrixHandler.save_matrix(matrix_file_without_extension, self.distance_matrix)
         print " Done\n"
     
@@ -63,7 +63,7 @@ class MatrixHandler(object):
         @param matrix_file_without_extension: Is the matrix file name without any 
         extension ('.bin' will be added).
         """
-        print "Loading matrix data from "+matrix_file_without_extension+".bin ..."
+        print "Loading matrix data from "+matrix_file_without_extension+".bin ...",
         self.distance_matrix = MatrixHandler.load_matrix(matrix_file_without_extension)
         self.distance_matrix.recalculateStatistics()
         MatrixHandler.save_statistics(self.statistics_folder, self.distance_matrix)

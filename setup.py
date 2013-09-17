@@ -8,8 +8,10 @@ import numpy
 import distutils.sysconfig
 
 setup(name='pyRMSD',
-      version='3.0',
-      description='pyRMSD is a small Python package that aims to offer an integrative and efficient way of performing RMSD calculations of large sets of structures. It is specially tuned to do fast collective RMSD calculations, as pairwise RMSD matrices.',
+      version='4.0',
+      description='pyRMSD is a small Python package that aims to offer an integrative and \
+      efficient way of performing RMSD calculations of large sets of structures. It is specially \
+      tuned to do fast collective RMSD calculations, as pairwise RMSD matrices.',
       author='Victor Alejandro Gil Sepulveda',
       author_email='victor.gil.sepulveda@gmail.com',
       url='https://github.com/victor-gil-sepulveda/pyRMSD.git',
@@ -32,8 +34,10 @@ setup(name='pyRMSD',
                              sources = [
                                         'src/python/pyRMSD.cpp',
                                         
-                                        'src/calculators/RMSDCalculator.cpp',
                                         'src/calculators/RMSDTools.cpp',
+                                        'src/calculators/RMSDCalculator.cpp',
+                                        'src/calculators/RMSDCalculationData.cpp',
+                                        
                                         'src/calculators/factory/RMSDCalculatorFactory.cpp',
 
                                         'src/calculators/KABSCH/KABSCHSerialKernel.cpp',
@@ -43,6 +47,7 @@ setup(name='pyRMSD',
                                         'src/calculators/QTRFIT/QTRFITOmpKernel.cpp',
                                         
                                         'src/calculators/QCP/QCPSerialKernel.cpp',
+                                        'src/calculators/QCP/QCPSerialFloatKernel.cpp',
                                         'src/calculators/QCP/QCPOmpKernel.cpp',
                              ],
                              extra_compile_args=['-fopenmp'],
