@@ -49,6 +49,9 @@ setup(name='pyRMSD',
                                         'src/calculators/QCP/QCPSerialKernel.cpp',
                                         'src/calculators/QCP/QCPSerialFloatKernel.cpp',
                                         'src/calculators/QCP/QCPOmpKernel.cpp',
+                                        
+                                        'src/calculators/NOSUP/NOSUPSerialKernel.cpp',
+                                        
                              ],
                              extra_compile_args=['-fopenmp'],
                              extra_link_args=['-fopenmp']
