@@ -1,14 +1,16 @@
 # pyRMSD
-pyRMSD goal is the fast (and easy!) calculation of rmsd collective operations, specially matrices of large ensembles of protein conformations. It also offers a symmetric distance matrix implementation with improved access speed and memory efficiency.
+pyRMSD goal is the fast (and easy!) calculation of rmsd collective operations, specially matrices of large ensembles of 
+protein conformations. It also offers a symmetric distance matrix implementation with improved access speed and memory 
+efficiency.
 
 If you like it and you are using it for your scientific projects, please cite [the pyRMSD paper](http://bioinformatics.oxfordjournals.org/content/29/18/2363).
 
-pyRMSD distributed under MIT license, and it is currently on its version 3.0 .
+pyRMSD distributed under MIT license, and it is currently on its version 4.0 .
 
 # Summary
 - [1 - Features](#1---features)  
 	- [Collective operations](#collective-operations)  
-	- [Ccondensed matrix](#condensed-matrix)  
+	- [Condensed matrix](#condensed-matrix)  
 - [2 - Usage](#2---usage)  
 	- [Getting coordinates](#getting-coordinates)  
 	- [Calculating the RMSD matrix](#calculating-the-rmsd-matrix)  
@@ -32,11 +34,11 @@ pyRMSD distributed under MIT license, and it is currently on its version 3.0 .
 ##1 - Features  
 ###Collective operations
 pyRMSD currently has 5 basic operations:  
-1 - Pairwise RMSD calculation  
-2 - One vs. following (of a sequence of conformers).  
-3 - One vs. all the other conformations (of a sequence of conformers).  
-4 - Pairwise RMSD matrix  
-5 - Iterative superposition of a sequence.  
+    1 - Pairwise RMSD calculation  
+    2 - One vs. following (of a sequence of conformers).  
+    3 - One vs. all the other conformations (of a sequence of conformers).  
+    4 - Pairwise RMSD matrix  
+    5 - Iterative superposition of a sequence.  
 
 All methods can use the same coordinates for fitting and RMSD calculation, or a different set of coordinates for fitting (superposing) and calculating RMSD (referred into the code as 'calculation coordinates' ).
 
@@ -49,8 +51,8 @@ The available calculators so far are:
 * QTRFIT_OMP_CALCULATOR
 * QCP_SERIAL_CALCULATOR
 * QCP_OMP_CALCULATOR
-* QCP_CUDA_CALCULATOR (in CUDA capable machines *)
-* QCP_CUDA_MEM_CALCULATOR (in CUDA capable machines *)
+* QCP_CUDA_CALCULATOR (in CUDA capable machines*)
+* QCP_CUDA_MEM_CALCULATOR (in CUDA capable machines*)
 
 In addition it offers 2 other calculators that do not perform superposition (for cases in which the parts of interest of the system are already superposed):
 * NOSUP_SERIAL_CALCULATOR  
@@ -64,6 +66,7 @@ Methods 1, 2 and 3 can be used to modify the input coordinates (the input coordi
 pyRMSD can also have fitting symmetries and rotational calculation symmetries into account. Documentation about this is on its way.  
 
 If you think you need new features to be added (or better examples) click [here](#contact_features).  
+\* Computing capability of the GPU must be equal or higher than 1.1 (>1.2 if built with double precision support).  
 ###Condensed matrix  
 pyRMSD contains also a C written data type called CondensedMatrix. This is a representation of a squared symmetric matrix and it will save you half of the, otherwise redundant, memory. Besides, its write and read access outperforms other implementations like pure python's list-based and even Cython implementations (see the benchmarks folder). This means that it will speed up for free any application that heavily relies on accessing a distance matrix, like clustering algorithms. 
 See the examples below to get more insight about how to use it.
@@ -106,12 +109,12 @@ Calculating the matrix using directly the RMSDCalculator is a little bit more ve
 
 As the resulting matrix is symmetric and its diagonal is 0, the rmsd_matrix object will store only the upper diagonal triangle (condensed matrix), in the same way [scipy.spatial.distance.pdist](http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html) does.  
 ###Available calculators
-Programatically, available calculators can be seen with:  
+Programatically, available calculators can be queried with:  
     
     from pyRMSD.availableCalculators import availableCalculators
     print availableCalculators()
   
-\* Computing capability of the GPU must be equal or higher than 1.1 (>1.2 if built with double precision support).
+
 
 ###Matrix handlers
 A **MatrixHandler** object will help you to create the matrix and will also help you saving and loading matrix data to disk.   
@@ -161,7 +164,7 @@ with superuser provileges. Use 'build' instead to only build it. This is the usu
 
 ###Windows  
   
-Windows Installation is discontinued. We'll keep some instructions [here](#windows-systems) though.
+Windows Installation is discontinued. I keep some very basic instructions [here](#windows-systems) though.
 
 ##4 - The custom building script  
 pyRMSD includes a small build script that is indeed a recipe to compile the C extensions of pyRMSD. The build.py script is the most versatile way to compile pyRMSD and will work in almost all situations. With this script one can build x86 and x64 distributions with enabled or disbled CUDA calculators. 
@@ -247,7 +250,7 @@ If you have used this package and you feel something is missing/incorrect or wha
 * Names in C code must be more self-explanatory. **IMPROVED**
 * C code must be revised and further simplified. **DONE**  
 * Add more and better tests to increase coverage.  
-* Convert build.py in a Makefile generator. **DISCARDED** (it now acts just like make would do)  
+* Convert build.py in a Makefile generator. **PARTIALLY DONE** (it now acts just like make would do)  
 * Add more comments...  
 * Symmetry features need to be explained. 
 * and of course improving this README!!
