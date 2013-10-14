@@ -244,9 +244,7 @@ int main(int argc, char **argv){
 				"data/Matrix_Fit_CA_Calc_BEN/prot_plus_ligand_offset_very_different.CA.rmsd_matrix",
 				get_precision(available_calculators[i], TEST_MATRIX_WITH_FIT_AND_CALCULATION_COORDINATES));
 
-
 		test_rmsd_calculation_fit_and_calc_with_symmetry(available_calculators[i]);
-
 	}
 
 #ifdef CUDA_PRECISION_SINGLE
@@ -256,6 +254,15 @@ int main(int argc, char **argv){
 			"data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_all.coords",
 			"data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_BEN.coords");
 #endif
+
+	test_calculator_with_no_superposition_fit(NOSUP_SERIAL_CALCULATOR,
+			"data/Superpose_Fit_CA_similar/prot_plus_ligand_similar.aligned_CA.coords",
+			"data/Superpose_Fit_CA_similar/prot_plus_ligand_similar.aligned_CA.rmsd");
+
+	test_calculator_with_no_superposition_fit_and_calc(NOSUP_SERIAL_CALCULATOR,
+			"data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_CA.coords",
+			"data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_BEN.coords",
+			"data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_BEN.rmsd");
 
 	return 0;
 }

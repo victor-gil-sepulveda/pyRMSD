@@ -57,7 +57,6 @@ void RMSDCalculator::oneVsFollowing(int reference_conformation_index, double* rm
 
 		}
 		else{
-
 			double* fit_reference_conformation = this->rmsdData->getFittingConformationAt(reference_conformation_index);
 			double* calc_reference_conformation = this->rmsdData->getCalculationConformationAt(reference_conformation_index);
 

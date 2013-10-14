@@ -1,6 +1,17 @@
 #include "NOSUPSerialKernel.h"
 #include "../RMSDCalculationData.h"
 #include "../RMSDTools.h"
+#include<iostream>
+using namespace std;
+
+/*
+ * Implementation for cases in which superposition is not required (structures are already superposed).
+ * In this cases superposition may converge very fast, but it will still add an important overhead. Indeed
+ * the calculator class will center structures when necessary, adding an overhead (which will be minimum when
+ * calculating the RMSD matrix).
+ * Due to the centering step 'oneVsFollowingFitDiffersCalcCoords' needs to have the two coordinate sets defined
+ * or the result will be undetermined.
+ */
 
 NoSuperpositionSerialKernel::NoSuperpositionSerialKernel(){}
 

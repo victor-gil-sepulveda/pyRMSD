@@ -1086,3 +1086,89 @@ void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 							1e-12); // Qualitative check
 
 }
+
+void test_calculator_with_no_superposition_fit(RMSDCalculatorType type, const char* final_coords_file,const char* rmsd_results_file){
+	print_test_tittle(__FUNCTION__);
+	cout<<"- Using "<<calculatorTypeToString(type)<<endl;
+
+	vector<double> superposed_fit_coordinates,
+					calculated_rmsds,
+					expected_rmsds;
+
+	vector<int> superposed_fit_coordinates_shape;
+
+	load_vector(expected_rmsds, rmsd_results_file);
+
+	load_and_center_pdb_coords(superposed_fit_coordinates,
+						superposed_fit_coordinates_shape,
+						final_coords_file);
+
+	calculated_rmsds.resize(superposed_fit_coordinates_shape[0],0);
+	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
+									type,
+									superposed_fit_coordinates_shape[0],
+									superposed_fit_coordinates_shape[1],
+									TOPOINTER(superposed_fit_coordinates));
+
+	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
+
+	// RMSDs must be the same
+	compareVectors("\tCalculated RMSDs coincide with golden: ",
+			&(expected_rmsds[1]),
+			TOPOINTER(calculated_rmsds),
+			superposed_fit_coordinates_shape[0]-1, 1e-14);
+
+	delete calculator;
+}
+
+void test_calculator_with_no_superposition_fit_and_calc(RMSDCalculatorType type,
+		const char* final_prot_coords_file,
+		const char* final_lig_coords_file,
+		const char* rmsd_results_file){
+	print_test_tittle(__FUNCTION__);
+	cout<<"- Using "<<calculatorTypeToString(type)<<endl;
+
+	vector<double> superposed_fit_coordinates,
+					superposed_calc_coordinates,
+					calculated_rmsds,
+					expected_rmsds,
+					centers;;
+
+	vector<int> superposed_fit_coordinates_shape,
+				superposed_calc_coordinates_shape;
+
+	load_vector(expected_rmsds, rmsd_results_file);
+
+
+	load_and_center_pdb_coords(superposed_fit_coordinates,
+						superposed_fit_coordinates_shape,
+						final_prot_coords_file,
+						&centers);
+
+	load_and_move_pdb_coords(superposed_calc_coordinates,
+							superposed_calc_coordinates_shape,
+							final_lig_coords_file,
+							TOPOINTER(centers));
+
+	calculated_rmsds.resize(superposed_fit_coordinates_shape[0],0);
+	RMSDCalculator* calculator = RMSDCalculatorFactory::createCalculator(
+									type,
+									superposed_fit_coordinates_shape[0],
+									superposed_fit_coordinates_shape[1],
+									TOPOINTER(superposed_fit_coordinates),
+									superposed_calc_coordinates_shape[1],
+									TOPOINTER(superposed_calc_coordinates));
+
+	calculator->oneVsFollowing(0, TOPOINTER(calculated_rmsds));
+
+//	print_vector<double>("expected RMSD: ", TOPOINTER(expected_rmsds), expected_rmsds.size(),12);
+//	print_vector<double>("calculated RMSD: ", TOPOINTER(calculated_rmsds), calculated_rmsds.size(),12);
+	// RMSDs must be the same
+	compareVectors("\tCalculated RMSDs coincide with golden: ",
+			&(expected_rmsds[1]),
+			TOPOINTER(calculated_rmsds),
+			superposed_fit_coordinates_shape[0]-1, 1e-13);
+
+	delete calculator;
+}
+
