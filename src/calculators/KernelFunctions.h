@@ -32,6 +32,16 @@ class KernelFunctions{
 				double* rmsd,
 				RMSDCalculationData* data) = 0;
 
+		virtual void handleSymmetriesWithFitCoords(
+				int reference_conformation_number,
+				double* rmsd,
+				RMSDCalculationData* data);
+
+		virtual void handleSymmetriesWithCalcCoords(
+				int reference_conformation_number,
+				double* rmsd,
+				RMSDCalculationData* data);
+
 		virtual void matrixInit(RMSDCalculationData* data){}
 
 		virtual void matrixEnd(int , std::vector<double>& ){}

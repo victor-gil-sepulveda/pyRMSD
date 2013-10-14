@@ -14,6 +14,10 @@
 	void test_translations();
 	void test_center_coordinates();
 
+	void test_swap_atoms();
+	void test_apply_symm_group();
+	void test_apply_all_symmetries();
+
 	void test_QCP_Kernel();
 	void test_KABSCH_Kernel();
 
@@ -68,5 +72,9 @@
 	void test_iterative_superposition_with_fit_and_calc_rotation_comparing_QCP_serial_and_QCP_CUDA(
 			const char* initial_prot_coords_file,
 			const char* initial_lig_coords_file);
+
+	void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type);
+
+	void test_rmsd_calculation_fit_with_symmetry(RMSDCalculatorType type);
 
 #endif /* TESTS_H_ */

@@ -1,5 +1,6 @@
 
 #include "RMSDTools.h"
+#include "symmGroups.h"
 #include <vector>
 #include <iostream>
 #include <algorithm>
@@ -442,4 +443,138 @@ void RMSDTools::cross(double* a, double* b, double* c)	{
 	  a[0] = b[1]*c[2] - b[2]*c[1];
 	  a[1] = b[2]*c[0] - b[0]*c[2];
 	  a[2] = b[0]*c[1] - b[1]*c[0];
+}
+
+/**
+ *  Performs a coordinate swap of two atoms (atoms i and j exchange their positions).
+ *
+ *  \param coordinates Coordinates for all the atoms.
+ *
+ *  \param atom_i First atom to be swapped.
+ *
+ *  \param atom_j The other atom.
+ */
+void RMSDTools::swap_atoms(double* coordinates, int atom_i, int atom_j){
+	int offset_i = atom_i*3;
+	int offset_j = atom_j*3;
+	swap(coordinates[offset_i], coordinates[offset_j]);
+	swap(coordinates[offset_i+1], coordinates[offset_j+1]);
+	swap(coordinates[offset_i+2], coordinates[offset_j+2]);
+}
+
+/**
+ * Creates a symmetric representation by changing the coordinates following the symmetry group
+ * changing 'instructions'
+ *
+ * \param coordinates Coordinates for all the atoms.
+ *
+ * \params symm_group
+ */
+void RMSDTools::applySymmetryGroup(double* coordinates, pair<vector<int>, vector<int> >& symm_group){
+	vector<int>& first_atoms = symm_group.first;
+	vector<int>& second_atoms = symm_group.second;
+
+	for (unsigned int i = 0; i < first_atoms.size(); ++i){
+		RMSDTools::swap_atoms(coordinates, first_atoms[i],second_atoms[i]);
+	}
+
+}
+
+/**
+ * Recursively creates all possible permutations of atoms given by the symmetry groups definition
+ * and adds its calculated rmsd to the rmsds vector. Original coordinates remain unchanged after this
+ * operation.
+ *
+ * \param reference The reference conformation.
+ *
+ * \param superposed_conformation Superposed coordinates to reference.
+ *
+ * \param number_of_atoms Number of atoms of both conformations.
+ *
+ * \param symm_groups A description of symmetries.
+ *
+ * \param applied_symm_group The symmetry group that will be applied in this call (0 if it
+ * 	is the first call)
+ *
+ * \param rmsds Array that will contain calculated rmsds for all permutations.
+ *
+ */
+void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
+											double* superposed_conformation,
+											int number_of_atoms,
+											symmGroups* symm_groups,
+											int applied_symm_group,
+											vector<double>& rmsds){
+
+	// Keep doing recursive calls until the binary tree is constructed
+	if (applied_symm_group < (int) symm_groups->size()){
+		// We apply the change in one branch
+		RMSDTools::applySymmetryGroup(reference,
+							symm_groups->at(applied_symm_group));
+
+		RMSDTools::calcRecursiveSymmGroupApplication(reference,
+				superposed_conformation,
+				number_of_atoms,
+				symm_groups,
+				applied_symm_group+1,
+				rmsds);
+
+		// But not in the other, so we have to undo the change (another swap will suffice)
+		RMSDTools::applySymmetryGroup(reference,
+							symm_groups->at(applied_symm_group));
+		RMSDTools::calcRecursiveSymmGroupApplication(reference,
+				superposed_conformation,
+				number_of_atoms,
+				symm_groups,
+				applied_symm_group+1,
+				rmsds);
+	}
+	else{
+		// We have reached a leave, so we calc. the RMSD for this permutation
+		rmsds.push_back(RMSDTools::calcRMS(reference, superposed_conformation, number_of_atoms));
+//		for (int i = 0; i < number_of_atoms; ++i){
+//			cout<<reference[i*3]<<","
+//					<<reference[i*3+1]<<","
+//					<<reference[i*3+2]<<", ";
+//		}
+//		cout<<endl<<"**"<<endl;
+//		for (int i = 0; i < number_of_atoms; ++i){
+//			cout<<superposed_conformation[i*3]<<","
+//					<<superposed_conformation[i*3+1]<<","
+//					<<superposed_conformation[i*3+2]<<", ";
+//		}
+//		cout<<setprecision(8)<<"["<<rmsds[rmsds.size()-1]<<"]"<<endl;
+	}
+
+}
+
+/**
+ * Calculates rmsds for all applications of symmetry groups and returns the minimum value
+ *
+ * \param reference The reference conformation.
+ *
+ * \param superposed_conformation Superposed coordinates to reference.
+ *
+ * \param number_of_atoms Number of atoms of both conformations.
+ *
+ * \param symm_groups A description of symmetries.
+ *
+ * \param rmsds Array that will contain calculated rmsds for all permutations.
+ */
+double RMSDTools::calcMinRMSDOfAllSymmetryGroups(	double* reference,
+											double* superposed_conformation,
+											int number_of_atoms,
+											symmGroups* symm_groups){
+
+	// We need to generate all possible combinations of symmetric group exchanges
+	// by creating a recursive tree of changes.
+	vector<double> rmsds;
+
+	RMSDTools::calcRecursiveSymmGroupApplication(	reference,
+													superposed_conformation,
+													number_of_atoms,
+													symm_groups,
+													0, // We start with the 0th symm group
+													rmsds);
+	return *min_element(rmsds.begin(), rmsds.end());
 }

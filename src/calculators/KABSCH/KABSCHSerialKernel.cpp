@@ -70,8 +70,6 @@ void KABSCHSerialKernel::oneVsFollowingFitDiffersCalcCoords(
 						data->atomsPerFittingConformation,
 						rot_matrix);
 
-
-
 		RMSDTools::rotate3D(data->atomsPerFittingConformation,
 				fit_conformation_coords,
 				rot_matrix);
@@ -86,6 +84,7 @@ void KABSCHSerialKernel::oneVsFollowingFitDiffersCalcCoords(
 		}
 	}
 }
+
 
 
 //-------------------------------------------

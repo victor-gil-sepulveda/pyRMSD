@@ -180,7 +180,7 @@ void save_pdb_coords(vector<double> & coords, vector<int> & shape, const char * 
 	ofs.setf (std::ios::scientific);
 	ofs<<shape[0]<<" "<<shape[1]<<" "<<shape[2]<<" "<<endl;
 	for(unsigned int i = 0; i < coords.size(); i+=3){
-		ofs<<coords[i]<<" "<<coords[i+1]<<" "<<coords[i+2]<<endl;
+		ofs<<setprecision(16)<<coords[i]<<" "<<coords[i+1]<<" "<<coords[i+2]<<endl;
 	}
 	ofs.close();
 }
@@ -191,3 +191,36 @@ void test_vector_len(vector<double>& v, unsigned int expected_len, const char* n
 	}
 }
 
+void append_vector(std::vector<double> &to_this_one, std::vector<double> &this_vector){
+	for (unsigned int i = 0; i < this_vector.size(); ++i){
+		to_this_one.push_back(this_vector[i]);
+	}
+}
+
+void load_and_merge(std::vector<double>& here, std::vector<int>& resulting_size, const char* this_file, const char* and_this_other){
+	std::vector<int> size1, size2;
+	std::vector<double> other_coords;
+
+	here.clear();
+
+	load_pdb_coords(here,
+					size1,
+					this_file);
+
+	load_pdb_coords(other_coords,
+					size2,
+					and_this_other);
+
+	if(size1[1] != size2[1]){
+		cout<<"ERROR, conformations must have the same number of atoms ( "<<size1[1]<<", "<<size2[1]<<") for"
+				<<this_file <<" and "<<and_this_other<<endl;
+		exit(-1);
+	}
+	resulting_size.clear();
+	resulting_size.resize(3);
+	resulting_size[0] = size1[0]+size2[0];
+	resulting_size[1] = size1[1];
+	resulting_size[2] = size1[2];
+
+	append_vector(here, other_coords);
+}

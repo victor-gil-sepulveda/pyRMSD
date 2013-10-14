@@ -210,7 +210,8 @@ If you have used this package and you feel something is missing/incorrect or wha
 * Adding number of threads option for any OpenMP calculator.  **DONE**  
 * Adding  number of blocks and threads per block option in CUDA calculator.  **DONE**  
 * Create an installer using Python distutils (difficult because of the use of CUDA).  
-* C code needs more comments and to encapsulate function arguments (an absolutely needed major refactoring).  
+* C code needs more comments and to encapsulate function arguments (an absolutely needed major refactoring).  **DONE** 
+* Matrix generation load balance can be improved.
 * Names in C code must be more self-explanatory. 
 * C code must be revised and further simplified. 
 * Add more and better tests to increase coverage.  

@@ -27,16 +27,22 @@ void writeVector(std::vector<double> & vector, const char* path);
 void test_vector_len(std::vector<double>& v, unsigned int expected_len, const char* name);
 
 void load_pdb_coords(std::vector<double> & coords, std::vector<int> & shape, const char * dataPath);
+
 void load_and_center_pdb_coords(std::vector<double> & coords,
 									std::vector<int> & shape,
 									const char * dataPath,
 									std::vector<double>* centers = NULL);
+
 void load_and_move_pdb_coords(std::vector<double> & coords,
 									std::vector<int> & shape,
 									const char * dataPath,
 									double* centers);
 
 void save_pdb_coords(std::vector<double> & coords, std::vector<int> & shape, const char * file);
+
+void append_vector(std::vector<double> &to_this_one, std::vector<double> &this_vector);
+
+void load_and_merge(std::vector<double>& here, std::vector<int>& resulting_size, const char* this_file, const char* and_this_other);
 
 template <class T>
 inline std::string toString(T data){
@@ -51,6 +57,7 @@ void print_vector(const char*message, T*  rmsd_vec, int len, int precission){
 	}
 	std::cout<<std::flush<<std::endl;
 }
+
 
 
 #endif /* TEST_TOOLS_H_ */

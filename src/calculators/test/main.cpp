@@ -143,11 +143,11 @@ int main(int argc, char **argv){
 
 	RMSDCalculatorType available_calculators_d [] =  {
 			KABSCH_SERIAL_CALCULATOR,
-			KABSCH_OMP_CALCULATOR,
-			QTRFIT_SERIAL_CALCULATOR,
-			QTRFIT_OMP_CALCULATOR,
-			QCP_SERIAL_CALCULATOR,
-			QCP_OMP_CALCULATOR,
+//			KABSCH_OMP_CALCULATOR,
+//			QTRFIT_SERIAL_CALCULATOR,
+//			QTRFIT_OMP_CALCULATOR,
+//			QCP_SERIAL_CALCULATOR,
+//			QCP_OMP_CALCULATOR,
 #ifdef USE_CUDA
 			QCP_CUDA_CALCULATOR,
 			QCP_CUDA_MEM_CALCULATOR
@@ -166,6 +166,12 @@ int main(int argc, char **argv){
 	test_translations();
 
 	test_center_coordinates();
+
+	test_swap_atoms();
+
+	test_apply_symm_group();
+
+	test_apply_all_symmetries();
 
 	test_QCP_Kernel();
 
@@ -237,6 +243,11 @@ int main(int argc, char **argv){
 				"data/Models/prot_plus_ligand_very_different/not_aligned_offset_prot_plus_ligand.ligand.coords",
 				"data/Matrix_Fit_CA_Calc_BEN/prot_plus_ligand_offset_very_different.CA.rmsd_matrix",
 				get_precision(available_calculators[i], TEST_MATRIX_WITH_FIT_AND_CALCULATION_COORDINATES));
+
+
+		test_rmsd_calculation_fit_and_calc_with_symmetry(available_calculators[i]);
+
+		test_rmsd_calculation_fit_with_symmetry(available_calculators[i]);
 	}
 
 #ifdef CUDA_PRECISION_SINGLE
@@ -246,6 +257,7 @@ int main(int argc, char **argv){
 			"data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_all.coords",
 			"data/Iterpose_Fit_CA_Rot_BEN/stretching_trajectory_offset_ligand.initial_BEN.coords");
 #endif
+
 	return 0;
 }
 

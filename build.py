@@ -43,7 +43,7 @@ if __name__ == '__main__':
     }
     
     files_to_compile_with_gcc = {
-                                 "src/calculators":["RMSDCalculator.cpp","RMSDTools.cpp","RMSDCalculationData.cpp"],
+                                 "src/calculators":["RMSDCalculator.cpp","RMSDTools.cpp","RMSDCalculationData.cpp","KernelFunctions.cpp"],
                                  "src/calculators/factory":["RMSDCalculatorFactory.cpp"],
                                  "src/calculators/KABSCH":["KABSCHSerialKernel.cpp"],
                                  "src/calculators/QTRFIT":["QTRFITSerialKernel.cpp"],
@@ -103,6 +103,7 @@ if __name__ == '__main__':
         
         calculator_obj_files = [
                                 files_to_link["RMSDTools"],
+                                files_to_link["KernelFunctions"],
                                 files_to_link["KABSCHSerialKernel"],
                                 files_to_link["KABSCHOmpKernel"],
                                 files_to_link["QTRFITSerialKernel"],

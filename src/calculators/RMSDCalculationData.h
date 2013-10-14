@@ -27,7 +27,7 @@ class RMSDCalculationData {
 		}
 
 		inline bool hasSymmetryGroups(){
-			return this->symmetryGroups != NULL;
+			return this->symmetryGroups != NULL && this->symmetryGroups->size() > 0;
 		}
 
 		inline double* getFittingConformationAt(int index){
