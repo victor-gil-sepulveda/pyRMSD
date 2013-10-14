@@ -55,6 +55,7 @@ The available calculators so far are:
 In addition it offers 2 other calculators that do not perform superposition (for cases in which the parts of interest of the system are already superposed):
 * NOSUP_SERIAL_CALCULATOR  
 * NOSUP_OMP_CALCULATOR  
+This calculator will also center the coordinates, adding a little unnecessary overhead. This overhead will be totally diluted when calculating RMSD matrices though.
   
 Finally it also holds a hidden calculator, QCP_SERIAL_FLOAT_CALCULATOR, maninly used to test against  QCP_CUDA_CALCULATOR in its float version.  
 
