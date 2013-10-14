@@ -22,7 +22,11 @@ enum RMSDCalculatorType{
 	QCP_SERIAL_FLOAT_CALCULATOR = 7,
 	QCP_OMP_CALCULATOR = 8,
 	QCP_CUDA_CALCULATOR = 9,
-	QCP_CUDA_MEM_CALCULATOR = 10
+	QCP_CUDA_MEM_CALCULATOR = 10,
+
+	NOSUP_SERIAL_CALCULATOR = 11,
+	NOSUP_OMP_CALCULATOR = 12,
+	NOSUP_CUDA_CALCULATOR = 13
 };
 
 inline std::string calculatorTypeToString(RMSDCalculatorType type){
@@ -71,8 +75,20 @@ inline std::string calculatorTypeToString(RMSDCalculatorType type){
 			return "QCP_CUDA_MEM_CALCULATOR";
 			break;
 
+		case NOSUP_SERIAL_CALCULATOR:
+			return "NOSUP_SERIAL_CALCULATOR";
+			break;
+
+		case NOSUP_OMP_CALCULATOR:
+			return "NOSUP_OMP_CALCULATOR";
+			break;
+
+		case NOSUP_CUDA_CALCULATOR:
+			return "NOSUP_CUDA_CALCULATOR";
+			break;
+
 		default:
-			return "";
+			return "UNKNOWN_CALCULATOR_TYPE";
 	}
 }
 

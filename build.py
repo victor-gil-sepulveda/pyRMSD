@@ -48,6 +48,7 @@ if __name__ == '__main__':
                                  "src/calculators/KABSCH":["KABSCHSerialKernel.cpp"],
                                  "src/calculators/QTRFIT":["QTRFITSerialKernel.cpp"],
                                  "src/calculators/QCP":["QCPSerialKernel.cpp","QCPSerialFloatKernel.cpp"],
+                                 "src/calculators/NOSUP":["NOSUPSerialKernel.cpp"],
                                  "src/matrix":["Matrix.cpp","Statistics.cpp"],
                                  "src/python":["pyRMSD.cpp"],
                                  "src/pdbreaderlite":["PDBReader.cpp","PDBReaderObject.cpp"],
@@ -111,6 +112,7 @@ if __name__ == '__main__':
                                 files_to_link["QCPSerialKernel"],
                                 files_to_link["QCPSerialFloatKernel"],
                                 files_to_link["QCPOmpKernel"],
+                                files_to_link["NOSUPSerialKernel"],
                                 files_to_link["RMSDCalculatorFactory"],
                                 files_to_link["RMSDCalculationData"],
                                 files_to_link["RMSDCalculator"],
@@ -171,7 +173,10 @@ def availableCalculators():
             #"QCP_SERIAL_FLOAT_CALCULATOR":7,
             "QCP_OMP_CALCULATOR":8,
             "QCP_CUDA_CALCULATOR":9,
-            "QCP_CUDA_MEM_CALCULATOR":10
+            "QCP_CUDA_MEM_CALCULATOR":10,
+            "NOSUP_SERIAL_CALCULATOR":11,
+            #"NOSUP_OMP_CALCULATOR":12,
+            #"NOSUP_CUDA_CALCULATOR":13
     }
 """
         else:
@@ -188,7 +193,10 @@ def availableCalculators():
             #"QCP_SERIAL_FLOAT_CALCULATOR":7,
             "QCP_OMP_CALCULATOR":8,
             #"QCP_CUDA_CALCULATOR":9,
-            #"QCP_CUDA_MEM_CALCULATOR":10
+            #"QCP_CUDA_MEM_CALCULATOR":10,
+            "NOSUP_SERIAL_CALCULATOR":11,
+            #"NOSUP_OMP_CALCULATOR":12,
+            #"NOSUP_CUDA_CALCULATOR":13
     }
 """
         os.system('echo "\033[33mWriting available calculators...\033[0m"')

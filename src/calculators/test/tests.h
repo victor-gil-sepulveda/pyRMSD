@@ -75,6 +75,4 @@
 
 	void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type);
 
-	void test_rmsd_calculation_fit_with_symmetry(RMSDCalculatorType type);
-
 #endif /* TESTS_H_ */

@@ -19,6 +19,7 @@
 #include "../QCP/QCPSerialKernel.h"
 #include "../QCP/QCPOmpKernel.h"
 #include "../QCP/QCPSerialFloatKernel.h"
+#include "../NOSUP/NOSUPSerialKernel.h"
 
 
 #ifdef USE_CUDA
@@ -54,36 +55,42 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 															allCalculationCoordinates,
 															symmetryGroups);
 
-
 	switch (type) {
 		case KABSCH_SERIAL_CALCULATOR:
-					kernelFunctions = new KABSCHSerialKernel;
-					break;
+			kernelFunctions = new KABSCHSerialKernel;
+			break;
 
 		case KABSCH_OMP_CALCULATOR:
-					kernelFunctions = new KABSCHOmpKernel(number_of_threads);
-					break;
+			kernelFunctions = new KABSCHOmpKernel(number_of_threads);
+			break;
 
 		case QTRFIT_SERIAL_CALCULATOR:
-					kernelFunctions = new QTRFITSerialKernel;
-					break;
+			kernelFunctions = new QTRFITSerialKernel;
+			break;
 
 		case QTRFIT_OMP_CALCULATOR:
-					kernelFunctions = new QTRFITOmpKernel(number_of_threads);
-					break;
-
+			kernelFunctions = new QTRFITOmpKernel(number_of_threads);
+			break;
 
 		case QCP_SERIAL_CALCULATOR:
-					kernelFunctions = new QCPSerialKernel;
-					break;
+			kernelFunctions = new QCPSerialKernel;
+			break;
 
 		case QCP_SERIAL_FLOAT_CALCULATOR:
-					kernelFunctions = new QCPSerialFloatKernel;
-					break;
+			kernelFunctions = new QCPSerialFloatKernel;
+			break;
 
 		case QCP_OMP_CALCULATOR:
-					kernelFunctions = new QCPOmpKernel(number_of_threads);
-					break;
+			kernelFunctions = new QCPOmpKernel(number_of_threads);
+			break;
+
+		case NOSUP_SERIAL_CALCULATOR:
+			kernelFunctions = new NoSuperpositionSerialKernel;
+			break;
+
+		case NOSUP_OMP_CALCULATOR:
+			kernelFunctions = NULL;// new NoSuperpositionOmpKernel(number_of_threads);
+			break;
 
 #ifdef USE_CUDA
 		case KABSCH_CUDA_CALCULATOR:
@@ -100,11 +107,16 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 											threads_per_block,
 											blocks_per_grid);
 					break;
+
 		case QCP_CUDA_MEM_CALCULATOR:
 					kernelFunctions = new QCPCUDAMemKernel(
 											rmsdData,
 											threads_per_block,
 											blocks_per_grid);
+					break;
+
+		case NOSUP_CUDA_MEM_CALCULATOR:
+					kernelFunctions = NULL;
 					break;
 #endif
 

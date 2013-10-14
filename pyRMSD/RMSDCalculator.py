@@ -13,8 +13,7 @@ class RMSDCalculator(object):
                  fittingCoordsets, 
                  calculationCoordsets = None,
                  fitSymmetryGroups = [], 
-                 calSymmetryGroups = [],
-                 onlyRMSDCalc = False):
+                 calSymmetryGroups = []):
         """
         Class constructor.
         
@@ -56,9 +55,6 @@ class RMSDCalculator(object):
         
         @param calcSymmetryGroups: As in 'fitSymmetryGroups', a list of symmetry groups. 
         
-        @param onlyRMSDCalc: If true NO SUPERPOSITION will be performed, and thus only RMSD of fittingCoordsets coordinates is 
-        calculated (or calculationCoordsets if not None).
-        
         @author: vgil
         @date: 26/11/2012
         """
@@ -70,7 +66,6 @@ class RMSDCalculator(object):
             self.calculator_type = calculatorType
             self.number_of_conformations = self.fitting_coordinates.shape[0]
             self.number_of_fitting_atoms = self.fitting_coordinates.shape[1]
-            self.only_rmsd = onlyRMSDCalc
             
             self.calculation_coordinates = calculationCoordsets
             if self.calculation_coordinates is not None:
