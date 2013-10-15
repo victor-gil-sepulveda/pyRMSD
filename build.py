@@ -59,6 +59,7 @@ if __name__ == '__main__':
                                             "src/calculators/KABSCH":["KABSCHOmpKernel.cpp"],
                                             "src/calculators/QTRFIT":["QTRFITOmpKernel.cpp"],
                                             "src/calculators/QCP":["QCPOmpKernel.cpp"],
+                                            "src/calculators/NOSUP":["NOSUPOmpKernel.cpp"]
     }
     ######################################
     
@@ -113,6 +114,7 @@ if __name__ == '__main__':
                                 files_to_link["QCPSerialFloatKernel"],
                                 files_to_link["QCPOmpKernel"],
                                 files_to_link["NOSUPSerialKernel"],
+                                files_to_link["NOSUPOmpKernel"],
                                 files_to_link["RMSDCalculatorFactory"],
                                 files_to_link["RMSDCalculationData"],
                                 files_to_link["RMSDCalculator"],

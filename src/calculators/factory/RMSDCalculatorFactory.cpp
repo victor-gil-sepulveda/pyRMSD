@@ -20,7 +20,7 @@
 #include "../QCP/QCPOmpKernel.h"
 #include "../QCP/QCPSerialFloatKernel.h"
 #include "../NOSUP/NOSUPSerialKernel.h"
-
+#include "../NOSUP/NOSUPOmpKernel.h"
 
 #ifdef USE_CUDA
 	#include "../QCP/QCPCUDAKernel.h"
@@ -89,7 +89,7 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 			break;
 
 		case NOSUP_OMP_CALCULATOR:
-			kernelFunctions = NULL;// new NoSuperpositionOmpKernel(number_of_threads);
+			kernelFunctions = new NoSuperpositionOmpKernel(number_of_threads);
 			break;
 
 #ifdef USE_CUDA

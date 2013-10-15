@@ -1,8 +1,6 @@
 #include "NOSUPSerialKernel.h"
 #include "../RMSDCalculationData.h"
 #include "../RMSDTools.h"
-#include<iostream>
-using namespace std;
 
 /*
  * Implementation for cases in which superposition is not required (structures are already superposed).

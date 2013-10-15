@@ -8,10 +8,8 @@
 #include "KABSCHOmpKernel.h"
 #include "../RMSDTools.h"
 #include <cmath>
-#include <iostream>
 #include <omp.h>
 #include "../RMSDCalculationData.h"
-using namespace std;
 
 KABSCHOmpKernel::KABSCHOmpKernel(int number_of_threads) {
 	this->number_of_threads = number_of_threads;

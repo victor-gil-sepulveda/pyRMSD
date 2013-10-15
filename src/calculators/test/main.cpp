@@ -259,7 +259,17 @@ int main(int argc, char **argv){
 			"data/Superpose_Fit_CA_similar/prot_plus_ligand_similar.aligned_CA.coords",
 			"data/Superpose_Fit_CA_similar/prot_plus_ligand_similar.aligned_CA.rmsd");
 
-	test_calculator_with_no_superposition_fit_and_calc(NOSUP_SERIAL_CALCULATOR,
+	test_calculator_with_no_superposition_fit(NOSUP_SERIAL_CALCULATOR,
+			"data/Superpose_Fit_CA_similar/prot_plus_ligand_similar.aligned_CA.coords",
+			"data/Superpose_Fit_CA_similar/prot_plus_ligand_similar.aligned_CA.rmsd");
+
+	test_calculator_with_no_superposition_fit_and_calc(NOSUP_OMP_CALCULATOR,
+			"data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_CA.coords",
+			"data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_BEN.coords",
+			"data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_BEN.rmsd");
+
+
+	test_calculator_with_no_superposition_fit_and_calc(NOSUP_OMP_CALCULATOR,
 			"data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_CA.coords",
 			"data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_BEN.coords",
 			"data/Superpose_Fit_CA_Calc_BEN_similar/prot_plus_ligand_similar.aligned_BEN.rmsd");
