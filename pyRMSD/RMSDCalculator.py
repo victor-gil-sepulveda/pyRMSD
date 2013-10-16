@@ -1,7 +1,7 @@
+import numpy
 import pyRMSD.calculators
 from pyRMSD.availableCalculators import availableCalculators
-import numpy
-from symmTools import symm_group_permutator, swap_atoms, min_rmsd_of_rmsds_list
+from pyRMSD.symmTools import symm_group_permutator, swap_atoms, min_rmsd_of_rmsds_list
 
 class RMSDCalculator(object):
     """

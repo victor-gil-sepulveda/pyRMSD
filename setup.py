@@ -17,7 +17,7 @@ setup(name='pyRMSD',
       url='https://github.com/victor-gil-sepulveda/pyRMSD.git',
       packages=['pyRMSD','pyRMSD.utils'],
       package_dir={'pyRMSD':'./pyRMSD'},
-      py_modules=['pyRMSD.availableCalculators', 'pyRMSD.matrixHandler', 'pyRMSD.RMSDCalculator', 'pyRMSD.utils.proteinReading'],
+      py_modules=['pyRMSD.availableCalculators', 'pyRMSD.matrixHandler', 'pyRMSD.RMSDCalculator', 'pyRMSD.utils.proteinReading','pyRMSD.symmTools'],
       include_dirs = [numpy.get_include(),
                       distutils.sysconfig.get_python_inc()],
       ext_modules=[

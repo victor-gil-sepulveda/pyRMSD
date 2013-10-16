@@ -13,6 +13,6 @@ def availableCalculators():
             #"QCP_CUDA_CALCULATOR":9,
             #"QCP_CUDA_MEM_CALCULATOR":10,
             "NOSUP_SERIAL_CALCULATOR":11,
-            #"NOSUP_OMP_CALCULATOR":12,
+            "NOSUP_OMP_CALCULATOR":12,
             #"NOSUP_CUDA_CALCULATOR":13
     }
