@@ -37,6 +37,7 @@ setup(name='pyRMSD',
                                         'src/calculators/RMSDTools.cpp',
                                         'src/calculators/RMSDCalculator.cpp',
                                         'src/calculators/RMSDCalculationData.cpp',
+                                        'src/calculators/KernelFunctions.cpp',
                                         
                                         'src/calculators/factory/RMSDCalculatorFactory.cpp',
 
@@ -51,6 +52,7 @@ setup(name='pyRMSD',
                                         'src/calculators/QCP/QCPOmpKernel.cpp',
                                         
                                         'src/calculators/NOSUP/NOSUPSerialKernel.cpp',
+                                        'src/calculators/NOSUP/NOSUPOmpKernel.cpp',
                                         
                              ],
                              extra_compile_args=['-fopenmp'],
