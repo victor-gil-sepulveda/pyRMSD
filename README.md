@@ -208,6 +208,8 @@ See the examples into the *build_conf* if you want to create your own configurat
 ###Unix-based systems  
 The building script was used in a Ubuntu x86 and Ubuntu x64 Os, as well as in MacOs (Snow Leopard) to perform a non CUDA build. It had the *python-dev* package installed, so python headers were available. PYTHON_X constants were left unchanged.  
 It was also used under Ubuntu x64 with CUDA 4.2 to build the CUDA enabled version.  
+####Mac Users
+Roman Sloutsky warns that if you're not able to compile using the build script with default configuration options, just try to change "PYTHON_LIBRARY_FOLDER":"AUTO" to "PYTHON_LIBRARY_FOLDER":"AUTO_ALT" in "default.conf". Creating a new configuration file with only this entry will also work.
 
 ###Windows systems  
 A preliminary version of the build script was also tested in Windows 7 32 and 64 systems using MinGW compiler tools. Here are the steps followed to succesfully compile the extensions:  
