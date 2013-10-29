@@ -10,15 +10,26 @@ using namespace std;
 
 #define calc_vector_pos(i,j,matrix) (i*(matrix->row_length_minus_one) - i - ((( i-1)*i) >> 1 ) + j - 1)
 
+#define InputType int
+#define INPUT_TYPE_NONE 0
+#define INPUT_TYPE_LIST 1
+#define INPUT_TYPE_NUMPY 2
+
+
 typedef struct {
     PyObject_HEAD
-    int row_length;
-    int row_length_minus_one;
-    int data_size;
+    InputType input_type;
+    long int row_length;
+    long int data_size;
+    // Data
     float* data;
+    PyObject* numpy_array;
+    // Statistics
     StatisticsCalculator* statisticsCalculator;
     bool statistics_already_calculated;
+    // Precalculated stuff
     PyObject* zero;
+    long int row_length_minus_one;
 } CondensedMatrix;
 
 /*
@@ -32,6 +43,9 @@ static void condensedMatrix_dealloc(CondensedMatrix* self){
 
 	// Python ops
 	Py_XDECREF(self->zero);
+	if(self->numpy_array != NULL){
+		Py_DECREF(self->numpy_array);
+	}
     self->ob_type->tp_free((PyObject*)self);
 }
 
@@ -45,55 +59,97 @@ static PyObject* condensedMatrix_new(PyTypeObject *type, PyObject *args, PyObjec
     	self->row_length = 0;
     	self->data_size = 0;
     	self->data = NULL;
+    	self->numpy_array = NULL;
     	self->zero =  Py_BuildValue("d", 0.); // To be returned always that a 0 is needed
     	self->statisticsCalculator = NULL;
     	self->statistics_already_calculated = false;
+    	self->input_type = INPUT_TYPE_NONE;
     }
     return (PyObject *) self;
 }
 
 static int condensedMatrix_init(CondensedMatrix *self, PyObject *args, PyObject *kwds){
 	PyObject* input = NULL;
-	PyArrayObject* rmsd_numpy_array = NULL;
-	bool numpy = false;
-	if (! PyArg_ParseTuple(args, "O!",&PyArray_Type,&rmsd_numpy_array)){
-		//cout<<"[CondensedMatrix] Getting matrix data from sequence."<<endl;
-		if (! PyArg_ParseTuple(args, "O",&input)){
-			PyErr_SetString(PyExc_RuntimeError, "Error parsing parameters.");
-			return -1;
-		}
 
-		rmsd_numpy_array = (PyArrayObject *) PyArray_ContiguousFromObject(input, PyArray_DOUBLE, 1, 1);
+	if (!PyArg_ParseTuple(args, "O",&input)){
+		PyErr_SetString(PyExc_ValueError, "[CondensedMatrix] Undefined problem parsing parameters.");
+		return -1;
+	}
+
+	if (PyArray_Check(input)){
+		//cout<<"[CondensedMatrix] Getting matrix data from numpy array."<<endl;
+		self->input_type = INPUT_TYPE_NUMPY;
 	}
 	else{
-		//cout<<"[CondensedMatrix] Getting matrix data from numpy array."<<endl;
-		numpy = true;
+		if (PyList_Check(input)){
+			self->input_type = INPUT_TYPE_LIST;
+			//cout<<"[CondensedMatrix] Getting matrix data from list."<<endl;
+		}
+		else{
+			self->input_type = INPUT_TYPE_NONE;
+		}
+
 	}
 
-    if (rmsd_numpy_array == NULL){
-    	PyErr_SetString(PyExc_RuntimeError, "Impossible to create intermediary data.\n"
-    										  "Check that the parameter is a sequence and there's memory available.");
-    	return -1;
-    }
+	switch(self->input_type){
+		case INPUT_TYPE_LIST:
+		{
+			self->data_size = PyList_Size(input);
 
-    self->data_size = rmsd_numpy_array->dimensions[0];
-    self->row_length = (int) (1 + sqrt(1+8*self->data_size))/2;
-    self->row_length_minus_one = self->row_length - 1;
-    self->data = new float[self->data_size];
+			if (self->data_size < 1 || !PyFloat_Check(PyList_GetItem(input, 0))){
+				PyErr_SetString(PyExc_ValueError, "[CondensedMatrix] Input list must be a 1D real vector with size > 0.");
+				return -1;
+			}
+			self->row_length = (long int) (1 + sqrt(1+8*self->data_size))/2;
+			self->row_length_minus_one = self->row_length - 1;
+			self->data = new float[self->data_size];
+			for(int i = 0;i < self->data_size; ++i){
+				self->data[i] = (float) PyFloat_AS_DOUBLE(PyList_GetItem(input, i));
+			}
 
-    double * inner_data = (double*)(rmsd_numpy_array->data);
+			npy_intp dims[] = {(npy_intp)self->data_size};
+			self->numpy_array = PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, self->data);
+		}
+		break;
 
-	for(int i = 0;i < self->data_size; ++i){
-		self->data[i] = (float) (inner_data[i]);
+		case INPUT_TYPE_NUMPY:
+		{
+			//cout<<"[CondensedMatrix] Processing numpy array."<<endl;
+			PyArrayObject* numpy_array = (PyArrayObject*) input;
+
+			if (numpy_array->descr->type_num != NPY_DOUBLE || numpy_array->nd != 1)  {
+				PyErr_SetString(PyExc_ValueError, "[CondensedMatrix] Input numpy array must be a 1D real vector.");
+				return -1;
+			}
+
+			self->data_size = PyArray_DIMS(numpy_array)[0];
+			self->row_length = (long int) (1 + sqrt(1+8*self->data_size))/2;
+			self->row_length_minus_one = self->row_length - 1;
+			double * inner_data = (double*)  PyArray_GETPTR1(numpy_array,0);
+			self->data = new float[self->data_size];
+
+			for(int i = 0; i < self->data_size; ++i){
+				self->data[i] = (float) (inner_data[i]);
+			}
+
+			self->numpy_array = input;
+			Py_INCREF(self->numpy_array);
+		}
+		break;
+
+		case INPUT_TYPE_NONE:
+			PyErr_SetString(PyExc_RuntimeError, "[CondensedMatrix] Input must be either a list or a numpy array.");
+			return -1;
+			break;
+
+		default:
+			PyErr_SetString(PyExc_RuntimeError, "[CondensedMatrix] Unexpected input behaviour.");
+			return -1;
 	}
+
 
 	// Let's alloc the statistics object
 	self->statisticsCalculator =  new StatisticsCalculator(self->data, self->data_size);
-
-	if(!numpy){
-    	Py_DECREF(rmsd_numpy_array);
-    }
-
 	return 0;
 }
 
@@ -112,8 +168,8 @@ static PyObject* condensedMatrix_get_number_of_rows(CondensedMatrix* self, PyObj
 }
 
 static PyObject* condensedMatrix_get_data(CondensedMatrix* self, PyObject *args){
-	npy_intp dims[] = {self->data_size};
-	return  PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, self->data);
+	Py_INCREF(self->numpy_array);
+	return  PyArray_Return((PyArrayObject*) self->numpy_array);
 }
 
 #include "Matrix.Statistics.cpp"
