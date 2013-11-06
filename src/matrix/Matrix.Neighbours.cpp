@@ -137,3 +137,55 @@ static PyObject*  condensedMatrix_choose_node_with_higher_cardinality(CondensedM
 	return tuple;
 }
 
+/*
+ # __eps_neighborhood will not return the central element!!
+def __eps_neighborhood(self,node,eps):
+	"""
+	Populates the neighbor list for a given node (without the node itself).
+	"""
+	neighbours = []
+	for i in range(self.number_of_elements):
+		if node != i and self.condensed_matrix[node,i] <= eps:
+			neighbours.append(i)
+	return neighbours
+
+ */
+// Simpler version of the neighbouring algorithm
+static PyObject* condensedMatrix_get_neighbors_of_node_for_radius(CondensedMatrix* self, PyObject *args){
+	// Parse all arguments
+	double radius = 0.0;
+	int node = -1;
+	long int number_of_nodes = self->row_length;
+
+	if (!PyArg_ParseTuple(args, "id",&node, &radius)){
+		PyErr_SetString(PyExc_RuntimeError, "Error parsing parameters.");
+		return NULL;
+	}
+
+	// Do the job
+	vector<int> neighbours;
+	int pos;
+	for(int i = 0; i < number_of_nodes; ++i){
+		if(i < node){
+			pos = calc_vector_pos(i, node, self);
+			if(self->data[pos] <= radius){
+				neighbours.push_back(i);
+			}
+		}
+
+		if(i > node){
+			pos = calc_vector_pos(node, i, self);
+			if(self->data[pos] <= radius){
+				neighbours.push_back(i);
+			}
+		}
+
+		//if i == node, do nothing
+	}
+
+	int neigh_len = neighbours.size();
+	npy_intp dims[1] = {neigh_len};
+	int* neighbours_data = new int[neigh_len];
+	copy(&(neighbours[0]), &(neighbours[0]) + neigh_len, neighbours_data);
+	return PyArray_SimpleNewFromData(1,dims,NPY_INT,neighbours_data);
+}

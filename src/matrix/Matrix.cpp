@@ -137,6 +137,7 @@ static PyMethodDef condensedMatrix_methods[] = {
 	// Matrix as graph
 	{"get_neighbors_for_node", (PyCFunction)condensedMatrix_get_neighbors_for_node, METH_VARARGS,PyDoc_STR("description")},
 	{"choose_node_with_higher_cardinality", (PyCFunction)condensedMatrix_choose_node_with_higher_cardinality, METH_VARARGS,PyDoc_STR("description")},
+	{"element_neighbors_within_radius",(PyCFunction)condensedMatrix_get_neighbors_of_node_for_radius, METH_VARARGS,PyDoc_STR("description")},
 	//{"calculate_rw_laplacian", (PyCFunction)condensedMatrix_calculate_rw_laplacian, METH_NOARGS,PyDoc_STR("description")},
 	//{"calculate_affinity_matrix", (PyCFunction)condensedMatrix_calculate_affinity_matrix, METH_VARARGS,PyDoc_STR("description")},
 	{NULL}  /* Sentinel */
