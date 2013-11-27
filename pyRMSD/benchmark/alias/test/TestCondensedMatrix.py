@@ -7,8 +7,8 @@ import unittest
 import scipy.spatial.distance as distance
 import cStringIO
 import random
-from pyproclust.matrix.condensedMatrix import CondensedDistanceMatrix, load_condensed_matrix, calc_number_of_rows,complete_to_condensed,zero_condensed
-from pyproclust.matrix.completeMatrix import CompleteDistanceMatrix
+from pyproct.matrix.condensedMatrix import CondensedDistanceMatrix, load_condensed_matrix, calc_number_of_rows,complete_to_condensed,zero_condensed
+from pyproct.matrix.completeMatrix import CompleteDistanceMatrix
 import numpy as np
 
 class Test(unittest.TestCase):

@@ -227,12 +227,12 @@ int condensedMatrix_ass_subscript(CondensedMatrix *self, PyObject *key, PyObject
 
 	if (i < j){
 		pos = calc_vector_pos(i,j,self);
-		self->data[pos] = PyFloat_AsDouble(v);
+		self->data[pos] = (float) PyFloat_AsDouble(v);
 	}
 	else{
 		if (i!=j){
 			pos = calc_vector_pos(j,i,self);
-			self->data[pos] = PyFloat_AsDouble(v);
+			self->data[pos] = (float) PyFloat_AsDouble(v);
 		}
 	}
 	return 0;

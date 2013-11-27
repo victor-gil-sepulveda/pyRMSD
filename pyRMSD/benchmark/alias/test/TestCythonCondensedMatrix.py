@@ -5,8 +5,8 @@ Created on 07/08/2012
 '''
 import unittest
 
-from pyproclust.matrix.cython.CythonCondensedMatrix import CythonCondensedMatrix #@UnresolvedImport
-from pyproclust.matrix.condensedMatrix import CondensedDistanceMatrix
+from pyproct.matrix.cython.CythonCondensedMatrix import CythonCondensedMatrix #@UnresolvedImport
+from pyproct.matrix.condensedMatrix import CondensedDistanceMatrix
 
 class Test(unittest.TestCase):
     
