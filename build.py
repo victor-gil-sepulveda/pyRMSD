@@ -5,18 +5,18 @@ import os
 from build_config import get_config_options_for
 
 if __name__ == '__main__':
-    parser = optparse.OptionParser(usage='%prog [--build-conf] [--cuda] [--build] [--clean] [--clean-all]', version='3.0')
+    parser = optparse.OptionParser(usage='%prog [--build-conf] [--cuda] [--build] [--clean] [--clean-all]', version='4.0.0')
     parser.add_option('--build-conf', dest = "conf_file",  help="Determines the file storing build configuration info.")
     parser.add_option('--cuda', dest = "cuda_type",  help="Use this flag if you want to compile the CUDA calculator.")
     parser.add_option('--build', dest = "build", action="store_true", help="Use this flag if you want to compile pyRMSD.")
     parser.add_option('--clean', dest = "clear",  action="store_true", help="Clear all .o generated files.")
     parser.add_option('--clean-all', dest = "clear_all", action="store_true",  help="The same as --clear, but it also removes generates libs and exes.")
     options, args = parser.parse_args()
-    
+
     # Load configuration
     conf = get_config_options_for(os.path.join("build_conf","default.conf"), options.conf_file)
-    
-    
+
+
     ######################################
     ### SET CUDA FLAGS
     ######################################
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     files_to_compile_with_nvcc = {
                                   "src/calculators/QCP":["QCPCUDAKernel.cu","QCPCUDAMemKernel.cu","kernel_functions_cuda.cu"]
     }
-    
+
     files_to_compile_with_gcc = {
                                  "src/calculators":["RMSDCalculator.cpp","RMSDTools.cpp","RMSDCalculationData.cpp","KernelFunctions.cpp"],
                                  "src/calculators/factory":["RMSDCalculatorFactory.cpp"],
@@ -54,7 +54,7 @@ if __name__ == '__main__':
                                  "src/pdbreaderlite":["PDBReader.cpp","PDBReaderObject.cpp"],
                                  "src/calculators/test":["main.cpp","test_tools.cpp","tests.cpp"],
     }
-    
+
     files_to_compile_with_gcc_and_openmp = {
                                             "src/calculators/KABSCH":["KABSCHOmpKernel.cpp"],
                                             "src/calculators/QTRFIT":["QTRFITOmpKernel.cpp"],
@@ -62,7 +62,7 @@ if __name__ == '__main__':
                                             "src/calculators/NOSUP":["NOSUPOmpKernel.cpp"]
     }
     ######################################
-    
+
     #########################################
     ###
     ###     BUILDING PROCESS
@@ -70,17 +70,17 @@ if __name__ == '__main__':
     #########################################
     if options.build:
         files_to_link = collections.defaultdict(str)
-        
+
         if options.use_cuda:
             conf["PYTHON_EXTENSION_OPTIONS"] = conf["PYTHON_EXTENSION_OPTIONS"]+" "+conf["DEFINE_USE_CUDA"]
-        
+
         compile_a_file_collection(conf["BASE_DIR"], files_to_compile_with_gcc, "gcc", conf["PYTHON_EXTENSION_OPTIONS"], [conf["PYTHON_INCLUDE_FOLDER"], conf["NUMPY_INCLUDE"]], ".o",files_to_link)
-            
+
         compile_a_file_collection(conf["BASE_DIR"], files_to_compile_with_gcc_and_openmp, "gcc", conf["PYTHON_EXTENSION_OPTIONS"]+" "+conf["OPENMP_OPTION"], [conf["PYTHON_INCLUDE_FOLDER"], conf["NUMPY_INCLUDE"]], ".o",files_to_link)
-        
+
         if options.use_cuda:
             compile_a_file_collection(conf["BASE_DIR"], files_to_compile_with_nvcc, "nvcc", conf["CUDA_OPTIONS"], [conf["CUDA_INCLUDE"]], ".o",files_to_link)
-        
+
         linkDSL = Link().\
                         using("g++").\
                         with_options([conf["PYTHON_EXTENSION_LINKING_OPTIONS"],conf["OPENMP_OPTION"]]).\
@@ -88,10 +88,10 @@ if __name__ == '__main__':
                         using_lib_locations([conf["PYTHON_LIBRARY_FOLDER"]]).\
                         this_object_files([files_to_link["Matrix"],files_to_link["Statistics"]]).\
                         to_produce("condensedMatrix.so")
-        
-        os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            
+
+        os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
         os.system( linkDSL.getLinkingCommand())
-        
+
         linkDSL = Link().\
                         using("g++").\
                         with_options([conf["PYTHON_EXTENSION_LINKING_OPTIONS"],conf["OPENMP_OPTION"]]).\
@@ -99,10 +99,10 @@ if __name__ == '__main__':
                         using_lib_locations([conf["PYTHON_LIBRARY_FOLDER"]]).\
                         this_object_files([files_to_link["PDBReaderObject"],files_to_link["PDBReader"]]).\
                         to_produce("pdbReader.so")
-        
-        os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')            
+
+        os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
         os.system( linkDSL.getLinkingCommand())
-        
+
         calculator_obj_files = [
                                 files_to_link["RMSDTools"],
                                 files_to_link["KernelFunctions"],
@@ -120,16 +120,16 @@ if __name__ == '__main__':
                                 files_to_link["RMSDCalculator"],
                                 files_to_link["pyRMSD"]
         ]
-        
+
         if options.use_cuda:
             calculator_obj_files.extend([files_to_link["QCPCUDAKernel"],files_to_link["QCPCUDAMemKernel"],files_to_link["kernel_functions_cuda"]])
             calculator_libraries = [conf["PYTHON_LIBRARY"],conf["CUDA_LIBRARY"]]
             calculator_library_locations  = [conf["PYTHON_LIBRARY_FOLDER"], conf["CUDA_LIBRARIES"]]
-            
+
         else:
             calculator_libraries = [conf["PYTHON_LIBRARY"]]
             calculator_library_locations  = [conf["PYTHON_LIBRARY_FOLDER"]]
-        
+
         linkDSL = Link().\
                         using("g++").\
                         with_options([conf["PYTHON_EXTENSION_LINKING_OPTIONS"],conf["OPENMP_OPTION"]]).\
@@ -137,10 +137,10 @@ if __name__ == '__main__':
                         using_lib_locations(calculator_library_locations).\
                         this_object_files(calculator_obj_files).\
                         to_produce("calculators.so")
-        
+
         os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
         os.system(linkDSL.getLinkingCommand())
-        
+
         test_obj_files = list(calculator_obj_files)
         test_obj_files.remove(files_to_link["pyRMSD"])
         test_obj_files.extend([files_to_link["main"], files_to_link["test_tools"], files_to_link["tests"]])
@@ -153,21 +153,21 @@ if __name__ == '__main__':
                         to_produce("test_rmsdtools_main")
         os.system('echo "\033[34m'+ linkDSL.getLinkingCommand()+'\033[0m"')
         os.system(linkDSL.getLinkingCommand())
-        
-                        
+
+
         os.system("mv calculators.so pyRMSD/")
         os.system("mv condensedMatrix.so pyRMSD/")
         os.system("mv pdbReader.so pyRMSD/")
         os.system("mv test_rmsdtools_main src/calculators/test")
-        
+
         ##Calculators
         if options.use_cuda:
             calcs_str = """
 def availableCalculators():
     return {
-            "KABSCH_SERIAL_CALCULATOR": 0, 
-            "KABSCH_OMP_CALCULATOR":1, 
-            #"KABSCH_CUDA_CALCULATOR":2, 
+            "KABSCH_SERIAL_CALCULATOR": 0,
+            "KABSCH_OMP_CALCULATOR":1,
+            #"KABSCH_CUDA_CALCULATOR":2,
             "QTRFIT_SERIAL_CALCULATOR":3,
             "QTRFIT_OMP_CALCULATOR":4,
             #"QTRFIT_CUDA_CALCULATOR":5,
@@ -185,9 +185,9 @@ def availableCalculators():
             calcs_str = """
 def availableCalculators():
     return {
-            "KABSCH_SERIAL_CALCULATOR": 0, 
-            "KABSCH_OMP_CALCULATOR":1, 
-            #"KABSCH_CUDA_CALCULATOR":2, 
+            "KABSCH_SERIAL_CALCULATOR": 0,
+            "KABSCH_OMP_CALCULATOR":1,
+            #"KABSCH_CUDA_CALCULATOR":2,
             "QTRFIT_SERIAL_CALCULATOR":3,
             "QTRFIT_OMP_CALCULATOR":4,
             #"QTRFIT_CUDA_CALCULATOR":5,
@@ -203,7 +203,7 @@ def availableCalculators():
 """
         os.system('echo "\033[33mWriting available calculators...\033[0m"')
         open("pyRMSD/availableCalculators.py","w").write(calcs_str)
-        
+
         # Save all produced files
         produced_file_handler = open(".products","w")
         for produced_file in  files_to_link:
@@ -211,7 +211,7 @@ def availableCalculators():
                 produced_file_handler.write(files_to_link[produced_file] +"\n")
         produced_file_handler.close()
     ######################################
-    
+
     #########################################
     ###
     ###     REMOVE ALL .o AND TRACKING FILES
@@ -229,10 +229,10 @@ def availableCalculators():
             os.system("rm .products")
         # Remove all trackers
         os.system("find src/ -name '.modif*' -exec rm {} \;")
-        # remove .pyc 
+        # remove .pyc
         os.system("find src/ -name '*.pyc' -exec rm {} \;")
     ######################################
-    
+
     #########################################
     ###
     ###     REMOVE ALL LIBS AND EXES

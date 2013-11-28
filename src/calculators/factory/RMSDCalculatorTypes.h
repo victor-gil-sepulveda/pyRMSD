@@ -26,7 +26,8 @@ enum RMSDCalculatorType{
 
 	NOSUP_SERIAL_CALCULATOR = 11,
 	NOSUP_OMP_CALCULATOR = 12,
-	NOSUP_CUDA_CALCULATOR = 13
+	NOSUP_CUDA_CALCULATOR = 13,
+	NOSUP_CUDA_MEM_CALCULATOR = 14
 };
 
 inline std::string calculatorTypeToString(RMSDCalculatorType type){
