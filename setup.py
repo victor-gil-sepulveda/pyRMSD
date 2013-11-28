@@ -7,24 +7,32 @@ from distutils.core import setup, Extension
 import numpy
 import distutils.sysconfig
 
-setup(name='pyRMSD',
-      version='4.0.0',
-      description='pyRMSD is a small Python package that aims to offer an integrative and \
+setup(
+      name = 'pyRMSD',
+      version = '4.0.0',
+      description = 'pyRMSD is a small Python package that aims to offer an integrative and \
       efficient way of performing RMSD calculations of large sets of structures. It is specially \
       tuned to do fast collective RMSD calculations, as pairwise RMSD matrices.',
-      author='Victor Alejandro Gil Sepulveda',
-      author_email='victor.gil.sepulveda@gmail.com',
-      url='https://github.com/victor-gil-sepulveda/pyRMSD.git',
-      packages=['pyRMSD','pyRMSD.utils'],
-      package_dir={'pyRMSD':'./pyRMSD'},
-      py_modules=['pyRMSD.availableCalculators',
+      author = 'Victor Alejandro Gil Sepulveda',
+      author_email = 'victor.gil.sepulveda@gmail.com',
+      url = 'https://github.com/victor-gil-sepulveda/pyRMSD.git',
+      packages = [
+                'pyRMSD',
+                'pyRMSD.utils'
+                ],
+      package_dir = {'pyRMSD':'./pyRMSD'},
+      py_modules = [
+                  'pyRMSD.availableCalculators',
                   'pyRMSD.matrixHandler',
                   'pyRMSD.RMSDCalculator',
                   'pyRMSD.utils.proteinReading',
-                  'pyRMSD.symmTools'],
-      include_dirs = [numpy.get_include(),
-                      distutils.sysconfig.get_python_inc()],
-      ext_modules=[
+                  'pyRMSD.symmTools'
+                  ],
+      include_dirs = [
+                      numpy.get_include(),
+                      distutils.sysconfig.get_python_inc()
+                      ],
+      ext_modules = [
                    Extension('pyRMSD.pdbReader',[
                                           'src/pdbreaderlite/PDBReader.cpp',
                                           'src/pdbreaderlite/PDBReaderObject.cpp'
@@ -59,9 +67,14 @@ setup(name='pyRMSD',
                                         'src/calculators/NOSUP/NOSUPOmpKernel.cpp',
 
                              ],
-                             extra_compile_args=['-fopenmp'],
-                             extra_link_args=['-fopenmp']
+                             extra_compile_args = ['-fopenmp','-O3'],
+                             extra_link_args = ['-fopenmp']
                    )
       ],
-
-     )
+      license = 'LICENSE.txt',
+      long_description = open('README.rst').read(),
+      install_requires=[
+        "numpy >= 1.6.1",
+        "Distutils >= 2.7.3",
+      ],
+)
