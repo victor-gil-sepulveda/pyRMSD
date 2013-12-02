@@ -3,7 +3,11 @@ include src/matrix/Matrix.Neighbours.cpp
 include src/matrix/Matrix.Statistics.cpp
 include src/pdbreaderlite/*.h
 include src/calculators/*.h
-include src/calculators/QCP/*.h
 include src/calculators/factory/*.h
+include src/calculators/QCP/*.h
 include src/calculators/QTRFIT/*.h
 include src/calculators/KABSCH/*.h
+include src/calculators/NOSUP/*.h
+include README.md
+include README.rst
+include LICENSE

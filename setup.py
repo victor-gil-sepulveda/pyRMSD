@@ -6,6 +6,11 @@ Created on 25/02/2013
 from distutils.core import setup, Extension
 import numpy
 import distutils.sysconfig
+import os
+
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
 
 setup(
       name = 'pyRMSD',
@@ -72,9 +77,8 @@ setup(
                    )
       ],
       license = 'LICENSE.txt',
-      long_description = open('README.rst').read(),
+      long_description = read('README.rst'),
       install_requires=[
-        "numpy >= 1.6.1",
-        "Distutils >= 2.7.3",
+        "numpy >= 1.6.1"
       ],
 )
