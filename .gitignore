@@ -1,0 +1,8 @@
+.products
+.project
+.pydevproject
+*.pyc
+*.o
+*.modif_*
+.cproject
+*.so

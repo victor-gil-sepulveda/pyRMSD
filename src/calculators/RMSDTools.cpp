@@ -470,14 +470,12 @@ void RMSDTools::swap_atoms(double* coordinates, int atom_i, int atom_j){
  *
  * \params symm_group
  */
-void RMSDTools::applySymmetryGroup(double* coordinates, pair<vector<int>, vector<int> >& symm_group){
-	vector<int>& first_atoms = symm_group.first;
-	vector<int>& second_atoms = symm_group.second;
-
-	for (unsigned int i = 0; i < first_atoms.size(); ++i){
-		RMSDTools::swap_atoms(coordinates, first_atoms[i],second_atoms[i]);
+void RMSDTools::applySymmetryGroup(double* coordinates, vector<pair<int,int> >& symm_group){
+	cout<<"DBG: swapping symm group"<< endl;
+	for (unsigned int i = 0; i < symm_group.size(); ++i){
+		cout<<"\tDBG: swapping "<< symm_group[i].first <<" by "<<symm_group[i].second<<endl;
+		RMSDTools::swap_atoms(coordinates, symm_group[i].first, symm_group[i].second);
 	}
-
 }
 
 /**
@@ -508,10 +506,8 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
 
 	// Keep doing recursive calls until the binary tree is constructed
 	if (applied_symm_group < (int) symm_groups->size()){
-		// We apply the change in one branch
-		RMSDTools::applySymmetryGroup(reference,
-							symm_groups->at(applied_symm_group));
-
+		// We do not apply the change in one branch
+		cout<<"DBG: NO "<<applied_symm_group<<endl;
 		RMSDTools::calcRecursiveSymmGroupApplication(reference,
 				superposed_conformation,
 				number_of_atoms,
@@ -519,7 +515,8 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
 				applied_symm_group+1,
 				rmsds);
 
-		// But not in the other, so we have to undo the change (another swap will suffice)
+		cout<<"DBG: YES "<<applied_symm_group<<endl;
+		// But we apply it into the other
 		RMSDTools::applySymmetryGroup(reference,
 							symm_groups->at(applied_symm_group));
 		RMSDTools::calcRecursiveSymmGroupApplication(reference,
@@ -531,6 +528,7 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
 	}
 	else{
 		// We have reached a leave, so we calc. the RMSD for this permutation
+		cout<<"DBG: RMSD OF PERM "<<RMSDTools::calcRMS(reference, superposed_conformation, number_of_atoms)<<endl;
 		rmsds.push_back(RMSDTools::calcRMS(reference, superposed_conformation, number_of_atoms));
 //		for (int i = 0; i < number_of_atoms; ++i){
 //			cout<<reference[i*3]<<","
@@ -569,12 +567,17 @@ double RMSDTools::calcMinRMSDOfAllSymmetryGroups(	double* reference,
 	// We need to generate all possible combinations of symmetric group exchanges
 	// by creating a recursive tree of changes.
 	vector<double> rmsds;
-
+	cout<<"DBG: calcMinRMSDOfAllSymmetryGroups"<<endl;
 	RMSDTools::calcRecursiveSymmGroupApplication(	reference,
 													superposed_conformation,
 													number_of_atoms,
 													symm_groups,
 													0, // We start with the 0th symm group
 													rmsds);
+	for (unsigned int i = 0 ; i < rmsds.size(); i++){
+		cout<<"DBG: RMSD "<<rmsds[i]<<" ";
+	}
+	cout<<endl;
+	
 	return *min_element(rmsds.begin(), rmsds.end());
 }

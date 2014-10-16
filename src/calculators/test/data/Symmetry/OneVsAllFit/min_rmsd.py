@@ -4,7 +4,7 @@ import numpy
 files = os.listdir(".") 
 files_to_process = []
 for filename in files:
-    if ".rmsd" in filename:
+    if ".rmsd" in filename and not "minimum" in filename:
         files_to_process.append(filename)
 
 values = []
