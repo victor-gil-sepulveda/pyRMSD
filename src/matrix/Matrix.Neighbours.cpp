@@ -106,32 +106,41 @@ static PyObject*  condensedMatrix_choose_node_with_higher_cardinality(CondensedM
 	for(int i = 0; i < len_nodes; ++i){
 		nodes[i] = PyInt_AS_LONG(PyList_GET_ITEM((PyObject*) nodes_list,i));
 	}
+	
 	//Do the job
 	vector<int> neighbors(len_nodes,0);
-	int inode,jnode,pos;
+	int inode, jnode, pos;
 	double value;
-	for (int i =0; i< len_nodes-1;++i){
+	for (int i = 0; i< len_nodes-1; ++i){
 		inode = nodes[i];
-		for (int j = i+1; j< len_nodes;++j){
-			jnode =nodes[j];
-			pos = calc_vector_pos(inode,jnode,self);
-			value =self->data[pos];
+		for (int j = i+1; j < len_nodes; ++j){
+			jnode = nodes[j];
+			pos = calc_vector_pos(inode, jnode, self);
+			value = self->data[pos];
 			if(value <= cutoff){
 				neighbors[i] += 1;
 				neighbors[j] += 1;
 			}
 		}
 	}
-	//Get index with maximum value
+	
+	//Get maximum value
 	int max =  *(max_element(neighbors.begin(),neighbors.end()));
+	// Get the index that corresponds to that value
+	// cout<<"DBG: Looking for "<<max<<endl;
 	int index = 0;
-	for (int i = 0; i< len_nodes-1;++i){
+	for (int i = 0; i < len_nodes; ++i){
 		if (neighbors[i]==max){
 			index = i;
 			break;
 		}
 	}
-
+//	cout<<"DBG: (node, nneig) ";
+//    for (int i = 0; i < len_nodes; ++i){
+//        cout<<"("<<nodes[i]<<", "<<neighbors[i]<<") ";
+//    }
+//    cout<<endl;
+//    cout<<"DBG: nodes, neig "<<nodes[index]<<" "<<neighbors[index]<<endl;
 	PyObject* tuple = Py_BuildValue("(ii)", nodes[index],neighbors[index]);//PyTuple_Pack(2,nodes[index],neighbors[index]);
 	delete [] nodes;
 	return tuple;
