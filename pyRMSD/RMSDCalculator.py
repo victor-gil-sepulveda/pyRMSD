@@ -1,7 +1,8 @@
 import numpy
 import pyRMSD.calculators
 from pyRMSD.availableCalculators import availableCalculators
-from pyRMSD.symmTools import symm_group_permutator, swap_atoms, min_rmsd_of_rmsds_list
+from pyRMSD.symmTools import symm_permutations, swap_atoms, min_rmsd_of_rmsds_list,\
+    symm_groups_validation
 
 class RMSDCalculator(object):
     """
@@ -35,24 +36,10 @@ class RMSDCalculator(object):
         @param calculationCoordsets: An array containing the coordinates used to calculate the RMSD. Must have the same structure
             than 'fittingCoordinates'.
 
-        @param fitSymmetryGroups: List of symmetry groups. Each symmetry group is a 2-Tuple of n-tuples defining interchangeable positions
-            of current calculation coordinates (which will be the fitting coordinates, or the calculation coordinates if defined).
-            For instance, given a calculator with this fitting coordinates (without calculation coordinates):
-                 a,  b,  c,  d,  e , f ;  for conf1
-                 a1, b1, c3, d4, e5, f6 ; for conf2
-                 a2, b2, c3, d4, e5, f6 ; for conf3
-
-            and a symmetry group definition [((1,3),(2,4)),]. The final RMSDs would be the minimum RMSDs of:
-                a,  b,  c,  d,  e , f ;  for conf1 (original)
-                a,  c,  b,  e,  d , f ;  for conf1 (applying symmetry group)
-
-            with:
-                a1, b1, c3, d4, e5, f6 ; for conf2
-                a2, b2, c3, d4, e5, f6 ; for conf3
-
+        @param fitSymmetryGroups: List of symmetry groups. 
             Symm. groups are a low-level structure-agnostic of the type of symmetries that can be found in some ligands,
             i.e. in rotating benzene groups. It can also be used in symmetries of bigger selections though.
-
+            See :py:func:`pyRMSD.symmTools.symm_permutations` 
         @param calcSymmetryGroups: As in 'fitSymmetryGroups', a list of symmetry groups.
 
         @author: vgil
@@ -83,21 +70,10 @@ class RMSDCalculator(object):
             self.__number_of_threads = 8
 
             # Symmetry group handling
-            self.__check_symm_groups(fitSymmetryGroups)
-            self.__check_symm_groups(calcSymmetryGroups)
+            symm_groups_validation(fitSymmetryGroups)
+            symm_groups_validation(calcSymmetryGroups)
             self.fit_symmetry_groups = fitSymmetryGroups
             self.calc_symmetry_groups = calcSymmetryGroups
-
-    def __check_symm_groups(self, symm_groups):
-        """
-        Checks that symmetry groups are well defined (each n-tuple has a correspondent symmetric n-tuple)
-        """
-        try:
-            for sg in symm_groups:
-                if len(sg[0]) != len(sg[1]):
-                    raise Exception
-        except Exception:
-            raise ValueError('Symmetry groups are not well defined')
 
     def pairwise(self, first_conformation_number, second_conformation_number, get_superposed_coordinates = False):
         """
@@ -129,7 +105,11 @@ class RMSDCalculator(object):
             second_calculation_coords = self.calculation_coordinates[second_conformation_number]
             tmp_calculation_coordsets = numpy.array([first_calculation_coords,second_calculation_coords])
 
-        rmsd = RMSDCalculator(self.calculator_type, tmp_coordsets, tmp_calculation_coordsets).oneVsFollowing(0)[0]
+        rmsd = RMSDCalculator(self.calculator_type, 
+                              tmp_coordsets, 
+                              tmp_calculation_coordsets,
+                              self.fit_symmetry_groups,
+                              self.calc_symmetry_groups).oneVsFollowing(0)[0]
 
         if get_superposed_coordinates:
             if tmp_calculation_coordsets is None:
@@ -181,7 +161,11 @@ class RMSDCalculator(object):
 
             rearranged_calculation_coords = numpy.array(rearranged_calculation_coords_list)
 
-        rmsd_array= RMSDCalculator(self.calculator_type, rearranged_coords, rearranged_calculation_coords).oneVsFollowing(0)
+        rmsd_array= RMSDCalculator(self.calculator_type, 
+                                   rearranged_coords, 
+                                   rearranged_calculation_coords,
+                                   self.fit_symmetry_groups,
+                                   self.calc_symmetry_groups).oneVsFollowing(0)
 
         if get_superposed_coordinates:
             if rearranged_calculation_coords is None:
@@ -190,18 +174,6 @@ class RMSDCalculator(object):
                 return rmsd_array, rearranged_coords, rearranged_calculation_coords
         else:
             return rmsd_array
-
-    def __coords_reshaping(self):
-        """
-        Flattens the coordinates.
-        """
-        # This kind of reshaping should not do a copy
-        np_coords_fit = numpy.reshape(self.fitting_coordinates, self.number_of_conformations*self.number_of_fitting_atoms*3)
-        np_coords_calc = numpy.array([])
-        if (self.calculation_coordinates is not None):
-            np_coords_calc = numpy.reshape(self.calculation_coordinates, self.number_of_conformations*self.number_of_calculation_atoms*3)
-
-        return np_coords_fit, np_coords_calc
 
     def oneVsFollowing(self, conformation_number):
         """
@@ -233,17 +205,23 @@ class RMSDCalculator(object):
             # If we have fitting symmetry groups, we have to try with all possible combinations.
             # Calculation symmetry groups are applied at C level, changing the way RMSD is calculated.
             symm_rmsds = []
-            symm_group_permutations = []
-            symm_group_permutator(self.fit_symmetry_groups, [], symm_group_permutations)
-            for symm_group_permutation in symm_group_permutations:
+            for permutation in symm_permutations(self.fit_symmetry_groups):
+                
+                # Copy the coordinates and convert to matrix form for ease of indexing
                 coords_copy = numpy.array(np_coords_fit, copy= True, dtype = numpy.float64)
-                coords_copy.shape = (self.number_of_conformations,self.number_of_fitting_atoms,3)
+                coords_copy.shape = (self.number_of_conformations, self.number_of_fitting_atoms,3)
+                
                 # Apply the changes to reference
-                for symm_group in symm_group_permutation:
-                    for i,j in zip(symm_group[0],symm_group[1]):
-                        swap_atoms(coords_copy[conformation_number], i, j)
+                for symm_group in permutation:
+                    # Do it only if the symm. group is not permuted. Otherwise we would always permute!
+                    if not symm_group in self.fit_symmetry_groups:
+                        for symm_pair in symm_group:
+                            swap_atoms(coords_copy[conformation_number], symm_pair[0], symm_pair[1])
+                    
+                # Flatten again to feed the C calculator
                 coords_copy.shape = (self.number_of_conformations*self.number_of_fitting_atoms*3)
-                # Then calculate the rmsd
+                
+                # And calculate the RMSD of this permutation
                 symm_rmsds.append(pyRMSD.calculators.oneVsFollowing(availableCalculators()[self.calculator_type],
                                                          coords_copy,
                                                          self.number_of_fitting_atoms,
@@ -255,7 +233,6 @@ class RMSDCalculator(object):
                                                          self.__number_of_threads,
                                                          self.__threads_per_block,
                                                          self.__blocks_per_grid))
-
             # Pick the minimum rmsd of all possibilities.
             rmsds = min_rmsd_of_rmsds_list(numpy.array(symm_rmsds))
 
@@ -290,7 +267,7 @@ class RMSDCalculator(object):
         the input coordinates are changed (it wouldn't have too much sense otherwise).
         In this case calculation coordinates are not used as such, but as a secondary coordinates set
         that is rotate along with the primary fitting set (which allows to use different selections
-        to do the iterative fit and any other calculation). Symmetry groups have no effect in iterative
+        to do the iterative fit and any other calculation). Fit symmetry groups have no effect in iterative
         superposition.
 
         @author: vgil
@@ -309,7 +286,18 @@ class RMSDCalculator(object):
                            self.__threads_per_block,
                            self.__blocks_per_grid)
         return numpy.reshape(np_coords_fit, (self.number_of_conformations, self.number_of_fitting_atoms, 3))
-
+    
+    def __coords_reshaping(self):
+        """
+        Flattens the coordinates.
+        """
+        # This kind of reshaping should not do a copy
+        np_coords_fit = numpy.reshape(self.fitting_coordinates, self.number_of_conformations*self.number_of_fitting_atoms*3)
+        np_coords_calc = numpy.array([])
+        if (self.calculation_coordinates is not None):
+            np_coords_calc = numpy.reshape(self.calculation_coordinates, self.number_of_conformations*self.number_of_calculation_atoms*3)
+        return np_coords_fit, np_coords_calc
+    
     def setNumberOfOpenMPThreads(self, number_of_threads):
         """
         Sets the number of threads to be used by an OpenMP calculator.

@@ -21,21 +21,18 @@ struct Params{
 	symmGroups* symmetry_groups;
 };
 
-/**
- * Parses an (int) n-ary tuple, storing its contents into a vector.
- *
- * \param tuple An integer n-ary tuple.
- *
- * \param v  Vector to store the elements of the tuple.
- *
- */
-void parse_tuple(PyTupleObject* tuple, vector<int>& v){
-	int number_of_elements = PyTuple_Size((PyObject*) tuple);
-	for (int i =0; i < number_of_elements; ++i){
-		v.push_back(PyInt_AsLong(PyTuple_GetItem((PyObject*) tuple, i)));
+
+PyObject* get_item(PyObject* list_or_tuple, int item){
+	
+	if(PyTuple_Check(list_or_tuple)){
+		// Then is a tuple (and item must be 0 or 1
+		return PyTuple_GetItem((PyObject*) list_or_tuple, item);
+	}
+	else{
+		// It is a list
+		return PyList_GetItem((PyObject*) list_or_tuple, item);
 	}
 }
-
 /**
  * Parses a 'symmetry groups' structure to recreate its homologous C structure using vectors.
  *
@@ -46,15 +43,24 @@ void parse_tuple(PyTupleObject* tuple, vector<int>& v){
 void parse_symmetry_groups(PyListObject* list_obj, symmGroups& symmetry_groups){
 	// Precondition: symmetry_groups is an empty vector
 	// and symmetry groups have the correct structure and size
+	
 	int number_of_symmetry_groups = PyList_Size((PyObject*) list_obj);
-	for (int i =0; i < number_of_symmetry_groups; ++i){
-		PyTupleObject* sg_pair = (PyTupleObject*) PyList_GetItem((PyObject*) list_obj, i);
-		PyTupleObject* first_tuple = (PyTupleObject*) PyTuple_GetItem((PyObject*) sg_pair, 0);
-		PyTupleObject* second_tuple = (PyTupleObject*) PyTuple_GetItem((PyObject*) sg_pair, 1);
-		vector<int> v1, v2;
-		parse_tuple(first_tuple,v1);
-		parse_tuple(second_tuple,v2);
-		symmetry_groups.push_back(pair<vector<int>, vector<int> > (v1,v2));
+	//cout<<"DBG: Num. symmgroups "<<number_of_symmetry_groups<<endl;
+	
+	for (int i = 0; i < number_of_symmetry_groups; ++i){
+		PyObject* symm_group =  get_item((PyObject*)list_obj, i);
+		vector<pair<int, int> > symm_group_vector;
+		int symmetry_elements = PyList_Size( symm_group);
+		for (int j=0; j < symmetry_elements; ++j){
+			PyObject* symm_pair = get_item(symm_group, j);
+			symm_group_vector.push_back(pair<int, int> (
+														(int) PyInt_AsLong(get_item(symm_pair, 0)),
+														(int) PyInt_AsLong(get_item(symm_pair, 1))
+														)
+														);
+		}
+	
+		symmetry_groups.push_back(symm_group_vector);
 	}
 }
 
@@ -163,7 +169,17 @@ static PyObject* oneVsFollowing(PyObject *self, PyObject *args){
 	parse_params(args, &params);
 
 	rmsd.resize(params.number_of_conformations-params.conformation_number-1);
-
+	
+	//cout<<"DBG: Parsed_size "<<params.symmetry_groups->size()<<endl;
+	//for (unsigned i=0;i<params.symmetry_groups->size();++i){
+	//	vector<pair<int,int> > group = params.symmetry_groups->at(i);
+	//	for (unsigned j=0;j<group.size();++j){
+	//		pair<int,int> pair = group[j];
+	//		cout<<" ("<<pair.first<<","<<pair.second<<") ";
+	//	}
+	//}
+	//cout<<endl;
+	
 	RMSDCalculator* rmsdCalculator = RMSDCalculatorFactory::createCalculator(
 									params.calculator_type,
 									params.number_of_conformations,

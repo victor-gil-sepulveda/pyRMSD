@@ -120,12 +120,15 @@ void test_apply_symm_group(){
 	double coordinates [] = 	{1,2,3,  4,5,6,   7,8,9, 10,11,12, 13,14,15, 16,17,18, 19,20,21, 22,23,24};
 	double swapped_coords [] = {1,2,3, 	16,17,18, 7,8,9, 22,23,24, 13,14,15,  4,5,6,   19,20,21, 10,11,12};
 
-	pair<vector<int>, vector<int> > symm_group;
-	symm_group.first.push_back(1);
-	symm_group.first.push_back(3);
-	symm_group.second.push_back(5);
-	symm_group.second.push_back(7);
-
+	//pair<vector<int>, vector<int> > symm_group;
+	//symm_group.first.push_back(1);
+	//symm_group.first.push_back(3);
+	//symm_group.second.push_back(5);
+	//symm_group.second.push_back(7);
+	vector<pair<int, int> > symm_group;
+	symm_group.push_back(pair<int,int>(1,5));
+	symm_group.push_back(pair<int,int>(3,7));
+	
 	RMSDTools::applySymmetryGroup(coordinates, symm_group);
 
 	compareVectors("\tSymm group was correctly applied: ", swapped_coords, coordinates, 8*3, 1e-16);
@@ -140,6 +143,9 @@ void test_apply_all_symmetries(){
 						   13,14,15, 16,17,18,
 						   19,20,21, 22,23,24,
 						   25,26,27, 28,29,30};
+	double reference_copy [10*3];
+	RMSDTools::copyArrays(TOPOINTER(reference_copy), 
+			TOPOINTER(reference), 30);
 
 	// Permutation of the first with one atom changed (negated) (rmsd = 13.1453 )
 	// This forces a search to get the best value
@@ -148,22 +154,33 @@ void test_apply_all_symmetries(){
 											-13,-14,-15,   4,5,6,
 											19,20,21, 10,11,12,
 											25,26,27, 28,29,30,};
+	double superposed_conformation_copy [10*3]; 
+	RMSDTools::copyArrays(TOPOINTER(superposed_conformation_copy), 
+			TOPOINTER(superposed_conformation), 30);
 
-	pair<vector<int>, vector<int> > symm_group_1;
-	symm_group_1.first.push_back(1);
-	symm_group_1.first.push_back(3);
-	symm_group_1.second.push_back(5);
-	symm_group_1.second.push_back(7);
+	//pair<vector<int>, vector<int> > symm_group_1;
+	//symm_group_1.first.push_back(1);
+	//symm_group_1.first.push_back(3);
+	//symm_group_1.second.push_back(5);
+	//symm_group_1.second.push_back(7);
+	vector<pair<int, int> > symm_group_1;
+	symm_group_1.push_back(pair<int,int>(1,5));
+	symm_group_1.push_back(pair<int,int>(3,7));
+	
+	//pair<vector<int>, vector<int> > symm_group_2;
+	//symm_group_2.first.push_back(2);
+	//symm_group_2.first.push_back(4);
+	//symm_group_2.second.push_back(6);
+	//symm_group_2.second.push_back(8);
+	vector<pair<int, int> > symm_group_2;
+	symm_group_2.push_back(pair<int,int>(2,6));
+	symm_group_2.push_back(pair<int,int>(4,8));
 
-	pair<vector<int>, vector<int> > symm_group_2;
-	symm_group_2.first.push_back(2);
-	symm_group_2.first.push_back(4);
-	symm_group_2.second.push_back(6);
-	symm_group_2.second.push_back(8);
-
-	pair<vector<int>, vector<int> > symm_group_3;
-	symm_group_3.first.push_back(5);
-	symm_group_3.second.push_back(9);
+	//pair<vector<int>, vector<int> > symm_group_3;
+	//symm_group_3.first.push_back(5);
+	//symm_group_3.second.push_back(9);
+	vector<pair<int, int> > symm_group_3;
+	symm_group_3.push_back(pair<int,int>(5,9));
 
 	symmGroups symm_groups;
 	symm_groups.push_back(symm_group_1);
@@ -191,8 +208,9 @@ void test_apply_all_symmetries(){
 	compareVectors("\tMinimum RMSD must be the expected one: ",
 			&expected_min_rmsd, &rmsd, 1, 1e-4);
 
-	rmsd = RMSDTools::calcMinRMSDOfAllSymmetryGroups(reference,
-													superposed_conformation,
+	// We have to use copies as the coordinates array has already been permuted
+	rmsd = RMSDTools::calcMinRMSDOfAllSymmetryGroups(reference_copy,
+													superposed_conformation_copy,
 													10,
 													&empty_symm_group);
 	double expected_empty_rmsd = 20.2188;
@@ -1043,21 +1061,28 @@ void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 		min_rmsds.push_back(min(min(calculated_rmsds_0[i],calculated_rmsds_1[i]),
 								min(calculated_rmsds_2[i],calculated_rmsds_3[i])));
 	}
-
-	// Now let's do the same defining the symmetry groups for the ligand.
 	// We will create two groups, one to substitute the symmetric Cs of the bezene ring
+	// Now let's do the same defining the symmetry groups for the ligand.
 	// and the other for the Ns.
 	symmGroups symm_groups;
-	vector<int> group1_first, group1_second;
-	group1_first.push_back(0);group1_first.push_back(3);
-	group1_second.push_back(2);group1_second.push_back(5);
-	symm_groups.push_back(pair<vector<int>, vector<int> >(group1_first, group1_second));
+	//vector<int> group1_first, group1_second;
+	//group1_first.push_back(0);group1_first.push_back(3);
+	//group1_second.push_back(2);group1_second.push_back(5);
+	//symm_groups.push_back(pair<vector<int>, vector<int> >(group1_first, group1_second));
+	//
+	//vector<int> group2_first, group2_second;
+	//group2_first.push_back(7);
+	//group2_second.push_back(8);
+	//symm_groups.push_back(pair<vector<int>, vector<int> >(group2_first, group2_second));
+	vector<pair<int, int> > symm_group_1;
+	symm_group_1.push_back(pair<int,int>(0,2));
+	symm_group_1.push_back(pair<int,int>(3,5));
 
-	vector<int> group2_first, group2_second;
-	group2_first.push_back(7);
-	group2_second.push_back(8);
-	symm_groups.push_back(pair<vector<int>, vector<int> >(group2_first, group2_second));
-
+	vector<pair<int, int> > symm_group_2;
+	symm_group_2.push_back(pair<int,int>(7,8));
+	symm_groups.push_back(symm_group_1);
+	symm_groups.push_back(symm_group_2);
+	
 	calculated_rmsds.resize(trajectory_with_native_CA_size[0]-1,0);
 	calculator = RMSDCalculatorFactory::createCalculator(
 									type,
@@ -1078,6 +1103,10 @@ void test_rmsd_calculation_fit_and_calc_with_symmetry(RMSDCalculatorType type){
 						min_rmsds.size(),
 						1e-12);
 
+	//print_vector<double>("DBG: *HAND CALCTED MIN RMSD: ", TOPOINTER(min_rmsds), min_rmsds.size(), 12);
+	//print_vector<double>("DBG: *EXPECTED MIN RMSD: ", TOPOINTER(expected_rmsds), min_rmsds.size(), 12);
+	//print_vector<double>("DBG: *CALCTED MIN RMSD: ", TOPOINTER(calculated_rmsds), min_rmsds.size(), 12);
+	
 	// The result has to be similar (at least in the same order) than the one got with prody
 	compareVectors("\tAnd results are within the safety range: ",
 							TOPOINTER(expected_rmsds),

@@ -74,7 +74,7 @@ namespace RMSDTools{
 
 	void swap_atoms(double* coordinates, int atom_i, int atom_j);
 
-	void applySymmetryGroup(double* coordinates, std::pair<std::vector<int>, std::vector<int> >& symm_group);
+	void applySymmetryGroup(double* coordinates, std::vector<std::pair<int,int> >& symm_group);
 
 	void calcRecursiveSymmGroupApplication(double* reference, double* superposed_conformation,
 												int number_of_atoms, symmGroups* symm_groups,

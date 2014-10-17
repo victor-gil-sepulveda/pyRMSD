@@ -65,7 +65,6 @@ void RMSDCalculator::oneVsFollowing(int reference_conformation_index, double* rm
 					calc_reference_conformation,
 					reference_conformation_index,
 					rmsd);
-
 			if(this->rmsdData->hasSymmetryGroups()){
 				this->kernelFunctions->handleSymmetriesWithCalcCoords(
 												reference_conformation_index,
