@@ -245,21 +245,40 @@ If you compiled the package using the build script, an extra test suite will be 
 Also available to users, inside the */benchmark* folder, there are the benchmarks used to assest the performance of pyRMSD.
 There one can find some small scripts to test OpenMP parametrizations, calculation time of every implementation or even a small floating point error check.
 
-##Future improvements
+##TODO
 If you have used this package and you feel something is missing/incorrect or whatever, you can change it and contribute. Some examples of things that need to be improved are:
-* Solving bug in the CondensedMatrix object (erroneous creation when using a numpy array)
-* Adding number of threads option for any OpenMP calculator.  **DONE**
-* Adding  number of blocks and threads per block option in CUDA calculator.  **DONE**
-* Create a unique installer using Python distutils (difficult because of the use of CUDA).
-* C code needs more comments and to encapsulate function arguments (an absolutely needed major refactoring).  **DONE**
-* Matrix generation load balance can be improved.
-* Names in C code must be more self-explanatory. **IMPROVED**
-* C code must be revised and further simplified. **DONE**
-* Add more and better tests to increase coverage.
-* Convert build.py in a Makefile generator. **PARTIALLY DONE** (it now acts just like make would do)
-* Add more comments...
-* Symmetry features need to be explained.
-* and of course improving this README!!
+
+###General
+- [ ] Separate condensed matrix as new project.  
+- [ ] Add distributed matrix calculation for VERY BIG datasets.  
+- [ ] Add more comments...
+- [x] Adding number of threads option for any OpenMP calculator.  
+- [x] Adding  number of blocks and threads per block option in CUDA calculator.
+- [ ] Create a unique setup.py-lik installer using Python distutils (difficult because of the use of CUDA).  
+- [x] Convert build.py in a Makefile generator.  
+- [x] and of course improve this README!!  
+
+### C
+- [ ] Solving bug in the CondensedMatrix object (erroneous creation when using a numpy array).  
+- [x] C code must be revised and further simplified. 
+- [ ] Improve performance even more (less ops, simd ops ... etc).  
+- [x] Names in C code must be more self-explanatory.  
+- [x] Ecapsulate function arguments ( major refactoring).
+- [ ] Add more comments...
+- [x] Add more and better tests to increase coverage.  
+- [x] OpenCL version.
+
+###Condensed Matrix
+- [ ] Matrix generation load balance can be improved.
+- [x] Symmetry features need to be explained.
+- [x] Improve symmetry handling.
+- [x] Change rules of array acceptance (add FLOAT32 and FLOAT16)
+- [ ] Improve single element data retrieval.
+
+###Symmetries
+- [ ] High level wrapper for atom selection as gist or separate project.
+- [ ] Hungarian algorithm to autodetect symmetries (see  [this paper](http://pubs.acs.org/doi/abs/10.1021/ci400534h?journalCode=jcisd8) and [this package](http://software.clapper.org/munkres/)).  
+  
 <a id="contact_features"></a>
 If you want to add new features (for instance mass weighting) do not hesitate to contact me at: victor.gil.sepulveda at gmail.com.
 Of course, you can fork the repository and add as many features and improvements as you want.
