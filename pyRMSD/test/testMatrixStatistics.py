@@ -1,8 +1,8 @@
-'''
+"""
 Created on 15/11/2012
 
 @author: victor
-'''
+"""
 import unittest
 from pyRMSD.condensedMatrix import CondensedMatrix
 import random 

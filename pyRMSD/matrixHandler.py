@@ -1,8 +1,8 @@
-'''
+"""
 Created on 19/09/2012
 
 @author: victor
-'''
+"""
 import json
 import numpy
 import os.path
@@ -92,7 +92,8 @@ class MatrixHandler(object):
 
         @return: The loaded condensed matrix.
         """
-        return CondensedMatrix(list(numpy.load(matrix_file_without_extension+".npy")))
+        data = numpy.load(matrix_file_without_extension+".npy").astype(numpy.float64, copy=False)
+        return CondensedMatrix(list(data))
 
     @classmethod
     def save_statistics(cls, statistics_folder, distance_matrix):

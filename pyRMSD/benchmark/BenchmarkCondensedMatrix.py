@@ -1,8 +1,8 @@
-'''
+"""
 Created on 07/08/2012
 
 @author: victor
-'''
+"""
 import time
 import random
 from pyRMSD.condensedMatrix import CondensedMatrix

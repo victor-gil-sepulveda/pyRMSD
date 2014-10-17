@@ -1,8 +1,8 @@
-'''
+"""
 Created on 25/02/2013
 
 @author: victor
-'''
+"""
 from distutils.core import setup, Extension
 import numpy
 import distutils.sysconfig
@@ -14,7 +14,7 @@ def read(fname):
 
 setup(
       name = 'pyRMSD',
-      version = '4.0.0',
+      version = '4.0.1',
       description = 'pyRMSD is a small Python package that aims to offer an integrative and \
       efficient way of performing RMSD calculations of large sets of structures. It is specially \
       tuned to do fast collective RMSD calculations, as pairwise RMSD matrices.',

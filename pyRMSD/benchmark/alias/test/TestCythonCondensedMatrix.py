@@ -1,8 +1,8 @@
-'''
+"""
 Created on 07/08/2012
 
 @author: victor
-'''
+"""
 import unittest
 
 from pyproct.matrix.cython.CythonCondensedMatrix import CythonCondensedMatrix #@UnresolvedImport

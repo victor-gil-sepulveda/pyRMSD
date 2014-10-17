@@ -228,11 +228,29 @@ int condensedMatrix_ass_subscript(CondensedMatrix *self, PyObject *key, PyObject
 	if (i < j){
 		pos = calc_vector_pos(i,j,self);
 		self->data[pos] = (float) PyFloat_AsDouble(v);
+		/////////////////////////////////////////
+		// BEWARE!!!!!! SLOW AND REDUNDANT HACK
+		/////////////////////////////////////////
+		// ALTERNATIVE: in construction use PyObject *PyArray_FROM_OTF(PyObject* obj, int typenum, int requirements) with
+		// http://docs.scipy.org/doc/numpy/user/c-info.how-to-extend.html?highlight=pyarray_simplenew#PyArray_SimpleNew
+		// NPY_ARRAY_INOUT_ARRAY
+		// NPY_ARRAY_FORCECAST
+		// NPY_ARRAY_ENSURECOPY
+		// NPY_ARRAY_ENSUREARRAY
+		if(self->numpy_array != NULL){
+			((double*) PyArray_GETPTR1(self->numpy_array,0))[pos] =self->data[pos];
+		}
 	}
 	else{
 		if (i!=j){
 			pos = calc_vector_pos(j,i,self);
 			self->data[pos] = (float) PyFloat_AsDouble(v);
+			/////////////////////////////////////////
+			// BEWARE!!!!!! SLOW AND REDUNDANT HACK
+			/////////////////////////////////////////
+			if(self->numpy_array != NULL){
+				((double*) PyArray_GETPTR1(self->numpy_array,0))[pos] =self->data[pos];
+			}
 		}
 	}
 	return 0;

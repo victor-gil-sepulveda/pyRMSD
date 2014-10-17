@@ -1,8 +1,8 @@
-'''
+"""
 Created on 26/07/2012
 
 @author: victor
-'''
+"""
 from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext

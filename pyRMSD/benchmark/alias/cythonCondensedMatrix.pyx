@@ -1,11 +1,11 @@
 #cython: boundscheck=False
 #cython: wraparound=False
 #cython: cdivision=True
-'''
+"""
 Created on 12/07/2012
 
 @author: victor
-'''
+"""
 import numpy
 cimport numpy
 import math

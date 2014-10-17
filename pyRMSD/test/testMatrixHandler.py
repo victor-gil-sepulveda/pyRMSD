@@ -1,8 +1,8 @@
-'''
+"""
 Created on 20/09/2012
 
 @author: victor
-'''
+"""
 import unittest
 from pyRMSD.matrixHandler import MatrixHandler
 from pyRMSD.condensedMatrix import CondensedMatrix #@UnresolvedImport

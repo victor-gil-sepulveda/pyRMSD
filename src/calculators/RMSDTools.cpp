@@ -477,7 +477,6 @@ void RMSDTools::applySymmetryGroup(double* coordinates, pair<vector<int>, vector
 	for (unsigned int i = 0; i < first_atoms.size(); ++i){
 		RMSDTools::swap_atoms(coordinates, first_atoms[i],second_atoms[i]);
 	}
-
 }
 
 /**
@@ -522,6 +521,7 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
 		// But not in the other, so we have to undo the change (another swap will suffice)
 		RMSDTools::applySymmetryGroup(reference,
 							symm_groups->at(applied_symm_group));
+
 		RMSDTools::calcRecursiveSymmGroupApplication(reference,
 				superposed_conformation,
 				number_of_atoms,
@@ -545,7 +545,6 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
 //		}
 //		cout<<setprecision(8)<<"["<<rmsds[rmsds.size()-1]<<"]"<<endl;
 	}
-
 }
 
 /**
@@ -576,5 +575,10 @@ double RMSDTools::calcMinRMSDOfAllSymmetryGroups(	double* reference,
 													symm_groups,
 													0, // We start with the 0th symm group
 													rmsds);
+	/*cout<<"RMSD list ";
+	for(unsigned int i =0; i < rmsds.size();++i){
+		cout<<rmsds[i]<<" ";
+	}
+	cout<<endl;*/
 	return *min_element(rmsds.begin(), rmsds.end());
 }

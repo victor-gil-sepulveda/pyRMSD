@@ -1,8 +1,8 @@
-'''
+"""
 Created on 29/07/2013
 
 @author: victor
-'''
+"""
 
 def symm_group_permutator(symm_groups_left, used, permutations):
    

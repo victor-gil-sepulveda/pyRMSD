@@ -1,8 +1,8 @@
-'''
+"""
 Created on 29/11/2012
 
 @author: victor
-'''
+"""
 import unittest
 import numpy
 from pyRMSD.utils.proteinReading import Reader

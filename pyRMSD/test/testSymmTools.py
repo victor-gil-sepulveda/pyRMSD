@@ -1,8 +1,8 @@
-'''
+"""
 Created on 29/07/2013
 
 @author: victor
-'''
+"""
 import unittest
 from pyRMSD.symmTools import  symm_group_permutator, swap_atoms, min_rmsd_of_rmsds_list
 import numpy

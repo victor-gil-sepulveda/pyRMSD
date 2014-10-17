@@ -1,8 +1,8 @@
-'''
+"""
 Created on 16/11/2012
 
 @author: victor
-'''
+"""
 import numpy
 
 def choose_node_with_higher_cardinality(condensed_matrix,nodes,cutoff):

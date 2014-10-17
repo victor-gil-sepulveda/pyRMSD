@@ -1,8 +1,8 @@
-'''
+"""
 Created on 10/08/2012
 
 @author: victor
-'''
+"""
 import time
 import random
 import numpy

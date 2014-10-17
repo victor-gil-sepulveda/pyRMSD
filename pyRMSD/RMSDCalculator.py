@@ -13,7 +13,7 @@ class RMSDCalculator(object):
                  fittingCoordsets,
                  calculationCoordsets = None,
                  fitSymmetryGroups = [],
-                 calSymmetryGroups = []):
+                 calcSymmetryGroups = []):
         """
         Class constructor.
 
@@ -84,9 +84,9 @@ class RMSDCalculator(object):
 
             # Symmetry group handling
             self.__check_symm_groups(fitSymmetryGroups)
-            self.__check_symm_groups(calSymmetryGroups)
+            self.__check_symm_groups(calcSymmetryGroups)
             self.fit_symmetry_groups = fitSymmetryGroups
-            self.calc_symmetry_groups = calSymmetryGroups
+            self.calc_symmetry_groups = calcSymmetryGroups
 
     def __check_symm_groups(self, symm_groups):
         """
@@ -308,6 +308,7 @@ class RMSDCalculator(object):
                            self.__number_of_threads,
                            self.__threads_per_block,
                            self.__blocks_per_grid)
+        return numpy.reshape(np_coords_fit, (self.number_of_conformations, self.number_of_fitting_atoms, 3))
 
     def setNumberOfOpenMPThreads(self, number_of_threads):
         """
