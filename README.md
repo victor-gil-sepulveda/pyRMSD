@@ -278,7 +278,8 @@ If you have used this package and you feel something is missing/incorrect or wha
 ###Symmetries
 - [ ] High level wrapper for atom selection as gist or separate project.
 - [ ] Hungarian algorithm to autodetect symmetries (see  [this paper](http://pubs.acs.org/doi/abs/10.1021/ci400534h?journalCode=jcisd8) and [this package](http://software.clapper.org/munkres/)).  
-  
+- [ ] Currently only used with the fitting+calculation scheme. It would be gret to add them to the fitting-only scheme.  
+
 <a id="contact_features"></a>
 If you want to add new features (for instance mass weighting) do not hesitate to contact me at: victor.gil.sepulveda at gmail.com.
 Of course, you can fork the repository and add as many features and improvements as you want.

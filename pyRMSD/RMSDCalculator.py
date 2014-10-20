@@ -248,7 +248,8 @@ class RMSDCalculator(object):
         @date: 26/11/2012
         """
         np_coords_fit, np_coords_calc = self.__coords_reshaping()
-
+        
+        
         rmsd_values = pyRMSD.calculators.calculateRMSDCondensedMatrix(availableCalculators()[self.calculator_type],
                                                                np_coords_fit,
                                                                self.number_of_fitting_atoms,
@@ -259,7 +260,13 @@ class RMSDCalculator(object):
                                                                self.__number_of_threads,
                                                                self.__threads_per_block,
                                                                self.__blocks_per_grid)
-        return rmsd_values
+        
+        # It has been necessary to add this hack to the function. When using symmetries, in one Test case,
+        # the only way to make it work was to add this list() hack and changing return PyArray_Return(rmsds_list_obj);
+        # by Py_INCREF(rmsds_list_obj); + return (PyObject*) rmsds_list_obj; in calculateRMSDCondensedMatrix
+        # This problem only happens in some cases and I've been unable to guess why.
+        # The error says: SystemError: ../Objects/listobject.c:169: bad argument to internal function
+        return list(rmsd_values)
 
     def iterativeSuperposition(self):
         """
@@ -276,15 +283,16 @@ class RMSDCalculator(object):
         np_coords_fit, np_coords_calc = self.__coords_reshaping()
 
         pyRMSD.calculators.iterativeSuperposition(availableCalculators()[self.calculator_type],
-                           np_coords_fit,
-                           self.number_of_fitting_atoms,
-                           np_coords_calc,
-                           self.number_of_calculation_atoms,
-                           self.number_of_conformations,
-                           self.calc_symmetry_groups,
-                           self.__number_of_threads,
-                           self.__threads_per_block,
-                           self.__blocks_per_grid)
+                                                   np_coords_fit,
+                                                   self.number_of_fitting_atoms,
+                                                   np_coords_calc,
+                                                   self.number_of_calculation_atoms,
+                                                   self.number_of_conformations,
+                                                   self.calc_symmetry_groups,
+                                                   self.__number_of_threads,
+                                                   self.__threads_per_block,
+                                                   self.__blocks_per_grid)
+        
         return numpy.reshape(np_coords_fit, (self.number_of_conformations, self.number_of_fitting_atoms, 3))
     
     def __coords_reshaping(self):
@@ -307,10 +315,7 @@ class RMSDCalculator(object):
         @author: vgil
         @date: 26/11/2012
         """
-        if ("OMP" in self.calculator_type):
-            self.__number_of_threads = number_of_threads
-        else:
-            raise KeyError("Cannot set any OpenMP related parameter using this calculator: "+str( self.calculator_type))
+        self.__number_of_threads = number_of_threads
 
     def setCUDAKernelThreadsPerBlock(self, number_of_threads, number_of_blocks):
         """
@@ -323,8 +328,5 @@ class RMSDCalculator(object):
         @author: vgil
         @date: 26/11/2012
         """
-        if ("CUDA" in self.calculator_type):
-            self.__threads_per_block = number_of_threads
-            self.__blocks_per_grid = number_of_blocks
-        else:
-            raise KeyError("Cannot set any CUDA related parameter using this calculator: "+str(self.calculator_type))
+        self.__threads_per_block = number_of_threads
+        self.__blocks_per_grid = number_of_blocks

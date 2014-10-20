@@ -154,7 +154,7 @@ PyArrayObject* embed_rmsd_data(vector<double>& rmsd){
 	PyArrayObject* rmsds_list_obj = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_DOUBLE);
 
 	double* rmsd_data = (double*) (rmsds_list_obj->data);
-	for (unsigned int i =0; i<rmsd.size(); i++){
+	for (unsigned int i = 0; i < rmsd.size(); ++i){
 		rmsd_data[i] = rmsd[i];
 	}
 	
@@ -235,26 +235,41 @@ static PyObject* calculateRMSDCondensedMatrix(PyObject *self, PyObject *args){
 
 	parse_params(args, &params);
 
+//  cout<<"DBG: Parsed_size "<<params.symmetry_groups->size()<<endl;
+//	for (unsigned i=0;i<params.symmetry_groups->size();++i){
+//		vector<pair<int,int> > group = params.symmetry_groups->at(i);
+//		for (unsigned j=0;j<group.size();++j){
+//			pair<int,int> pair = group[j];
+//			cout<<" ("<<pair.first<<","<<pair.second<<") ";
+//		}
+//	}
+//	cout<<endl;
+//	
+//	cout<<"DBG: Inner "<<params.number_of_threads<< " "<<params.threads_per_block<<" "<<params.blocks_per_grid<<endl;
+
 	RMSDCalculator* rmsdCalculator = RMSDCalculatorFactory::createCalculator(
-									params.calculator_type,
-									params.number_of_conformations,
-									params.number_of_fitting_atoms,
-									params.fitting_coords_list,
-									params.number_of_calc_atoms,
-									params.calc_coords_list,
-									params.symmetry_groups,
-									params.number_of_threads,
-									params.threads_per_block,
-									params.blocks_per_grid);
-
+												params.calculator_type,
+												params.number_of_conformations,
+												params.number_of_fitting_atoms,
+												params.fitting_coords_list,
+												params.number_of_calc_atoms,
+												params.calc_coords_list,
+												params.symmetry_groups,
+												params.number_of_threads,
+												params.threads_per_block,
+												params.blocks_per_grid);
+    
 	rmsdCalculator->calculateRMSDCondensedMatrix(rmsd);
-
+    
 	PyArrayObject* rmsds_list_obj = embed_rmsd_data(rmsd);
 
+    
 	delete rmsdCalculator;
 	delete params.symmetry_groups;
-
-	return PyArray_Return(rmsds_list_obj);
+	
+    //return PyArray_Return(rmsds_list_obj);
+    //Py_INCREF(rmsds_list_obj);
+	return (PyObject*) rmsds_list_obj;
 }
 
 static PyMethodDef pyRMSDMethods[] = {
