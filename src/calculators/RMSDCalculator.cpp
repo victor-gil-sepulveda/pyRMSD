@@ -109,11 +109,9 @@ void RMSDCalculator::calculateRMSDCondensedMatrix(std::vector<double>& rmsd){
  * form the first row, the next N-2 the second row and so on.
  */
 void RMSDCalculator::calculate_rmsd_condensed_matrix_with_fitting_coordinates(vector<double>& rmsd){
-
-	RMSDTools::centerAllAtOrigin(this->rmsdData->atomsPerFittingConformation,
-									this->rmsdData->numberOfConformations,
-									this->rmsdData->fittingCoordinates);
-
+	
+	this->kernelFunctions->centerAllAtCOM(this->rmsdData);
+	
 	this->kernelFunctions->matrixInit(rmsdData);
 
 	for(int reference_index = 0; reference_index < this->rmsdData->numberOfConformations; ++reference_index){
@@ -125,7 +123,6 @@ void RMSDCalculator::calculate_rmsd_condensed_matrix_with_fitting_coordinates(ve
 					&(rmsd[offset]),
 					rmsdData);
 	}
-
 }
 
 /**
@@ -136,21 +133,9 @@ void RMSDCalculator::calculate_rmsd_condensed_matrix_with_fitting_coordinates(ve
  * form the first row, the next N-2 the second row and so on.
  */
 void RMSDCalculator::calculate_rmsd_condensed_matrix_with_fitting_and_calculation_coordinates(vector<double>& rmsd){
-	double* fit_centers =new double[this->rmsdData->numberOfConformations*3];
 
-	RMSDTools::centerAllAtOrigin(this->rmsdData->atomsPerFittingConformation,
-									this->rmsdData->numberOfConformations,
-									this->rmsdData->fittingCoordinates,
-									fit_centers);
-
-	RMSDTools::applyTranslationsToAll(this->rmsdData->atomsPerCalculationConformation,
-											this->rmsdData->numberOfConformations,
-											this->rmsdData->calculationCoordinates,
-											fit_centers,
-											-1);
-
-	delete [] fit_centers;
-
+	this->kernelFunctions->centerAllAtFittingCOM(this->rmsdData);
+	
 	this->kernelFunctions->matrixInit(rmsdData);
 
 	for(int reference_index = 0; reference_index<this->rmsdData->numberOfConformations; ++reference_index){

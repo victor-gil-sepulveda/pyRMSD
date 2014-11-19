@@ -10,8 +10,13 @@
 
 #include "../KernelFunctions.h"
 
+#include <iostream>
+using namespace std;
+
 class NoSuperpositionOmpKernel: public KernelFunctions {
 	public:
+		int number_of_threads;
+
 		NoSuperpositionOmpKernel(int number_of_threads);
 		virtual ~NoSuperpositionOmpKernel();
 
@@ -27,8 +32,12 @@ class NoSuperpositionOmpKernel: public KernelFunctions {
 				int reference_conformation_number,
 				double* rmsd,
 				RMSDCalculationData* data);
+		
+		// If not superposition is done, then centering must not be 
+		// performed either
+		void centerAllAtCOM(RMSDCalculationData*){cout<<"OMP only fit no center"<<endl;}
+		void centerAllAtFittingCOM(RMSDCalculationData*){cout<<"OMP fit and calc no center"<<endl;}
 
-		int number_of_threads;
 };
 
 #endif /* KABSCHSERIALKERNEL_H_ */

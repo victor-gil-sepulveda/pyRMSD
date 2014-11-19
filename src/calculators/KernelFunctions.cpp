@@ -2,9 +2,6 @@
 #include "RMSDCalculationData.h"
 #include "RMSDTools.h"
 
-#include <iostream>
-using namespace std;
-
 /**
  * Given a set of calculation coordinates which have already been superposed, the function
  * rewrites the RMSD calculation to be the minimum RMSD of all the possible symmetric
@@ -34,4 +31,39 @@ void KernelFunctions::handleSymmetriesWithCalcCoords(
 				data->atomsPerCalculationConformation,
 				data->symmetryGroups);
 	}
+}
+/**
+ * Centers all coordinates at the center of mass (indeed into de geometrical center, as we do 
+ * not have atomic information at this point).
+ *
+ * \param rmsdData The RMSD data object containing all the details of the calculation.
+ *
+ */
+void KernelFunctions::centerAllAtCOM(RMSDCalculationData* rmsdData){
+	RMSDTools::centerAllAtOrigin(	rmsdData->atomsPerFittingConformation,
+									rmsdData->numberOfConformations,
+									rmsdData->fittingCoordinates);
+}
+
+/**
+ * Centers all coordinates ar the center of mass of the fitting coordinates. Used in superpositions
+ * with different fit. and calc. selections.
+ *
+ * \param rmsdData The RMSD data object containing all the details of the calculation.
+ *
+ */
+void KernelFunctions::centerAllAtFittingCOM(RMSDCalculationData* rmsdData){
+	double* fit_centers =new double[rmsdData->numberOfConformations*3];
+	
+	RMSDTools::centerAllAtOrigin(rmsdData->atomsPerFittingConformation,
+									rmsdData->numberOfConformations,
+									rmsdData->fittingCoordinates,
+									fit_centers);
+
+	RMSDTools::applyTranslationsToAll(	rmsdData->atomsPerCalculationConformation,
+										rmsdData->numberOfConformations,
+										rmsdData->calculationCoordinates,
+										fit_centers, -1);
+
+	delete [] fit_centers;
 }

@@ -3,6 +3,9 @@
 #include "../RMSDTools.h"
 #include <omp.h>
 
+#include <iostream>
+using namespace std;
+
 NoSuperpositionOmpKernel::NoSuperpositionOmpKernel(int number_of_threads){
 	this->number_of_threads = number_of_threads;
 	omp_set_num_threads(number_of_threads);
@@ -21,7 +24,6 @@ void NoSuperpositionOmpKernel::oneVsFollowingFitEqualCalcCoords(
 			second_conformation_index < data->numberOfConformations; ++second_conformation_index){
 
 		double* second_conformation_coords = data->getFittingConformationAt(second_conformation_index);
-
 		if(rmsd!=NULL){
 			rmsd[second_conformation_index-(reference_conformation_number+1)] = RMSDTools::calcRMS(reference,
 					second_conformation_coords,
@@ -42,7 +44,6 @@ void NoSuperpositionOmpKernel::oneVsFollowingFitDiffersCalcCoords(
 			second_conformation_index < data->numberOfConformations; ++second_conformation_index){
 
 		double* calc_conformation_coords =  data->getCalculationConformationAt(second_conformation_index);
-
 		if(rmsd!=NULL){
 			rmsd[second_conformation_index-(reference_conformation_number+1)] = RMSDTools::calcRMS(calcReference,
 					calc_conformation_coords,

@@ -67,6 +67,9 @@ class KernelFunctions{
 												rmsd,
 												data);
 		}
+		
+		virtual void centerAllAtCOM(RMSDCalculationData*);
+		virtual void centerAllAtFittingCOM(RMSDCalculationData*);
 };
 
 
