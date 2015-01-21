@@ -97,53 +97,84 @@ See 'pyRMSD/pyRMSD/test/testPdbReader.py for a simple usage example.
 To calculate the RMSD matrix you can use a **MatrixHandler** or use directly one calculator object to feed a CondensedMatrix.
 
 Using **MatrixHandler** to get the RMSD pairwise matrix (given that we already have read the coordinates) will look like this:
+```python
+from pyRMSD.matrixHandler import MatrixHandler
 
-    from pyRMSD.matrixHandler import MatrixHandler
-    rmsd_matrix = MatrixHandler()\
-       .createMatrix(coordinates, 'QCP_OMP_CALCULATOR')
+rmsd_matrix = MatrixHandler()\
+   .createMatrix(coordinates, 'QCP_OMP_CALCULATOR')
+```
 
 Calculating the matrix using directly the RMSDCalculator is a little bit more verbose:
 
-    import pyRMSD.RMSDCalculator
-    calculator = pyRMSD.RMSDCalculator.\
-                    RMSDCalculator(coordsets,\
-                    "QCP_SERIAL_CALCULATOR")
-    rmsd = calculator.pairwiseRMSDMatrix()
-    rmsd_matrix = CondensedMatrix(rmsd)
+```python
+import pyRMSD.RMSDCalculator
+
+calculator = pyRMSD.RMSDCalculator.\
+                RMSDCalculator(coordsets,\
+                "QCP_SERIAL_CALCULATOR")
+rmsd = calculator.pairwiseRMSDMatrix()
+rmsd_matrix = CondensedMatrix(rmsd)
+```
 
 As the resulting matrix is symmetric and its diagonal is 0, the rmsd_matrix object will store only the upper diagonal triangle (condensed matrix), in the same way [scipy.spatial.distance.pdist](http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html) does.
 ###Available calculators
 Programatically, available calculators can be queried with:
 
-    from pyRMSD.availableCalculators import availableCalculators
-    print availableCalculators()
+```python
+from pyRMSD.availableCalculators import availableCalculators
 
+print availableCalculators()
+```
 
 
 ###Matrix handlers
 A **MatrixHandler** object will help you to create the matrix and will also help you saving and loading matrix data to disk.
 
-    from pyRMSD.matrixHandler import MatrixHandler
-    # Create a matrix with the coordsets and using a calculator
-    mHandler = MatrixHandler()
-    matrix = mHandler.createMatrix( coordsets,\
-                                    "QCP_CUDA_CALCULATOR")
+```python
+from pyRMSD.matrixHandler import MatrixHandler
 
-    # Save the matrix to 'to_this_file.bin'
-    m_handler.saveMatrix("to_this_file")
+# Create a matrix with the coordsets and using a calculator
+mHandler = MatrixHandler()
+matrix = mHandler.createMatrix( coordsets,\
+                                "QCP_CUDA_CALCULATOR")
 
-    # Load it from 'from_this_file.bin'
-    m_handler.loadMatrix("from_this_file")
+# Save the matrix to 'to_this_file.bin'
+m_handler.saveMatrix("to_this_file")
 
-    # Get the inner CondensedMatrix instance
-    rmsd_matrix = m_handler.getMatrix()
+# Load it from 'from_this_file.bin'
+mHandler.loadMatrix("from_this_file")
+
+# Get the inner CondensedMatrix instance
+rmsd_matrix = mHandler.getMatrix()
+```
 
 ###Accessing the RMSD matrix
 You can access a matrix object contents like this:
 
-    rmsd_at_pos_2_3 = rmsd_matrix[2,3]
+```python
+rmsd_at_pos_2_3 = rmsd_matrix[2,3]
+```
 
 The **row_lenght** parameter will give you the... row length. Remember that the matrix is square and symmetric, so row_length == column_length, rmsd_matrix[i,j] == rmsd_matrix[j,i] and as it is a distance matrix, rmsd_matrix[i,i] == 0.
+
+One can also access the inner representation of the data (a numpy array) using the `get_data( )` function. Ex.
+```python
+inner_data = rmsd_matrix.get_data()  
+```
+The ```inner_data``` array will contain only the elements of the matrix upper triangle (diagonal not included), in row-major order. 
+for example, the matrix:
+```python
+0 1 2 3 4
+1 0 5 6 7
+2 5 0 8 9
+3 6 8 0 1
+4 7 9 1 0
+```
+Will be retrieved as:  
+```python
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 1]
+```
+
 
 ###Matrix statistics
 The CondensedMatrix class also offers an efficient way to ask for the most common statistical moments. Use the methods **calculateMean**, **calculateVariance**, **calculateSkewness** and **calculateKurtosis** to get mean, variance, skewness and kurtosis ( easy, isn't it :) ). You can also use **calculateMax** and **calculateMin** to get the maximum and minimum value of the matrix.
@@ -162,7 +193,7 @@ Those users have the following choices:
 
     > python setup.py install
 
-with superuser provileges. Use 'build' instead to only build it. This is the usual way python packages are deployed. As 'distutils' do not support CUDA directly, your package will not be able to use CUDA calculators.
+with superuser privileges. Use 'build' instead to only build it. This is the usual way python packages are deployed. As 'distutils' do not support CUDA directly, your package will not be able to use CUDA calculators.
 
 **2)** Using the custom build.py script in pyRMSD main folder. This will compile a version of pyRMSD following your configuration details. To finish the installation you will need to change your PYTHONPATH in order to point to the parent folder of the package (or copy it in a folder already inside your PYTHONPATH). See [this](http://superuser.com/questions/247620/how-to-globally-modify-the-default-pythonpath-sys-path) if you have any problem modifying it.
 
@@ -218,10 +249,10 @@ Roman Sloutsky warns that if you're not able to compile using the build script w
 ###Windows systems
 A preliminary version of the build script was also tested in Windows 7 32 and 64 systems using MinGW compiler tools. Here are the steps followed to succesfully compile the extensions:
 
-\- [Download](http://www.mingw.org/) and install MinGW. Then add its /bin folder to Windows PATH
-\- [Download](http://www.python.org/download/releases/2.7.3/) and install Python 2.7.3
-\- [Download](http://www.scipy.org/Download) and install Numpy (tested with v. 1.7.0 for python 2.7)
-\- \[Optional\] [Download](http://www.csb.pitt.edu/prody/getprody.html) and install Prody (tested with v. 1.4.1 for python 2.7)
+\- [Download](http://www.mingw.org/) and install MinGW. Then add its /bin folder to Windows PATH  
+\- [Download](http://www.python.org/download/releases/2.7.3/) and install Python 2.7.3  
+\- [Download](http://www.scipy.org/Download) and install Numpy (tested with v. 1.7.0 for python 2.7)  
+\- \[Optional\] [Download](http://www.csb.pitt.edu/prody/getprody.html) and install Prody (tested with v. 1.4.1 for python 2.7)  
 
 *PYTHON_INCLUDE_FOLDER* and *PYTHON_LIBRARY_FOLDER* constants were changed to match our Python installation paths.
 *PYTHON_EXTENSION_LINKING_OPTIONS* and *PYTHON_EXTENSION_OPTIONS* were also changed to fit Windows extension creation options.
@@ -234,7 +265,9 @@ In order to create or modify a system variable under Windows 7, you will have to
 ##5 - Testing (Developers)
 Once installed you can run the tests in *pyRMSD/test* using:
 
-    > python -m unittest discover
+```bash
+> python -m unittest discover
+```
 
 Currently only the *test_create_with_reader* test will fail if all the dependencies are fullfilled (it's unwritten yet).
 If you didn't build pyRMSD with CUDA support, 5 tests will be skipped.
@@ -242,7 +275,7 @@ If you didn't build pyRMSD with CUDA support, 5 tests will be skipped.
 If you compiled the package using the build script, an extra test suite will be available in the *src/calculators/test* folder with pure C tests. Run it inside this folder with ./test_rmsdtools_main
 
 ##6 - Benchmarks (Developers)
-Also available to users, inside the */benchmark* folder, there are the benchmarks used to assest the performance of pyRMSD.
+Also available to users, inside the */benchmark* folder, there are the benchmarks used to assess the performance of pyRMSD.
 There one can find some small scripts to test OpenMP parametrizations, calculation time of every implementation or even a small floating point error check.
 
 ##TODO
@@ -290,11 +323,11 @@ Of course, you can fork the repository and add as many features and improvements
 
 - The initial Python implementation of superposition was extracted from Prody source code (by [Ahmet Bakan](http://www.csb.pitt.edu/People/abakan/)) and modified, with the only goal of providing a python example to compare performance and stability. The iterative superposition algorithm is a direct translation of his iterpose algorithm.
 
-- QCP superposition method code was adapted from the code [here](http://theobald.brandeis.edu/qcp/)
+- QCP superposition method code was adapted from the code [here](http://theobald.brandeis.edu/qcp/).
 
 - The statistics function code was adapted from the work of jjhaag@dreamincode.net (available [here](http://www.dreamincode.net/code/snippet1447.htm) ).
 
-- Kabsch algorithm code was adapted from the work of [Dr. Bosco K. Ho](http://boscoh.com/). I would like to give him special tanks for his help.
+- Kabsch algorithm code was adapted from the work of [Dr. Bosco K. Ho](http://boscoh.com/). I would like to give him special thanks for his help.
 
 - As far as I know the first CUDA implementation of QCP is from [Yutong Zhao](http://proteneer.com/blog/). He went a step further trying to improve memory coalescence by changing the coordinates overlay. Pitifully his code is not open source.
 

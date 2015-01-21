@@ -70,10 +70,10 @@ class MatrixHandler(object):
     @classmethod
     def save_matrix(cls, matrix_file_without_extension, distance_matrix):
         """
-        Saves the internal matrix to a file. It adds the extension '.bin' to that name.
+        Saves the internal matrix to a file. It adds the extension '.npy' to that name.
 
         @param matrix_file_without_extension: Is the matrix file name without any
-        extension ('.bin' will be added).
+        extension ('.npy' will be added).
         @param distance_matrix: The matrix to be saved.
         """
         numpy.save(matrix_file_without_extension,distance_matrix.get_data())
@@ -95,7 +95,7 @@ class MatrixHandler(object):
     @classmethod
     def save_statistics(cls, statistics_folder, distance_matrix):
         """
-        Saves a file with some statistics of the internal matrix.
+        Saves a file with some statistics of the internal matrix in json format.
 
         @param statistics_folder: Folder where the file 'statistics.json' will be stored.
         @param distance_matrix: The distance matrix from which the statistics are calculated.
