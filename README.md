@@ -174,6 +174,7 @@ Will be retrieved as:
 ```python
 [1, 2, 3, 4, 5, 6, 7, 8, 9, 1]
 ```
+It is possible to use ```scipy.spatial.distance.squareform``` in order to recover the initial matrix layout.
 
 
 ###Matrix statistics
