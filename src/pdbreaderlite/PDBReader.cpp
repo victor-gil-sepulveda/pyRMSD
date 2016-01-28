@@ -73,20 +73,20 @@ void PDBReader::read(const char* path, const char* name_filter_c){
 			processATOM(line, name_filter, atoms_counter);
 		}
 		else if(record == "MODEL "){
-
-			 if(number_of_atoms == 0 && number_of_models ==1){
-				 number_of_atoms = atoms_counter;
-			 }
-
-			 check_atoms(number_of_atoms, atoms_counter);
-
-			 atoms_counter = 0;
-
-			 processMODEL();
+			if(number_of_atoms == 0 && number_of_models ==1){
+				number_of_atoms = atoms_counter;
+			}     
+			if (number_of_models >= 1){
+				check_atoms(number_of_atoms, atoms_counter);
+			}
+			processMODEL();
+			atoms_counter = 0;
 		}
 	}
 
-	check_atoms(number_of_atoms, atoms_counter);
+	if (number_of_models == 1){
+		number_of_atoms = atoms_counter;
+	}
 
 	stream.close();
 	cout<<line_number<<" lines read in "<<long(time(0) - old_time)<<" seconds."<<endl;
@@ -102,7 +102,9 @@ void PDBReader::read(const char* path, const char* name_filter_c){
 /// \date 10/02/2011
 ///////////////////////////////////////////////////////////////
 void PDBReader::processMODEL(){
-     number_of_models++;
+	
+	number_of_models++;
+	
 }
 
 ///////////////////////////////////////////////////////////////
