@@ -10,6 +10,9 @@
 
 #include "../KernelFunctions.h"
 
+#include <iostream>
+using namespace std;
+
 class NoSuperpositionSerialKernel: public KernelFunctions {
 	public:
 		NoSuperpositionSerialKernel();
@@ -27,6 +30,11 @@ class NoSuperpositionSerialKernel: public KernelFunctions {
 				int reference_conformation_number,
 				double* rmsd,
 				RMSDCalculationData* data);
+		
+		// If not superposition is done, then centering must not be 
+		// performed either
+		void centerAllAtCOM(RMSDCalculationData*){cout<<"Serial only fit no center"<<endl;}
+		void centerAllAtFittingCOM(RMSDCalculationData*){cout<<"Serial fit and calc no center"<<endl;}
 };
 
 #endif /* KABSCHSERIALKERNEL_H_ */

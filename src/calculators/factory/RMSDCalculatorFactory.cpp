@@ -85,10 +85,12 @@ RMSDCalculator* RMSDCalculatorFactory::createCalculator(
 			break;
 
 		case NOSUP_SERIAL_CALCULATOR:
+		    cout<<"NOSUP_SERIAL_CALCULATOR"<<endl;
 			kernelFunctions = new NoSuperpositionSerialKernel;
 			break;
 
 		case NOSUP_OMP_CALCULATOR:
+		    cout<<"NOSUP_OMP_CALCULATOR"<<endl;
 			kernelFunctions = new NoSuperpositionOmpKernel(number_of_threads);
 			break;
 

@@ -271,6 +271,17 @@ class TestRMSDCalculators(unittest.TestCase):
         rmsds = calculator.oneVsFollowing(0)
         numpy.testing.assert_almost_equal(expected_rmsds, rmsds, 12)
         
+        calculator = pyRMSD.RMSDCalculator.RMSDCalculator("QTRFIT_SERIAL_CALCULATOR", 
+                                                          fittingCoordsets= numpy.array(CA_coords),
+                                                          calculationCoordsets= numpy.array(lig_coords), 
+                                                          calcSymmetryGroups=[
+                                                                                [[0,2],[3,5]],
+                                                                                [[7,8]]
+                                                                             ])
+        
+        rmsds = calculator.pairwiseRMSDMatrix()
+        print rmsds
+        
         
     # ------------------------------------------------------
     # Replication of some C tests (in  src/calculators/test)

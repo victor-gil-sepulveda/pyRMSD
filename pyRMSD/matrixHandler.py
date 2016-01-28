@@ -36,14 +36,13 @@ class MatrixHandler(object):
         @param pdb_coordsets: Input coordinates in Prody format.
         @param calculator: One of the possible available calculator types.
 
-        @return: A consensed matrix with the pairwise RMSD matrix.
+        @return: A condensed matrix with the pairwise RMSD matrix.
         """
-        print "Calculating matrix..."
-        rmsd = pyRMSD.RMSDCalculator.RMSDCalculator(pdb_coordsets, calculator).pairwiseRMSDMatrix()
+        print "Calculating matrix ..."
+        rmsd = pyRMSD.RMSDCalculator.RMSDCalculator(calculator, pdb_coordsets).pairwiseRMSDMatrix()
         self.distance_matrix = CondensedMatrix(rmsd)
-        self.distance_matrix.recalculateStatistics()
-        self.__save_statistics()
-        print " Done\n"
+        MatrixHandler.save_statistics(self.statistics_folder,self.distance_matrix)
+        print " Done"
         return self.distance_matrix
 
     def saveMatrix(self, matrix_file_without_extension):
@@ -55,7 +54,7 @@ class MatrixHandler(object):
         """
         print "Writing matrix data (in "+matrix_file_without_extension+".bin) ...",
         MatrixHandler.save_matrix(matrix_file_without_extension, self.distance_matrix)
-        print " Done\n"
+        print " Done"
 
     def loadMatrix(self, matrix_file_without_extension):
         """
@@ -66,17 +65,15 @@ class MatrixHandler(object):
         """
         print "Loading matrix data from "+matrix_file_without_extension+".bin ...",
         self.distance_matrix = MatrixHandler.load_matrix(matrix_file_without_extension)
-        self.distance_matrix.recalculateStatistics()
-        MatrixHandler.save_statistics(self.statistics_folder, self.distance_matrix)
-        print " Done\n"
+        print " Done"
 
     @classmethod
     def save_matrix(cls, matrix_file_without_extension, distance_matrix):
         """
-        Saves the internal matrix to a file. It adds the extension '.bin' to that name.
+        Saves the internal matrix to a file. It adds the extension '.npy' to that name.
 
         @param matrix_file_without_extension: Is the matrix file name without any
-        extension ('.bin' will be added).
+        extension ('.npy' will be added).
         @param distance_matrix: The matrix to be saved.
         """
         numpy.save(matrix_file_without_extension,distance_matrix.get_data())
@@ -98,12 +95,13 @@ class MatrixHandler(object):
     @classmethod
     def save_statistics(cls, statistics_folder, distance_matrix):
         """
-        Saves a file with some statistics of the internal matrix.
+        Saves a file with some statistics of the internal matrix in json format.
 
         @param statistics_folder: Folder where the file 'statistics.json' will be stored.
         @param distance_matrix: The distance matrix from which the statistics are calculated.
         """
         if statistics_folder is not None:
+            print "Calculating statistics ..."
             stats_dic = {}
             stats_dic["Minimum"] =  distance_matrix.calculateMin()
             stats_dic["Maximum"] =  distance_matrix.calculateMax()

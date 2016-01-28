@@ -498,11 +498,11 @@ void RMSDTools::applySymmetryGroup(double* coordinates, vector<pair<int,int> >& 
  *
  */
 void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
-											double* superposed_conformation,
-											int number_of_atoms,
-											symmGroups* symm_groups,
-											int applied_symm_group,
-											vector<double>& rmsds){
+													double* superposed_conformation,
+													int number_of_atoms,
+													symmGroups* symm_groups,
+													int applied_symm_group,
+													vector<double>& rmsds){
 
 	// Keep doing recursive calls until the binary tree is constructed
 	if (applied_symm_group < (int) symm_groups->size()){
@@ -521,7 +521,6 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
 		// the coordinates array is unchanged.
 		RMSDTools::applySymmetryGroup(reference,
 							symm_groups->at(applied_symm_group));
-
 		RMSDTools::calcRecursiveSymmGroupApplication(reference,
 				superposed_conformation,
 				number_of_atoms,
@@ -531,7 +530,7 @@ void RMSDTools::calcRecursiveSymmGroupApplication(double* reference,
 	}
 	else{
 		// We have reached a leave, so we calc. the RMSD for this permutation
-		//cout<<"DBG: RMSD OF PERM "<<RMSDTools::calcRMS(reference, superposed_conformation, number_of_atoms)<<endl;
+		// cout<<"DBG: RMSD OF PERM "<<RMSDTools::calcRMS(reference, superposed_conformation, number_of_atoms)<<endl;
 		rmsds.push_back(RMSDTools::calcRMS(reference, superposed_conformation, number_of_atoms));
 //		for (int i = 0; i < number_of_atoms; ++i){
 //			cout<<reference[i*3]<<","
@@ -576,10 +575,12 @@ double RMSDTools::calcMinRMSDOfAllSymmetryGroups(	double* reference,
 													symm_groups,
 													0, // We start with the 0th symm group
 													rmsds);
-	//for (unsigned int i = 0 ; i < rmsds.size(); i++){
-	//	cout<<"DBG: RMSD "<<rmsds[i]<<" ";
-	//}
-	//cout<<endl;
+//	for (unsigned int i = 0 ; i < rmsds.size(); i++){
+//		cout<<"DBG: RMSD "<<rmsds[i]<<" ";
+//	}
+//	cout<<endl;
 	
-	return *min_element(rmsds.begin(), rmsds.end());
+	double min = *min_element(rmsds.begin(), rmsds.end());
+//	cout<<"DBG: min "<<min<<endl;
+	return min;
 }
