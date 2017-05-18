@@ -35,8 +35,8 @@ pyRMSD distributed under MIT license, and it is currently on its version 4.0 .
 - [Future improvements](#future-improvements)
 - [Credits](#credits)
 
-##1 - Features
-###Collective operations
+## 1 - Features
+### Collective operations
 pyRMSD currently has 5 basic operations:
     1 - Pairwise RMSD calculation
     2 - One vs. following (of a sequence of conformers).
@@ -55,8 +55,8 @@ The available calculators so far are:
 * QTRFIT_OMP_CALCULATOR
 * QCP_SERIAL_CALCULATOR
 * QCP_OMP_CALCULATOR
-* QCP_CUDA_CALCULATOR (in CUDA capable machines*)
-* QCP_CUDA_MEM_CALCULATOR (in CUDA capable machines*)
+* QCP_CUDA_CALCULATOR (in CUDA capable machines\*)
+* QCP_CUDA_MEM_CALCULATOR (in CUDA capable machines\*)
 
 In addition it offers 2 other calculators that do not perform superposition (for cases in which the parts of interest of the system are already superposed):
 * NOSUP_SERIAL_CALCULATOR
@@ -71,13 +71,13 @@ pyRMSD can also have fitting symmetries and rotational calculation symmetries in
 
 If you think you need new features to be added (or better examples) click [here](#contact_features).
 \* Computing capability of the GPU must be equal or higher than 1.1 (>1.2 if built with double precision support).
-###Condensed matrix
+### Condensed matrix
 pyRMSD contains also a C written data type called CondensedMatrix. This is a representation of a squared symmetric matrix and it will save you half of the, otherwise redundant, memory. Besides, its write and read access outperforms other implementations like pure python's list-based and even Cython implementations (see the benchmarks folder). This means that it will speed up for free any application that heavily relies on accessing a distance matrix, like clustering algorithms.
 See the examples below to get more insight about how to use it.
 ##2 - Usage
 Some code snippets and explanations about them will be shown below. Note that, as the code changes rapidly, this snippets can be outdated. I will put all my effort for this not to happen, but if you detect that the code examples are being more problematic than helpful for you, please [contact me](#contact_features). You will also find method and variables documentation in the code. Do not hesitate to ask for more documentation if you find is missing.
 
-###Getting coordinates
+### Getting coordinates
 To use the module the first thing will be to extract all the coordinates from a PDB file. Coordinates must be stored in numpy arrays, using the same layout that Prody uses:
 
     Coordset: [Conformation 1, Conformation 2, ..., Conformation N]
@@ -92,8 +92,8 @@ In order to do this there's a convenience class function in *pyRMSD/utils/protei
     num_of_atoms = reader.numberOfAtoms
     num_of_frames = reader.numberOfFrames
 
-See 'pyRMSD/pyRMSD/test/testPdbReader.py for a simple usage example.
-###Calculating the RMSD matrix
+See 'pyRMSD/pyRMSD/test/testPdbReader.py' for a simple usage example.
+### Calculating the RMSD matrix
 To calculate the RMSD matrix you can use a **MatrixHandler** or use directly one calculator object to feed a CondensedMatrix.
 
 Using **MatrixHandler** to get the RMSD pairwise matrix (given that we already have read the coordinates) will look like this:
@@ -127,7 +127,7 @@ print availableCalculators()
 ```
 
 
-###Matrix handlers
+### Matrix handlers
 A **MatrixHandler** object will help you to create the matrix and will also help you saving and loading matrix data to disk.
 
 ```python
@@ -148,7 +148,7 @@ mHandler.loadMatrix("from_this_file")
 rmsd_matrix = mHandler.getMatrix()
 ```
 
-###Accessing the RMSD matrix
+### Accessing the RMSD matrix
 You can access a matrix object contents like this:
 
 ```python
@@ -177,16 +177,16 @@ Will be retrieved as:
 It is possible to use ```scipy.spatial.distance.squareform``` in order to recover the initial matrix layout.
 
 
-###Matrix statistics
+### Matrix statistics
 The CondensedMatrix class also offers an efficient way to ask for the most common statistical moments. Use the methods **calculateMean**, **calculateVariance**, **calculateSkewness** and **calculateKurtosis** to get mean, variance, skewness and kurtosis ( easy, isn't it :) ). You can also use **calculateMax** and **calculateMin** to get the maximum and minimum value of the matrix.
 
-##3 - Building & Installation
-###Before installation
+## 3 - Building & Installation
+### Before installation
 **Users** only need to install Python version 2.6/2.7 (pyRMSD has only been tested with those, however it may work with another versions of the Python 2.X family). Numpy is also required. Surely you already have it into your machine, but, in the case you don't, it can be found [here](http://sourceforge.net/projects/numpy/files/). There you will be able to find installers for almost all the combinations of platforms and Python versions you can think about.
 
 **Developers** may remember that header files of Python and Numpy may be accessible, and your Python installation must contain the python shared library. This usually means that you have to compile it using ./configure --enable-shared before building Python (usually 2.7 distributions already come with this library). Prody is not a dependency, but I encourage its use to handle coordinates, as it is well-tested and powerful tool.
 
-###Linux and MacOs
+### Linux and MacOs
 
 Those users have the following choices:
 
@@ -198,11 +198,11 @@ with superuser privileges. Use 'build' instead to only build it. This is the usu
 
 **2)** Using the custom build.py script in pyRMSD main folder. This will compile a version of pyRMSD following your configuration details. To finish the installation you will need to change your PYTHONPATH in order to point to the parent folder of the package (or copy it in a folder already inside your PYTHONPATH). See [this](http://superuser.com/questions/247620/how-to-globally-modify-the-default-pythonpath-sys-path) if you have any problem modifying it.
 
-###Windows
+### Windows
 
 Windows Installation is discontinued. I keep some very basic instructions [here](#windows-systems) though.
 
-##4 - The custom building script
+## 4 - The custom building script
 pyRMSD includes a small build script that is indeed a recipe to compile the C extensions of pyRMSD. The build.py script is the most versatile way to compile pyRMSD and will work in almost all situations. With this script one can build x86 and x64 distributions with enabled or disbled CUDA calculators.
 Invoke it from pyRMSD root folder with:
 
@@ -241,13 +241,13 @@ These are the parameters that can be changed. If one key is not present in the f
 
 See the examples into the *build_conf* if you want to create your own configuration files.
 
-###Unix-based systems
+### Unix-based systems
 The building script was used in a Ubuntu x86 and Ubuntu x64 Os, as well as in MacOs (Snow Leopard) to perform a non CUDA build. It had the *python-dev* package installed, so python headers were available. PYTHON_X constants were left unchanged.
 It was also used under Ubuntu x64 with CUDA 4.2 to build the CUDA enabled version.
-####Mac Users
+#### Mac Users
 Roman Sloutsky warns that if you're not able to compile using the build script with default configuration options, just try to change "PYTHON_LIBRARY_FOLDER":"AUTO" to "PYTHON_LIBRARY_FOLDER":"AUTO_ALT" in "default.conf". Creating a new configuration file with only this entry will also work.
 
-###Windows systems
+### Windows systems
 A preliminary version of the build script was also tested in Windows 7 32 and 64 systems using MinGW compiler tools. Here are the steps followed to succesfully compile the extensions:
 
 \- [Download](http://www.mingw.org/) and install MinGW. Then add its /bin folder to Windows PATH  
@@ -263,7 +263,7 @@ Once everything is built, create (or modify) the PYTHONPATH system variable and 
 
 In order to create or modify a system variable under Windows 7, you will have to go to Control Panel -> System and Security -> System -> Advanced System Settings.
 
-##5 - Testing (Developers)
+## 5 - Testing (Developers)
 Once installed you can run the tests in *pyRMSD/test* using:
 
 ```bash
@@ -275,14 +275,14 @@ If you didn't build pyRMSD with CUDA support, 5 tests will be skipped.
 
 If you compiled the package using the build script, an extra test suite will be available in the *src/calculators/test* folder with pure C tests. Run it inside this folder with ./test_rmsdtools_main
 
-##6 - Benchmarks (Developers)
+## 6 - Benchmarks (Developers)
 Also available to users, inside the */benchmark* folder, there are the benchmarks used to assess the performance of pyRMSD.
 There one can find some small scripts to test OpenMP parametrizations, calculation time of every implementation or even a small floating point error check.
 
-##TODO
+## TODO
 If you have used this package and you feel something is missing/incorrect or whatever, you can change it and contribute. Some examples of things that need to be improved are:
 
-###General
+### General
 - [ ] Separate condensed matrix as new project.  
 - [ ] Add distributed matrix calculation for VERY BIG datasets.  
 - [ ] Add more comments...
@@ -302,14 +302,14 @@ If you have used this package and you feel something is missing/incorrect or wha
 - [x] Add more and better tests to increase coverage.  
 - [x] OpenCL version.
 
-###Condensed Matrix
+### Condensed Matrix
 - [ ] Matrix generation load balance can be improved.
 - [x] Symmetry features need to be explained.
 - [x] Improve symmetry handling.
 - [x] Change rules of array acceptance (add FLOAT32 and FLOAT16)
 - [ ] Improve single element data retrieval.
 
-###Symmetries
+### Symmetries
 - [ ] High level wrapper for atom selection as gist or separate project.
 - [ ] Hungarian algorithm to autodetect symmetries (see  [this paper](http://pubs.acs.org/doi/abs/10.1021/ci400534h?journalCode=jcisd8) and [this package](http://software.clapper.org/munkres/)).  
 - [ ] Currently only used with the fitting+calculation scheme. It would be gret to add them to the fitting-only scheme.  
@@ -319,7 +319,7 @@ If you want to add new features (for instance mass weighting) do not hesitate to
 Of course, you can fork the repository and add as many features and improvements as you want.
 
 
-##Credits
+## Credits
 - Some Numpy helper functions were first seen in  http://www.scipy.org/Cookbook/C_Extensions/NumPy_arrays, by Lou Pecora (if I'm not wrong).
 
 - The initial Python implementation of superposition was extracted from Prody source code (by [Ahmet Bakan](http://www.csb.pitt.edu/People/abakan/)) and modified, with the only goal of providing a python example to compare performance and stability. The iterative superposition algorithm is a direct translation of his iterpose algorithm.
