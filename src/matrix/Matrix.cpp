@@ -15,6 +15,12 @@ using namespace std;
 #define INPUT_TYPE_LIST 1
 #define INPUT_TYPE_NUMPY 2
 
+#if PY_VERSION_HEX >= 0x03000000
+#define PyInt_AsLong(x) PyLong_AsLong(x)
+#define PyInt_AS_LONG PyLong_AS_LONG
+#endif
+
+
 
 typedef struct {
     PyObject_HEAD
@@ -46,7 +52,7 @@ static void condensedMatrix_dealloc(CondensedMatrix* self){
 	if(self->numpy_array != NULL){
 		Py_DECREF(self->numpy_array);
 	}
-    self->ob_type->tp_free((PyObject*)self);
+    Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 /*
@@ -267,8 +273,12 @@ static PyMappingMethods pdb_as_mapping = {
 };
 
 static PyTypeObject CondensedMatrixType = {
+#if PY_VERSION_HEX >= 0x03000000
+    PyVarObject_HEAD_INIT(NULL, 0)
+#else
     PyObject_HEAD_INIT(NULL)
     0,                         						/*ob_size*/
+#endif
     "condensedMatrix.CondensedMatrixType",      	/*tp_name*/
     sizeof(CondensedMatrix), 	/*tp_basicsize*/
     0,                         /*tp_itemsize*/
@@ -313,18 +323,43 @@ static PyTypeObject CondensedMatrixType = {
 #endif
 
 
+#if PY_MAJOR_VERSION >= 3
+#define MODULE_INIT_ERROR NULL
+PyMODINIT_FUNC PyInit_condensedMatrix(void){
+    static struct PyModuleDef moduledef = {
+        PyModuleDef_HEAD_INIT,
+        "condensedMatrix",           /* m_name */
+        "Fast Access Condensed Matrix",  /* m_doc */
+        -1,                    /* m_size */
+        NULL,                  /* m_methods */
+        NULL,                  /* m_reload */
+        NULL,                  /* m_traverse */
+        NULL,                  /* m_clear */
+        NULL,                  /* m_free */
+    };
+#else
+#define MODULE_INIT_ERROR
 PyMODINIT_FUNC initcondensedMatrix(void){
+#endif
+
     PyObject* module;
 
     if (PyType_Ready(&CondensedMatrixType) < 0)
-        return;
+        return MODULE_INIT_ERROR;
 
+#if PY_MAJOR_VERSION >= 3
+    module = PyModule_Create(&moduledef);
+#else
     module = Py_InitModule3("condensedMatrix", NULL,"Fast Access Condensed Matrix");
+#endif
     if (module == NULL)
-          return;
+          return MODULE_INIT_ERROR;
 
     Py_INCREF(&CondensedMatrixType);
     PyModule_AddObject(module, "CondensedMatrix", (PyObject*) &CondensedMatrixType);
 
     import_array();
+#if PY_MAJOR_VERSION >= 3
+    return module;
+#endif
 }

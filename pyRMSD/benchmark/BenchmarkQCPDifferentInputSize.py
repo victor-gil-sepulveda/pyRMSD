@@ -3,6 +3,7 @@ Created on 22/02/2013
 
 @author: victor
 """
+from __future__ import print_function
 import pyRMSD.RMSDCalculator
 import time
 import numpy
@@ -31,7 +32,7 @@ if __name__ == '__main__':
     coordsets = numpy.load("data/tmp_amber_long.npy")
     number_of_atoms = coordsets.shape[1]
     number_of_conformations = coordsets.shape[0]
-    print "Coordinates read (%d models, %d atoms)"%(number_of_conformations, number_of_atoms)
+    print("Coordinates read (%d models, %d atoms)"%(number_of_conformations, number_of_atoms))
     sys.stdout.flush()
     original_size = coordsets.shape[1]
     for times in range(10):
@@ -41,7 +42,7 @@ if __name__ == '__main__':
         rmsd = calculator.pairwiseRMSDMatrix()
         t2 = time.time()
         del rmsd
-        print "With CUDA and num. atoms %d it took: %fs"%(coordsets.shape[1],t2-t1)
+        print("With CUDA and num. atoms %d it took: %fs"%(coordsets.shape[1],t2-t1))
         sys.stdout.flush()
         coordsets = add_coordsets_copy(coordsets, original_size)
     #------------------
@@ -53,7 +54,7 @@ if __name__ == '__main__':
     number_of_atoms = coordsets.shape[1]
     number_of_conformations = coordsets.shape[0]
     original_size = coordsets.shape[1]
-    print "Coordinates read (%d models, %d atoms)"%(number_of_conformations, number_of_atoms)
+    print("Coordinates read (%d models, %d atoms)"%(number_of_conformations, number_of_atoms))
     sys.stdout.flush()
     for times in range(10):
         calculator = pyRMSD.RMSDCalculator.RMSDCalculator( calculatorType="QCP_OMP_CALCULATOR", fittingCoordsets=coordsets)
@@ -62,6 +63,6 @@ if __name__ == '__main__':
         rmsd = calculator.pairwiseRMSDMatrix()
         t2 = time.time()
         del rmsd
-        print "With OpenMP and num. atoms %d it took: %fs"%(coordsets.shape[1],t2-t1)
+        print("With OpenMP and num. atoms %d it took: %fs"%(coordsets.shape[1],t2-t1))
         sys.stdout.flush()
         coordsets = add_coordsets_copy(coordsets, original_size)

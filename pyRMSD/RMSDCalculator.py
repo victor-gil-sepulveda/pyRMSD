@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy
 import pyRMSD.calculators
 from pyRMSD.availableCalculators import availableCalculators
@@ -46,7 +47,7 @@ class RMSDCalculator(object):
         @date: 26/11/2012
         """
         if not calculatorType in availableCalculators():
-            print "Calculator ", calculatorType, " is not an available calculator."
+            print("Calculator ", calculatorType, " is not an available calculator.")
             raise ValueError
         else:
             self.fitting_coordinates = fittingCoordsets
@@ -58,7 +59,7 @@ class RMSDCalculator(object):
             if self.calculation_coordinates is not None:
                 self.calculation_coordinates = calculationCoordsets
                 if self.number_of_conformations != self.calculation_coordinates.shape[0]:
-                    print "Calculation coordinates must hold the same number of conformations than fitting coordinates."
+                    print("Calculation coordinates must hold the same number of conformations than fitting coordinates.")
                     raise ValueError
                 self.number_of_calculation_atoms = self.calculation_coordinates.shape[1]
             else:

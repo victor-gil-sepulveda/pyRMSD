@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy
 import pyRMSD.pdbReader
 
@@ -80,12 +81,12 @@ class Reader(object):
             if not self.__checkAndUpdateNumberOfAtoms(atoms_in_this_trajectory,path):
                 return None
             
-            if verbose: print "PDB parsed (",path,")"
+            if verbose: print("PDB parsed (",path,")")
             
             coordinates = numpy.append(coordinates, coordsets, axis=0)
             del coordsets
             del reader
-        print coordinates.shape, (self.numberOfFrames, self.numberOfAtoms, 3)
+        print(coordinates.shape, (self.numberOfFrames, self.numberOfAtoms, 3))
         coordinates.shape = (self.numberOfFrames, self.numberOfAtoms, 3)
         return coordinates
         
@@ -102,7 +103,7 @@ class Reader(object):
         """
         if( self.numberOfAtoms != None):
             if self.numberOfAtoms != atoms_in_this_trajectory:
-                print "[Error :: Reader.read] The number of atoms of ", path, " is different from the number of atoms of the first trajectory."
+                print("[Error :: Reader.read] The number of atoms of ", path, " is different from the number of atoms of the first trajectory.")
                 return False
             else:
                 return True

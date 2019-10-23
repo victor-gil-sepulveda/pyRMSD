@@ -4,6 +4,7 @@ Created on 22/02/2013
 @author: victor
 """
 
+from __future__ import print_function
 import pyRMSD.RMSDCalculator
 import numpy
 import math
@@ -38,10 +39,10 @@ if __name__ == '__main__':
     rms = {}
     calculator_names = rmsds.keys()
     for calculator_name_i in calculator_names:
-        print "* ",calculator_name_i
+        print("* ",calculator_name_i)
         rms[calculator_name_i] = {}
         for calculator_name_j in calculator_names:
-            print "\t ",calculator_name_j
+            print("\t ",calculator_name_j)
             rmsd_diff = rmsds[calculator_name_i] - rmsds[calculator_name_j]
             rms[calculator_name_i][calculator_name_j] = math.sqrt(numpy.sum(rmsd_diff**2))
     #---------------#

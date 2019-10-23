@@ -100,8 +100,12 @@ static PyMethodDef pdbreader_methods[] = {
 };
 
 static PyTypeObject pdbreaderType = {
+#if PY_VERSION_HEX >= 0x03000000
+    PyVarObject_HEAD_INIT(NULL, 0)
+#else
     PyObject_HEAD_INIT(NULL)
     0,                         						/*ob_size*/
+#endif
     "PDBReader.Reader",      	/*tp_name*/
     sizeof(pdbreader), 	/*tp_basicsize*/
     0,                         /*tp_itemsize*/
@@ -146,18 +150,43 @@ static PyTypeObject pdbreaderType = {
 #endif
 
 
+#if PY_MAJOR_VERSION >= 3
+#define MODULE_INIT_ERROR NULL
+PyMODINIT_FUNC PyInit_pdbReader(void){
+    static struct PyModuleDef moduledef = {
+        PyModuleDef_HEAD_INIT,
+        "pdbReader",           /* m_name */
+        "Simple pdb reading",  /* m_doc */
+        -1,                    /* m_size */
+        NULL,                  /* m_methods */
+        NULL,                  /* m_reload */
+        NULL,                  /* m_traverse */
+        NULL,                  /* m_clear */
+        NULL,                  /* m_free */
+    };
+#else
+#define MODULE_INIT_ERROR
 PyMODINIT_FUNC initpdbReader(void){
+#endif
+
     PyObject* module;
 
     if (PyType_Ready(&pdbreaderType) < 0)
-        return;
+        return MODULE_INIT_ERROR;
 
+#if PY_MAJOR_VERSION >= 3
+    module = PyModule_Create(&moduledef);
+#else
     module = Py_InitModule3("pdbReader", NULL,"Simple pdb reading");
+#endif
     if (module == NULL)
-          return;
+          return MODULE_INIT_ERROR;
 
     Py_INCREF(&pdbreaderType);
     PyModule_AddObject(module, "PDBReader", (PyObject*) &pdbreaderType);
 
     import_array();
+#if PY_MAJOR_VERSION >= 3
+    return module;
+#endif
 }

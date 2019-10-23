@@ -72,7 +72,7 @@ class CondensedMatrix(object):
                 else:
                     real_pos = self.__condensedsubscript(index[1],index[0]-1)
                 return self.contents[real_pos]
-        except Exception,msg:
+        except Exception as msg:
             print ("[Error in CondensedDistanceMatrix::__getitem__]",msg)
             exit(0)
 
@@ -86,7 +86,7 @@ class CondensedMatrix(object):
                 else:
                     real_pos = self.__condensedsubscript(index[1],index[0]-1)
             self.contents[real_pos] = item
-        except Exception,msg:
+        except Exception as msg:
             print ("[Error in CondensedDistanceMatrix::__setitem__]",msg)
             exit(0)
 

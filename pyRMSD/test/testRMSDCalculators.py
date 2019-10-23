@@ -3,6 +3,7 @@ Created on 16/11/2012
 
 @author: victor
 """
+from __future__ import print_function
 import unittest
 import pyRMSD.RMSDCalculator
 import numpy
@@ -28,7 +29,7 @@ class TestRMSDCalculators(unittest.TestCase):
                                        0.93694602,0.76944618,0.82288799,0.91196003,0.75938856,0.68278426,
                                        0.76302383]
     def setUp(self):
-#         print "In method", self._testMethodName
+#         print("In method", self._testMethodName)
         # Each test gets a fresh coordinates set, as they will modify the coordinates
         # QCP is specially sensitive to variations in input coordinates and results can vary
         self.coordsets_mini =  numpy.load("data/coordsets_mini.npy")
@@ -280,7 +281,7 @@ class TestRMSDCalculators(unittest.TestCase):
                                                                              ])
         
         rmsds = calculator.pairwiseRMSDMatrix()
-        print rmsds
+        print(rmsds)
         
         
     # ------------------------------------------------------

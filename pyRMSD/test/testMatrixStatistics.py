@@ -3,16 +3,21 @@ Created on 15/11/2012
 
 @author: victor
 """
+from __future__ import division
 import unittest
 from pyRMSD.condensedMatrix import CondensedMatrix
 import random 
 import numpy
+import sys
+
+if sys.version_info[0] >= 3:
+    xrange = range
 
 class testMatrixStatistics(unittest.TestCase):
     
     def setUp(self):
         random.seed(12345)
-        num_elems = 50*49/2;
+        num_elems = 50*49//2;
         self.contents = random.sample(xrange(num_elems+1),num_elems)
         self.condensedMatrix = CondensedMatrix(self.contents)
         

@@ -101,11 +101,11 @@ def compile_a_file_collection(base_dir, file_collection, compiler, options, incl
             modif_data = os.path.getmtime(file_name)
             # Then open the dic with last mod. dates
             if os.path.exists(modif_file):
-                last_modif_data = pickle.load(open(modif_file,"r"))
+                last_modif_data = pickle.load(open(modif_file,"rb"))
             else:
                 last_modif_data = -1 # If it does not exist, compile
             # Finally, do last = current for the next step
-            pickle.dump(modif_data, open(modif_file,"w"))
+            pickle.dump(modif_data, open(modif_file,"wb"))
             
             filewoext,extension = file_name.split(".") #@UnusedVariable
             product = os.path.join(folder,filewoext)+product_extension

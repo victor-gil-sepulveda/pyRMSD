@@ -5,6 +5,11 @@
 #include "../calculators/factory/RMSDCalculatorFactory.h"
 #include "../calculators/RMSDCalculator.h"
 #include "../calculators/symmGroups.h"
+
+#if PY_VERSION_HEX >= 0x03000000
+#define PyInt_AsLong(x) PyLong_AsLong(x)
+#endif
+
 using namespace std;
 
 struct Params{
@@ -279,8 +284,32 @@ static PyMethodDef pyRMSDMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit_calculators(void){
+    static struct PyModuleDef moduledef = {
+        PyModuleDef_HEAD_INIT,
+        "calculators",         /* m_name */
+        "calculators",         /* m_doc */
+        -1,                    /* m_size */
+        pyRMSDMethods,         /* m_methods */
+        NULL,                  /* m_reload */
+        NULL,                  /* m_traverse */
+        NULL,                  /* m_clear */
+        NULL,                  /* m_free */
+    };
+    PyObject *module;
+#else
 PyMODINIT_FUNC initcalculators(void){
-    (void) Py_InitModule("calculators", pyRMSDMethods);
+#endif
+
+#if PY_MAJOR_VERSION >= 3
+    module = PyModule_Create(&moduledef);
+#else
+        (void) Py_InitModule("calculators", pyRMSDMethods);
+#endif
 
     import_array();
+#if PY_MAJOR_VERSION >= 3
+    return module;
+#endif
 }

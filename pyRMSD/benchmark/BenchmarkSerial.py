@@ -3,6 +3,7 @@ Created on 14/11/2012
 
 @author: victor
 """
+from __future__ import print_function
 import pyRMSD.RMSDCalculator
 import time
 import numpy
@@ -20,10 +21,10 @@ if __name__ == '__main__':
             ("amber_35k.pdb",3)]
     
     for pdb_file, tries in files:
-        print "Reading file ", "data/"+pdb_file,"...",
+        print("Reading file ", "data/"+pdb_file,"...", end=' ')
         sys.stdout.flush()
         coordsets = numpy.load("data/%s.npy"%pdb_file.split(".")[0])
-        print "OK"
+        print("OK")
         sys.stdout.flush()
         number_of_conformations = coordsets.shape[0]
         number_of_atoms = coordsets.shape[1]
@@ -36,7 +37,7 @@ if __name__ == '__main__':
             t2 = time.time()
             del rmsd
             times.append(t2-t1)
-        print "With Serial and ",pdb_file, " it took: ",numpy.mean(times),"[", numpy.std(times), "]"
+        print("With Serial and ",pdb_file, " it took: ",numpy.mean(times),"[", numpy.std(times), "]")
         sys.stdout.flush()
 
 #28

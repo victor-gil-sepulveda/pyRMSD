@@ -1,3 +1,4 @@
+from __future__ import print_function
 import matplotlib.pyplot
 from matplotlib.ticker import FormatStrFormatter
 import pylab
@@ -39,8 +40,8 @@ for i in range(len(tags)):
 		speedups[(first,second)] = file_times[first] /file_times[second]
 
 for key in speedups:
-	print key
-	print speedups[key]
+	print(key)
+	print(speedups[key])
 
 matplotlib.rc('xtick', labelsize=18) 
 matplotlib.rc('ytick', labelsize=18)

@@ -3,6 +3,7 @@ Created on 29/07/2013
 
 @author: victor
 """
+from __future__ import print_function
 
 
 def symm_groups_validation( symm_groups):
@@ -55,9 +56,9 @@ def symm_permutations(groups):
         yield []
         
 def swap_atoms(coordset_reference, atom_i, atom_j):
-    #print "PRIMA", coordset_reference
+    #print("PRIMA", coordset_reference)
     coordset_reference[[atom_i,atom_j]] =  coordset_reference[[atom_j,atom_i]]
-    #print "DOPO", coordset_reference
+    #print("DOPO", coordset_reference)
     
 def min_rmsd_of_rmsds_list(rmsds_list):
     return (rmsds_list.T).min(1)
